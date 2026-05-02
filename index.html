@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gia Phả Thông Minh - Cập Nhật 2024</title>
+    <style>
+        :root {
+            --bg-color: #0f111a;
+            --container-bg: #1a1c27;
+            --text-color: #e2e8f0;
+            --primary-color: #38bdf8;
+            --border-color: #334155;
+            --tree-line: #475569;
+            --male-bg: #1e3a8a;
+            --male-border: #3b82f6;
+            --female-bg: #701a75;
+            --female-border: #d946ef;
+            --wife2-color: #f59e0b;
+            /* Màu sắc nút bấm */
+            --btn-expand: #10b981; /* Xanh khi có dấu + */
+            --btn-collapse: #ef4444; /* Đỏ khi có dấu - */
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding-bottom: 100px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(to bottom, #1e293b, var(--bg-color));
+        }
+
+        main { display: block; text-align: center; padding: 40px; overflow-x: auto; }
+
+        .tree { display: inline-block; margin: 0 auto; text-align: left; }
+        .tree ul { display: flex; position: relative; padding: 30px 0 0 0; justify-content: center; margin: 0; }
+        .tree li { text-align: center; list-style-type: none; position: relative; padding: 20px 10px 0 10px; }
+        
+        .tree li::before, .tree li::after {
+            content: ''; position: absolute; top: 0; right: 50%;
+            border-top: 2px solid var(--tree-line); width: 50%; height: 20px;
+        }
+        .tree li::after { right: auto; left: 50%; border-left: 2px solid var(--tree-line); }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; }
+        .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 2px solid var(--tree-line); border-radius: 0 5px 0 0; }
+        .tree li:first-child::after { border-radius: 5px 0 0 0; }
+        
+        .tree ul ul::before {
+            content: ''; position: absolute; top: 0; left: 50%;
+            border-left: 2px solid var(--tree-line); width: 0; height: 30px;
+        }
+
+        .family-group {
+            position: relative; display: inline-flex; flex-direction: column;
+            align-items: center; padding: 20px 15px 15px 15px; z-index: 1; margin-top: 5px;
+        }
+
+        .family-group::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
+            height: 200px; border: 2px dashed var(--tree-line);
+            border-radius: 12px; background: rgba(30, 41, 59, 0.4); z-index: -1;
+        }
+
+        .husband-row { position: relative; margin-bottom: 20px; z-index: 2; }
+        .husband-row::after {
+            content: ''; position: absolute; bottom: -20px; left: 50%;
+            border-left: 2px dashed var(--tree-line); height: 20px;
+            transform: translateX(-50%); z-index: -1;
+        }
+
+        .wives-row { display: flex; justify-content: center; padding: 0 !important; margin: 0; position: relative; z-index: 2; }
+        .tree ul.wives-row::before { display: none !important; }
+        .tree ul.wives-row > li { padding-top: 20px !important; }
+
+        /* Hộp thông tin */
+        .person-container { position: relative; display: inline-block; z-index: 5; }
+        .person-box {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 10px; background: var(--container-bg); border: 2px solid var(--border-color);
+            border-radius: 10px; min-width: 130px; position: relative; z-index: 2;
+        }
+        .person { padding: 4px 10px; border-radius: 4px; font-size: 13px; font-weight: 700; white-space: nowrap; margin-bottom: 2px; }
+        .dates { font-size: 11px; opacity: 0.8; font-weight: 400; color: #cbd5e1; }
+        
+        .male { background: var(--male-bg); border: 1px solid var(--male-border); }
+        .female { background: var(--female-bg); border: 1px solid var(--female-border); }
+        
+        .wife-label {
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            background: #000; padding: 2px 8px; border-radius: 4px;
+            font-size: 10px; font-weight: bold; border: 1px solid currentColor; z-index: 10;
+        }
+
+        /* Nút Toggle Màu Sắc */
+        .toggle-btn {
+            position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%);
+            width: 22px; height: 22px; border: 2px solid var(--bg-color);
+            border-radius: 50%; font-size: 16px; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; z-index: 10;
+            color: white !important; transition: 0.2s;
+        }
+        .btn-minus { background: var(--btn-collapse) !important; }
+        .btn-plus { background: var(--btn-expand) !important; }
+
+        footer { position: fixed; bottom: 0; width: 100%; background: var(--container-bg); padding: 15px; text-align: center; border-top: 1px solid var(--border-color); z-index: 100; }
+        button.update-btn { background: var(--primary-color); color: #000; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--container-bg); padding: 25px; border-radius: 15px; width: 90%; max-width: 800px; }
+        textarea { width: 100%; height: 350px; background: #000; color: #00ff00; border: 1px solid var(--border-color); padding: 15px; font-size: 14px; margin: 15px 0; border-radius: 8px; box-sizing: border-box; tab-size: 4; }
+    </style>
+</head>
+<body>
+
+<header><h1>GIA PHẢ PHÂN NHÁNH VỢ CON</h1></header>
+
+<main><div id="treeContainer" class="tree"></div></main>
+
+<footer><button class="update-btn" onclick="openModal()">Cập Nhật Dữ Liệu</button></footer>
+
+<div class="modal-overlay" id="modal">
+    <div class="modal-content">
+        <h2>Nhập dữ liệu</h2>
+        <textarea id="dataInput"></textarea>
+        <div style="text-align: right;">
+            <button class="update-btn" onclick="closeModal()" style="background:#475569; margin-right:10px; color:#fff">Hủy</button>
+            <button class="update-btn" onclick="saveData()">Cập Nhật</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById('dataInput');
+    const container = document.getElementById('treeContainer');
+    const modal = document.getElementById('modal');
+
+    const defaultData = `Nguyễn Văn (Nam)
++ Nguyễn Thị (Nữ)
+    Nguyễn Lữ (Nữ)
+    Nguyễn Hai (Nam)
++ Nguyễn Lẽ (Nữ)
+    Nguyễn Ba (Nam)
+    + Lê Thị
+    + Trương Thị
+        Nguyễn Kim
+        Nguyễn Cường
+        + Nguyễn Hà
+            Nguyễn Trọng
+    + Kiều Thị
+        Nguyễn Nhạc
+        Nguyễn Dữ
+    Nguyễn Tư (Nữ)
+        Phạm Văn (Nam)
+        Phạm Hùng (Nam)
+Nguyễn Tuấn (Nam)
++ Trần Thị (Nữ)
++ Lê Thị (Nữ)
+    Nguyễn Huệ (Nam)`;
+
+    input.value = defaultData;
+
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            var start = this.selectionStart;
+            this.value = this.value.substring(0, start) + "\t" + this.value.substring(this.selectionEnd);
+            this.selectionStart = this.selectionEnd = start + 1;
+        }
+    });
+
+    function parseLine(line) {
+        let text = line.trim();
+        let isWife = text.startsWith('+');
+        if (isWife) text = text.substring(1).trim();
+        
+        // Trích xuất năm (VD: 1900 - 2000)
+        let dateMatch = text.match(/\((\d{4}\s*-\s*\d{4})\)/) || text.match(/\((\d{4}\s*-\s*)\)/);
+        let dates = dateMatch ? dateMatch[1] : "";
+        
+        let gender = text.toLowerCase().includes('(nữ)') ? 'female' : 'male';
+        let name = text.replace(/\(\d{4}\s*-\s*\d*\)/g, "").replace(/\(nam\)|\(nữ\)/gi, "").trim();
+        
+        return { name, dates, gender, isWife };
+    }
+
+    function buildTree(lines) {
+        let roots = [], stack = [];
+        lines.forEach(line => {
+            if (!line.trim()) return;
+            let indent = 0;
+            let match = line.match(/^\s*/)[0];
+            for(let c of match) indent += (c === '\t' ? 4 : 1);
+            
+            let node = { ...parseLine(line), children: [] };
+            while (stack.length > 0 && stack[stack.length - 1].indent >= indent) {
+                if (node.isWife && stack[stack.length - 1].indent === indent && !stack[stack.length - 1].node.isWife) break;
+                stack.pop();
+            }
+            if (stack.length > 0) {
+                stack[stack.length - 1].node.children.push(node);
+            } else {
+                roots.push(node);
+            }
+            stack.push({ node, indent });
+        });
+        return roots;
+    }
+
+    function toggleChildren(btn) {
+        const childContainer = btn.parentElement.nextElementSibling;
+        if (childContainer && childContainer.classList.contains('children-container')) {
+            const isHidden = childContainer.style.display === 'none';
+            childContainer.style.display = isHidden ? 'block' : 'none';
+            btn.innerText = isHidden ? '-' : '+';
+            btn.className = isHidden ? 'toggle-btn btn-minus' : 'toggle-btn btn-plus';
+        }
+    }
+
+    function createPersonBox(node, isWife = false, label = "") {
+        let html = `<div class="person-container">`;
+        let borderStyle = isWife && label !== "Vợ 1" ? "border-style: dashed; border-color: var(--wife2-color);" : "";
+        let labelHtml = isWife ? `<span class="wife-label" style="color: ${label === "Vợ 1" ? 'var(--female-border)' : 'var(--wife2-color)'}">${label}</span>` : "";
+        
+        html += `<div class="person-box" style="${borderStyle}">
+                    ${labelHtml}
+                    <div class="person ${node.gender}">${node.name}</div>
+                    ${node.dates ? `<div class="dates">${node.dates}</div>` : ""}
+                 </div>`;
+        
+        if (node.children.length > 0) {
+            html += `<button class="toggle-btn btn-minus" onclick="toggleChildren(this)">-</button>`;
+        }
+        html += `</div>`;
+        return html;
+    }
+
+    function renderHTML(nodes, isRoot = false) {
+        if (!nodes || !nodes.length) return "";
+        let html = `<ul ${isRoot ? "style='padding-top:0;'" : ""}>`;
+        nodes.forEach(node => {
+            if (node.isWife) return;
+            let wives = node.children.filter(c => c.isWife);
+            let directChildren = node.children.filter(c => !c.isWife);
+            
+            html += `<li>`;
+            if (wives.length > 0) {
+                html += `<div class="family-group"><div class="husband-row">`;
+                html += createPersonBox(node);
+                if (directChildren.length > 0) {
+                    html += `<div class="children-container" style="position:absolute; top:100%; left:50%; transform:translateX(-50%); z-index:10;">${renderHTML(directChildren)}</div>`;
+                }
+                html += `</div><ul class="wives-row">`;
+                wives.forEach((wife, idx) => {
+                    html += `<li>${createPersonBox(wife, true, "Vợ " + (idx+1))}`;
+                    if (wife.children.length > 0) {
+                        html += `<div class="children-container">${renderHTML(wife.children)}</div>`;
+                    }
+                    html += `</li>`;
+                });
+                html += `</ul></div>`;
+            } else {
+                html += createPersonBox(node);
+                if (directChildren.length > 0) {
+                    html += `<div class="children-container">${renderHTML(directChildren)}</div>`;
+                }
+            }
+            html += `</li>`;
+        });
+        return html + "</ul>";
+    }
+
+    function openModal() { modal.style.display = 'flex'; }
+    function closeModal() { modal.style.display = 'none'; }
+    function saveData() {
+        container.innerHTML = renderHTML(buildTree(input.value.split('\n')), true);
+        closeModal();
+    }
+    saveData();
+</script>
+</body>
+</html>
