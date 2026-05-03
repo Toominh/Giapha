@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gia Phả Thông Minh - Cập Nhật Danh Sách</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --container-bg: #1e293b;
+            --text-color: #f8fafc;
+            --primary-color: #0ea5e9;
+            --border-color: #334155;
+            --tree-line: #64748b;
+            --male-bg: #1e3a8a;
+            --male-border: #3b82f6;
+            --female-bg: #701a75;
+            --female-border: #d946ef;
+            --wife1-border: #f97316;
+            --wife-other-border: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding-bottom: 100px;
+            font-size: 16px;
+            cursor: grab;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        body:active { cursor: grabbing; }
+
+        header {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(to bottom, #1e293b, var(--bg-color));
+            user-select: none;
+        }
+        
+        h1 { font-size: 32px; margin: 0; color: var(--primary-color); text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+
+        main { 
+            display: block; 
+            text-align: center; 
+            padding: 60px; 
+            height: calc(100vh - 180px);
+            overflow: auto;
+            scrollbar-width: none;
+        }
+        main::-webkit-scrollbar { display: none; }
+
+        .tree { display: inline-block; margin: 0 auto; text-align: left; user-select: none; }
+        .tree ul { display: flex; position: relative; padding: 35px 0 0 0; justify-content: center; margin: 0; }
+        .tree li { text-align: center; list-style-type: none; position: relative; padding: 25px 10px 0 10px; }
+        
+        .tree li::before, .tree li::after {
+            content: ''; position: absolute; top: 0; right: 50%;
+            border-top: 2px solid var(--tree-line); width: 50%; height: 25px;
+        }
+        .tree li::after { right: auto; left: 50%; border-left: 2px solid var(--tree-line); }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; }
+        .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 2px solid var(--tree-line); border-radius: 0 6px 0 0; }
+        .tree li:first-child::after { border-radius: 6px 0 0 0; }
+        
+        .tree ul ul::before {
+            content: ''; position: absolute; top: 0; left: 50%;
+            border-left: 2px solid var(--tree-line); width: 0; height: 35px;
+        }
+
+        .family-group {
+            position: relative; display: inline-flex; flex-direction: column;
+            align-items: center; padding: 25px 15px 15px 15px; z-index: 1; margin-top: 5px;
+        }
+
+        .family-group::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0;
+            height: 220px; border: 2px dashed var(--tree-line);
+            border-radius: 16px; background: rgba(30, 41, 59, 0.5); z-index: -1;
+        }
+
+        .husband-row { position: relative; margin-bottom: 25px; z-index: 2; }
+        .husband-row::after {
+            content: ''; position: absolute; bottom: -25px; left: 50%;
+            border-left: 2px dashed var(--tree-line); height: 25px;
+            transform: translateX(-50%); z-index: -1;
+        }
+
+        .wives-row { display: flex; justify-content: center; padding: 0 !important; margin: 0; position: relative; z-index: 2; }
+        .tree ul.wives-row::before { display: none !important; }
+        .tree ul.wives-row > li { padding-top: 25px !important; }
+
+        .person-container { position: relative; display: inline-block; z-index: 5; }
+        .person-box {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 12px 15px; background: var(--container-bg); border: 2px solid var(--border-color);
+            border-radius: 12px; min-width: 150px; position: relative; z-index: 2;
+            box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.4);
+        }
+        
+        .person { padding: 6px 14px; border-radius: 6px; font-size: 16px; font-weight: 700; white-space: nowrap; margin-bottom: 4px; }
+        .dates { font-size: 13px; opacity: 0.9; font-weight: 400; color: #cbd5e1; }
+        
+        .male { background: var(--male-bg); border: 1px solid var(--male-border); }
+        .female { background: var(--female-bg); border: 1px solid var(--female-border); }
+        
+        .wife-label {
+            position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+            background: var(--bg-color); padding: 4px 10px; border-radius: 6px;
+            font-size: 12px; font-weight: bold; border: 1px solid currentColor; z-index: 10;
+        }
+
+        .gen-badge {
+            position: absolute; top: -10px; right: -10px; background: #ef4444; color: #ffffff;
+            font-size: 12px; font-weight: bold; width: 24px; height: 24px; display: flex;
+            align-items: center; justify-content: center; border-radius: 50%;
+            border: 2px solid var(--container-bg); box-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 15;
+        }
+
+        .toggle-btn {
+            position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%);
+            width: 26px; height: 26px; background: #ffffff !important;
+            color: #000 !important; border: 2px solid #94a3b8;
+            border-radius: 50%; font-size: 18px; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        footer { display: flex; justify-content: center; gap: 15px; position: fixed; bottom: 0; width: 100%; background: var(--container-bg); padding: 15px; border-top: 1px solid var(--border-color); z-index: 100; cursor: default; }
+        button.update-btn { background: var(--primary-color); color: #fff; border: none; padding: 12px 28px; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        button.update-btn:hover { filter: brightness(1.1); }
+        button.list-btn { background: #10b981; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); cursor: default; }
+        .modal-content { background: var(--container-bg); padding: 30px; border-radius: 15px; width: 90%; max-width: 800px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        textarea { width: 100%; height: 350px; background: #0f172a; color: #10b981; border: 1px solid var(--border-color); padding: 15px; font-size: 16px; margin: 15px 0; border-radius: 8px; box-sizing: border-box; }
+        
+        /* Custom scrollbar cho popup */
+        .custom-scroll::-webkit-scrollbar { width: 8px; }
+        .custom-scroll::-webkit-scrollbar-track { background: var(--bg-color); border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<header><h1>GIA PHẢ PHÂN NHÁNH VỢ CON</h1></header>
+
+<main id="scrollContainer"><div id="treeContainer" class="tree"></div></main>
+
+<footer>
+    <button class="update-btn list-btn" onclick="openListModal()">Xem danh sách</button>
+    <button class="update-btn" onclick="openModal()">Cập Nhật Dữ Liệu</button>
+</footer>
+
+<!-- Modal Cập nhật dữ liệu -->
+<div class="modal-overlay" id="modal">
+    <div class="modal-content">
+        <h2>Nhập dữ liệu</h2>
+        <textarea id="dataInput"></textarea>
+        <div style="text-align: right;">
+            <button class="update-btn" onclick="closeModal()" style="background:#475569; margin-right:10px;">Hủy</button>
+            <button class="update-btn" onclick="saveData()">Cập Nhật</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xem danh sách -->
+<div class="modal-overlay" id="listModal">
+    <div class="modal-content" style="max-width: 600px;">
+        
+        <!-- Bước 1: Chọn đời -->
+        <div id="step1">
+            <h2 style="margin-top: 0;">Chọn đời để xem</h2>
+            <div id="genCheckboxes" class="custom-scroll" style="text-align: left; margin: 20px 0; max-height: 300px; overflow-y: auto; padding-right: 10px;">
+                <!-- Sinh checkbox tự động -->
+            </div>
+            <div style="text-align: right;">
+                <button class="update-btn" onclick="closeListModal()" style="background:#475569; margin-right:10px;">Đóng</button>
+                <button class="update-btn" onclick="showSelectedGens()">Xem</button>
+            </div>
+        </div>
+
+        <!-- Bước 2: Hiển thị danh sách -->
+        <div id="step2" style="display: none;">
+            <h2 style="margin-top: 0; color: #10b981;">Danh sách thành viên
+                <span id="totalCount" style="font-size: 16px; background: #10b981; color: #fff; padding: 2px 12px; border-radius: 20px;">0 người</span>
+            </h2>
+            <div id="genListView" class="custom-scroll" style="text-align: left; margin: 20px 0; max-height: 400px; overflow-y: auto; color: var(--text-color); padding-right: 10px;">
+                <!-- Sinh danh sách tự động -->
+            </div>
+            <div style="text-align: right;">
+                <button class="update-btn" onclick="backToListModal()" style="background:#475569; margin-right:10px;">Quay lại</button>
+                <button class="update-btn" onclick="closeListModal()">Đóng</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById('dataInput');
+    const container = document.getElementById('treeContainer');
+    const modal = document.getElementById('modal');
+    const scrollContainer = document.getElementById('scrollContainer');
+
+    // Mảng lưu trữ màu ngẫu nhiên cho từng cặp vợ chồng
+    const coupleColors = ['#f87171', '#fb923c', '#fbbf24', '#a3e635', '#34d399', '#2dd4bf', '#38bdf8', '#818cf8', '#a78bfa', '#e879f9', '#f43f5e', '#bef264', '#5eead4'];
+    let coupleColorMap = {};
+    let colorIndex = 0;
+
+    function getCoupleColor(key) {
+        if (!coupleColorMap[key]) {
+            coupleColorMap[key] = coupleColors[colorIndex % coupleColors.length];
+            colorIndex++;
+        }
+        return coupleColorMap[key];
+    }
+
+    // --- Tính năng kéo thả bàn tay ---
+    let isDown = false;
+    let startX; let startY; let scrollLeft; let scrollTop;
+    scrollContainer.addEventListener('mousedown', (e) => {
+        isDown = true; scrollContainer.classList.add('active');
+        startX = e.pageX - scrollContainer.offsetLeft;
+        startY = e.pageY - scrollContainer.offsetTop;
+        scrollLeft = scrollContainer.scrollLeft;
+        scrollTop = scrollContainer.scrollTop;
+    });
+    scrollContainer.addEventListener('mouseleave', () => { isDown = false; });
+    scrollContainer.addEventListener('mouseup', () => { isDown = false; });
+    scrollContainer.addEventListener('mousemove', (e) => {
+        if (!isDown) return; e.preventDefault();
+        const x = e.pageX - scrollContainer.offsetLeft;
+        const y = e.pageY - scrollContainer.offsetTop;
+        scrollContainer.scrollLeft = scrollLeft - (x - startX) * 2;
+        scrollContainer.scrollTop = scrollTop - (y - startY) * 2;
+    });
+
+    // --- Logic Gia Phả ---
+    const defaultData = `Nguyễn Văn (Nam)
++ Nguyễn Thị (Nữ)
+    Nguyễn Lữ (Nữ)
+    Nguyễn Hai (Nam)
++ Nguyễn Lẽ (Nữ)
+    Nguyễn Ba (Nam)
+    + Lê Thị
+    + Trương Thị
+        Nguyễn Kim
+        Nguyễn Cường
+        + Nguyễn Hà
+            Nguyễn Trọng
+    + Kiều Thị
+        Nguyễn Nhạc
+        Nguyễn Dữ
+    Nguyễn Tư (Nữ)
+        Phạm Văn (Nam)
+        Phạm Hùng (Nam)
+Nguyễn Tuấn (Nam)
++ Trần Thị (Nữ)
++ Lê Thị (Nữ)
+    Nguyễn Huệ (Nam)`;
+
+    input.value = defaultData;
+
+    function parseLine(line) {
+        let text = line.trim();
+        let isWife = text.startsWith('+');
+        if (isWife) text = text.substring(1).trim();
+        let dateMatch = text.match(/\((\d{4}\s*-\s*\d{4})\)/) || text.match(/\((\d{4}\s*-\s*)\)/);
+        let dates = dateMatch ? dateMatch[1] : "";
+        let gender = text.toLowerCase().includes('(nữ)') ? 'female' : 'male';
+        let name = text.replace(/\(\d{4}\s*-\s*\d*\)/g, "").replace(/\(nam\)|\(nữ\)/gi, "").trim();
+        return { name, dates, gender, isWife };
+    }
+
+    function buildTree(lines) {
+        let roots = [], stack = [];
+        window.treeData = roots; // Lưu trữ biến toàn cục để dùng cho chức năng Xem danh sách
+
+        lines.forEach(line => {
+            if (!line.trim()) return;
+            let indent = 0;
+            let match = line.match(/^\s*/)[0];
+            for(let c of match) indent += (c === '\t' ? 4 : 1);
+            let node = { ...parseLine(line), children: [] };
+            
+            while (stack.length > 0 && stack[stack.length - 1].indent >= indent) {
+                if (node.isWife && stack[stack.length - 1].indent === indent && !stack[stack.length - 1].node.isWife) break;
+                stack.pop();
+            }
+            
+            if (stack.length > 0) {
+                let parentNode = stack[stack.length - 1].node;
+                node.gen = node.isWife ? parentNode.gen : parentNode.gen + 1;
+                
+                // Xác định thông tin cha mẹ cùng huyết thống để hiển thị phụ
+                if (!node.isWife) {
+                    if (parentNode.isWife) {
+                        let husbandNode = stack[stack.length - 2].node;
+                        node.bloodParentName = husbandNode.name;
+                        node.coupleKey = husbandNode.name + "_" + parentNode.name; // ID riêng cho từng cặp bố mẹ
+                    } else {
+                        node.bloodParentName = parentNode.name;
+                        node.coupleKey = parentNode.name + "_none"; // Cùng mẹ/cha mà chưa ghi vợ/chồng
+                    }
+                }
+                parentNode.children.push(node);
+            } else {
+                node.gen = 1;
+                node.bloodParentName = null;
+                node.coupleKey = "root_" + node.name;
+                roots.push(node);
+            }
+            stack.push({ node, indent });
+        });
+        return roots;
+    }
+
+    function toggleChildren(btn) {
+        const childContainer = btn.parentElement.nextElementSibling;
+        if (childContainer && childContainer.classList.contains('children-container')) {
+            const isHidden = childContainer.style.display === 'none';
+            childContainer.style.display = isHidden ? 'block' : 'none';
+            btn.innerText = isHidden ? '-' : '+';
+        }
+    }
+
+    function createPersonBox(node, isWife = false, label = "", hasChildren = false) {
+        let html = `<div class="person-container">`;
+        let borderStyle = ""; let labelHtml = "";
+        if (isWife) {
+            let color = label === "Bạn đời 1" ? "var(--wife1-border)" : "var(--wife-other-border)";
+            borderStyle = `border: 2px dashed ${color}; ${label !== "Bạn đời 1" ? "opacity: 0.85;" : ""}`;
+            labelHtml = `<span class="wife-label" style="color: ${color};">${label}</span>`;
+        }
+        
+        html += `<div class="person-box" style="${borderStyle}">
+                    <div class="gen-badge" title="Đời thứ ${node.gen}">${node.gen}</div>
+                    ${labelHtml}
+                    <div class="person ${node.gender}">${node.name}</div>
+                    ${node.dates ? `<div class="dates">${node.dates}</div>` : ""}
+                 </div>`;
+        if (hasChildren) html += `<button class="toggle-btn" onclick="toggleChildren(this)">-</button>`;
+        html += `</div>`;
+        return html;
+    }
+
+    function renderHTML(nodes, isRoot = false) {
+        if (!nodes || !nodes.length) return "";
+        let html = `<ul ${isRoot ? "style='padding-top:0;'" : ""}>`;
+        nodes.forEach(node => {
+            if (node.isWife) return;
+            let wives = node.children.filter(c => c.isWife);
+            let directChildren = node.children.filter(c => !c.isWife);
+            html += `<li>`;
+            if (wives.length > 0) {
+                html += `<div class="family-group"><div class="husband-row">`;
+                html += createPersonBox(node, false, "", directChildren.length > 0);
+                if (directChildren.length > 0) {
+                    html += `<div class="children-container" style="position:absolute; top:100%; left:50%; transform:translateX(-50%); z-index:10;">${renderHTML(directChildren)}</div>`;
+                }
+                html += `</div><ul class="wives-row">`;
+                wives.forEach((wife, idx) => {
+                    html += `<li>${createPersonBox(wife, true, "Bạn đời " + (idx+1), wife.children.length > 0)}`;
+                    if (wife.children.length > 0) html += `<div class="children-container">${renderHTML(wife.children)}</div>`;
+                    html += `</li>`;
+                });
+                html += `</ul></div>`;
+            } else {
+                html += createPersonBox(node, false, "", directChildren.length > 0);
+                if (directChildren.length > 0) html += `<div class="children-container">${renderHTML(directChildren)}</div>`;
+            }
+            html += `</li>`;
+        });
+        return html + "</ul>";
+    }
+
+    function openModal() { modal.style.display = 'flex'; }
+    function closeModal() { modal.style.display = 'none'; }
+    function saveData() {
+        container.innerHTML = renderHTML(buildTree(input.value.split('\n')), true);
+        closeModal();
+    }
+    saveData();
+
+    // --- LOGIC XEM DANH SÁCH ---
+    
+    // Đệ quy lấy tất cả người cùng huyết thống (loại bỏ Vợ - có dấu +)
+    function getBloodRelatives() {
+        let list = [];
+        function traverse(nodes) {
+            for (let node of nodes) {
+                if (!node.isWife) {
+                    list.push(node);
+                }
+                traverse(node.children);
+            }
+        }
+        traverse(window.treeData);
+        return list;
+    }
+
+    function openListModal() {
+        let list = getBloodRelatives();
+        let maxGen = Math.max(...list.map(n => n.gen));
+        
+        // Render checkbox
+        let html = '';
+        for(let i=1; i<=maxGen; i++) {
+            html += `<label style="display:block; margin: 12px 0; cursor:pointer; font-size: 18px;">
+                        <input type="checkbox" class="gen-cb" value="${i}" style="transform: scale(1.3); margin-right: 10px;"> Đời ${i}
+                     </label>`;
+        }
+        document.getElementById('genCheckboxes').innerHTML = html;
+        
+        document.getElementById('step1').style.display = 'block';
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('listModal').style.display = 'flex';
+    }
+
+    function closeListModal() {
+        document.getElementById('listModal').style.display = 'none';
+    }
+
+    function backToListModal() {
+        document.getElementById('step1').style.display = 'block';
+        document.getElementById('step2').style.display = 'none';
+    }
+
+   function showSelectedGens() {
+    let cbs = document.querySelectorAll('.gen-cb:checked');
+    let selectedGens = Array.from(cbs).map(cb => parseInt(cb.value));
+    
+    if(selectedGens.length === 0) {
+        alert("Vui lòng chọn ít nhất 1 đời để xem!");
+        return;
+    }
+    
+    let list = getBloodRelatives();
+    let grouped = {};
+    let total = 0; // Biến đếm tổng số người
+    
+    selectedGens.forEach(g => grouped[g] = []);
+    
+    list.forEach(node => {
+        if (selectedGens.includes(node.gen)) {
+            grouped[node.gen].push(node);
+            total++; // Tăng tổng số mỗi khi tìm thấy người thuộc đời đã chọn
+        }
+    });
+    
+    // Cập nhật con số tổng lên tiêu đề
+    document.getElementById('totalCount').innerText = total + " người";
+    
+    let html = '';
+    selectedGens.sort((a,b)=>a-b).forEach(g => {
+        // Thêm số lượng của riêng đời đó bên cạnh tiêu đề Đời
+        html += `<h3 style="color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-top: 25px; display: flex; justify-content: space-between;">
+                    Đời ${g} 
+                    <span style="font-size: 14px; opacity: 0.7;">(${grouped[g].length} thành viên)</span>
+                 </h3>`;
+        html += `<ul style="list-style: none; padding-left: 5px;">`;
+        
+        if (grouped[g].length === 0) {
+            html += `<li>(Không có dữ liệu)</li>`;
+        } else {
+            grouped[g].forEach((node, idx) => {
+                let nameColor = node.gender === 'male' ? 'var(--male-border)' : 'var(--female-border)';
+                let extraInfo = '';
+                if (node.bloodParentName) {
+                    let cColor = getCoupleColor(node.coupleKey);
+                    extraInfo = ` <span style="color: ${cColor}; font-size: 14px; font-style: italic; margin-left: 10px;">(con của: ${node.bloodParentName})</span>`;
+                }
+                
+                html += `<li style="margin-bottom: 12px; font-size: 17px; background: rgba(30,41,59, 0.5); padding: 8px 10px; border-radius: 6px;">
+                            <strong style="display:inline-block; width: 30px; color:#cbd5e1;">${idx + 1}.</strong> 
+                            <span style="color: ${nameColor}; font-weight: bold;">${node.name}</span>
+                            ${extraInfo}
+                         </li>`;
+            });
+        }
+        html += `</ul>`;
+    });
+    
+    document.getElementById('genListView').innerHTML = html;
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+}
+</script>
+</body>
+</html>
