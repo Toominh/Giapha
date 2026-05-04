@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gia Phả Thông Minh - Cây Thư Mục</title>
+    <title>Gia Phả Thông Minh - Quản Lý Nhiều Gia Phả</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -25,31 +25,128 @@
             box-sizing: border-box;
         }
 
+        /* ---------------- HEADER ---------------- */
         header {
             text-align: center;
             padding: 15px 30px;
             background: linear-gradient(to bottom, #1e293b, var(--bg-color));
             user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
         }
         
         h1 { font-size: 26px; margin: 0; color: var(--primary-color); text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
-        main { 
+        /* HEADER MỚI CỦA MÀN HÌNH CÂY GIA PHẢ */
+        #treeHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            background: var(--container-bg);
+            border-bottom: 1px solid var(--border-color);
+            gap: 15px;
+        }
+
+        /* DROPDOWN MENU ☰ */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        /* Tạo cầu nối vô hình để chuột không bị trượt khi di chuyển từ nút xuống menu */
+        .dropdown::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 15px;
+            bottom: -15px;
+            left: 0;
+            background: transparent;
+            z-index: 1001;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: var(--container-bg);
+            min-width: 180px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+            z-index: 1002;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            top: calc(100% + 5px);
+            left: 0;
+        }
+        .dropdown-content a {
+            color: var(--text-color);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 15px;
+            text-align: left;
+        }
+        .dropdown-content a:hover {
+            background-color: #334155;
+            color: var(--primary-color);
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* ---------------- MÀN HÌNH CHÍNH (DANH SÁCH) ---------------- */
+        #homeScreen {
+            height: 100vh;
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+
+        .tree-list-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tree-card {
+            background: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .tree-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 15px rgba(14, 165, 233, 0.2);
+        }
+        .tree-card h3 { margin: 0 0 10px 0; color: #10b981; font-size: 20px; }
+        .tree-card p { margin: 0; color: #94a3b8; font-size: 14px; }
+
+        /* ---------------- MÀN HÌNH CHI TIẾT (CÂY) ---------------- */
+        #treeScreen { display: none; height: 100vh; }
+
+        #treeScreen main { 
             display: block;
             flex-direction: column;
             padding: 20px 40px; 
-            height: calc(100vh - 160px);
+            height: calc(100vh - 75px);
             overflow: auto;
             scrollbar-width: none;
             position: relative;
             cursor: grab; 
         }
-        main:active {
-            cursor: grabbing;
-        }
-        main::-webkit-scrollbar { display: none; }
+        #treeScreen main:active { cursor: grabbing; }
+        #treeScreen main::-webkit-scrollbar { display: none; }
 
-        /* ---------------- FOOTER & TÌM KIẾM ---------------- */
+        /* ---------------- FOOTER CHUNG (Chỉ dùng cho Home Screen) ---------------- */
         footer { 
             display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;
             position: fixed; bottom: 0; width: 100%; background: var(--container-bg); 
@@ -65,12 +162,11 @@
             text-align: center; box-sizing: border-box; outline: none; appearance: auto;
         }
         button.update-btn:hover, select.update-btn:hover, .upload-btn-wrapper:hover { filter: brightness(1.1); transform: translateY(-1px);}
-        button.list-btn { background: #10b981; }
 
         select.update-btn option { background: var(--container-bg); color: var(--text-color); }
 
         .search-wrapper {
-            display: flex; align-items: center; gap: 10px; width: 100%; max-width: 400px;
+            display: flex; align-items: center; gap: 10px; width: 100%;
             background: #0f172a; padding: 5px 15px; border-radius: 25px; border: 2px solid var(--border-color);
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
         }
@@ -91,44 +187,24 @@
 
         /* ------------------------------------------- */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); cursor: default; }
-       /* Điều chỉnh kích thước và vị trí của Popup */
-.modal-content {
-    background: var(--container-bg);
-    padding: 30px;
-    border-radius: 15px;
-    
-    /* Chiều rộng 70% và luôn ở chính giữa */
-    width: 70% !important; 
-    max-width: 70% !important; 
-    margin: auto; 
-    
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    display: flex;
-    flex-direction: column;
-    max-height: 90vh;
-    
-    /* Tăng font chữ cơ bản của popup */
-    font-size: 18px; 
-}
+        .modal-content {
+            background: var(--container-bg); padding: 30px; border-radius: 15px;
+            width: 70% !important; max-width: 70% !important; margin: auto; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; max-height: 90vh; font-size: 18px; 
+        }
 
-/* Tăng kích thước chữ cho danh sách thành viên */
-#genListView li {
-    font-size: 20px !important; /* Chữ tên thành viên to lên */
-    margin-bottom: 15px;
-    padding: 12px 15px !important;
-}
+        #genListView li { font-size: 20px !important; margin-bottom: 15px; padding: 12px 15px !important; }
+        #genListView h3 { font-size: 24px !important; }
 
-/* Tăng kích thước các tiêu đề đời (Đời 1, Đời 2...) */
-#genListView h3 {
-    font-size: 24px !important;
-}
+        .custom-input {
+            width: 100%; padding: 15px; font-size: 18px; background: #0f172a; color: #fff;
+            border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 15px; box-sizing: border-box;
+            outline: none;
+        }
+        .custom-input:focus { border-color: var(--primary-color); }
 
-/* Tăng kích thước chữ cho các checkbox chọn đời */
-#genCheckboxes label {
-    font-size: 20px !important;
-    margin: 15px 0 !important;
-}
-        textarea { width: 100%; height: 350px; background: #0f172a; color: #10b981; border: 1px solid var(--border-color); padding: 15px; font-size: 16px; margin: 15px 0; border-radius: 8px; box-sizing: border-box; }
+        textarea { width: 100%; height: 350px; background: #0f172a; color: #10b981; border: 1px solid var(--border-color); padding: 15px; font-size: 16px; margin: 0 0 15px 0; border-radius: 8px; box-sizing: border-box; outline:none;}
+        textarea:focus { border-color: var(--primary-color); }
         
         .custom-scroll::-webkit-scrollbar { width: 8px; height: 8px;}
         .custom-scroll::-webkit-scrollbar-track { background: var(--bg-color); border-radius: 4px; }
@@ -136,20 +212,10 @@
 
         /* --- CSS CÂY THƯ MỤC TRÊN MÀN HÌNH CHÍNH --- */
         .compact-tree-container {
-            width: max-content; 
-            min-width: 100%;
-            background: transparent; 
-            text-align: left;
-            font-family: 'Consolas', 'Courier New', monospace; 
-            font-size: 18px; 
-            line-height: 1.8;
-            margin: 0; 
-            padding-right: 50vw;
-            padding-bottom: 30vh;
-            box-sizing: border-box;
+            width: max-content; min-width: 100%; background: transparent; text-align: left;
+            font-family: 'Consolas', 'Courier New', monospace; font-size: 18px; line-height: 1.8;
+            margin: 0; padding-right: 50vw; padding-bottom: 30vh; box-sizing: border-box;
         }
-        
-        .compact-tree-controls { position: fixed; top: 15px; right: 30px; z-index: 10; }
         
         .compact-tree-container ul { list-style-type: none; padding-left: 35px; margin: 0; transition: all 0.3s ease; }
         .compact-tree-container > ul { padding-left: 0; }
@@ -174,62 +240,67 @@
 </head>
 <body>
 
-<header>
-    <h1>GIA PHẢ DÒNG HỌ</h1>
-</header>
-
-<div class="compact-tree-controls">
-    <select id="genCollapseSelect" class="update-btn" style="background:#f59e0b; padding: 8px 15px; font-size: 14px;" onchange="collapseToGen(this.value)">
-    </select>
+<!-- ================= MÀN HÌNH CHỦ (DANH SÁCH GIA PHẢ) ================= -->
+<div id="homeScreen">
+    <header>
+        <h1>DANH SÁCH GIA PHẢ</h1>
+    </header>
+    <div id="treeList" class="tree-list-container">
+        <!-- Render danh sách qua JS -->
+    </div>
+    <footer>
+        <button class="update-btn" style="background: #10b981; font-size: 18px; padding: 12px 30px;" onclick="openCreateModal()">+ Tạo Gia Phả Mới</button>
+        <button class="update-btn" style="background:#8b5cf6;" onclick="openManageModal()">Quản lý Dữ Liệu</button>
+    </footer>
 </div>
 
-<main id="scrollContainer" class="custom-scroll">
-    <div id="compactTreeContainerMain" class="compact-tree-container">
-        <div id="compactTreeView"></div>
-    </div>
-</main>
-
-<footer>
-    <div class="search-wrapper">
-        <span style="font-size: 18px; margin-left: 5px;">🔍</span>
-        <input type="text" id="searchInput" placeholder="Tìm kiếm thành viên..." oninput="onSearchInput()" onkeydown="handleSearchKey(event)">
-        <span id="searchCount">0/0</span>
-        <button class="nav-btn" onclick="prevMatch()" title="Kết quả trước (Shift+Enter)">▲</button>
-        <button class="nav-btn" onclick="nextMatch()" title="Kết quả tiếp theo (Enter)">▼</button>
-    </div>
-    
-    <div class="footer-buttons">
-        <button class="update-btn list-btn" onclick="openListModal()">Danh sách</button>
-        <button class="update-btn" style="background:#e11d48;" onclick="openDeathModal()">Ngày Giỗ</button>
-        <button class="update-btn" onclick="openModal()">Cập Nhật</button>
-        <button class="update-btn" style="background:#8b5cf6;" onclick="openManageModal()">Quản lý Backup</button>
-    </div>
-</footer>
-
-<!-- Modal Quản lý -->
-<div class="modal-overlay" id="manageModal">
-    <div class="modal-content" style="max-width: 400px; text-align: center;">
-        <h2 style="margin-top: 0; color: #8b5cf6;">Backup & Khôi Phục</h2>
-        <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 20px;">Dữ liệu luôn tự động lưu trên máy bạn. Bạn có thể xuất file JSON để lưu trữ hoặc chuyển máy.</p>
-        <div style="display: flex; flex-direction: column; gap: 15px; margin: 25px 0;">
-            <button class="update-btn" style="background:#10b981;" onclick="exportJSON()">Xuất Backup (.json)</button>
-            <label class="upload-btn-wrapper" style="background:#3b82f6;">
-                Nhập Backup (.json)
-                <input type="file" accept=".json" style="display: none;" onchange="importJSON(event)">
-            </label>
-            <button class="update-btn" style="background:#f59e0b;" onclick="exportDataHTML()">Xuất Offline (.html)</button>
+<!-- ================= MÀN HÌNH CHI TIẾT CÂY GIA PHẢ ================= -->
+<div id="treeScreen">
+    <header id="treeHeader">
+        <!-- 1. Menu (Sửa, Danh sách, Ngày giỗ, Xóa) -->
+        <div class="dropdown">
+            <button class="update-btn" style="background:#475569; padding: 8px 15px; font-size: 18px;">☰</button>
+            <div class="dropdown-content">
+                <a onclick="openEditModal()">✏️ Sửa Dữ Liệu</a>
+                <a onclick="openListModal()">📋 Danh sách</a>
+                <a onclick="openDeathModal()">🕯️ Ngày Giỗ</a>
+                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 5px 0;">
+                <a onclick="deleteCurrentTree()" style="color: #ef4444;">🗑️ Xóa Gia Phả</a>
+            </div>
         </div>
-        <div style="text-align: right;">
-            <button class="update-btn" onclick="closeManageModal()" style="background:#475569;">Đóng</button>
+
+        <!-- 2. Thanh tìm kiếm -->
+        <div class="search-wrapper" style="flex: 1;">
+            <span style="font-size: 18px; margin-left: 5px;">🔍</span>
+            <input type="text" id="searchInput" placeholder="Tìm kiếm thành viên..." oninput="onSearchInput()" onkeydown="handleSearchKey(event)">
+            <span id="searchCount">0/0</span>
+            <button class="nav-btn" onclick="prevMatch()" title="Kết quả trước (Shift+Enter)">▲</button>
+            <button class="nav-btn" onclick="nextMatch()" title="Kết quả tiếp theo (Enter)">▼</button>
         </div>
-    </div>
+        
+        <!-- 3. Combo box (Thu gọn) -->
+        <select id="genCollapseSelect" class="update-btn" style="background:#f59e0b; padding: 8px 15px; font-size: 14px;" onchange="collapseToGen(this.value)">
+        </select>
+
+        <!-- 4. Close (✖) -->
+        <button class="update-btn" style="background:#ef4444; padding: 8px 15px; font-size: 18px;" onclick="closeTree()" title="Đóng">✖</button>
+    </header>
+
+    <main id="scrollContainer" class="custom-scroll">
+        <div id="compactTreeContainerMain" class="compact-tree-container">
+            <div id="compactTreeView"></div>
+        </div>
+    </main>
 </div>
 
-<!-- Modal Cập nhật dữ liệu -->
+<!-- ================= MODALS ================= -->
+
+<!-- Modal Tạo / Cập nhật dữ liệu -->
 <div class="modal-overlay" id="modal">
     <div class="modal-content">
-        <h2>Nhập dữ liệu Gia Phả</h2>
-        <textarea id="dataInput" class="custom-scroll"></textarea>
+        <h2 id="modalTitle">Nhập dữ liệu Gia Phả</h2>
+        <input type="text" id="treeNameInput" class="custom-input" placeholder="Nhập tên gia phả (VD: Gia phả họ Lê, Gia phả Nguyễn Tộc...)">
+        <textarea id="dataInput" class="custom-scroll" placeholder="Nhập cấu trúc dữ liệu..."></textarea>
         <div style="text-align: right;">
             <button class="update-btn" onclick="closeModal()" style="background:#475569; margin-right:10px;">Hủy</button>
             <button class="update-btn" onclick="saveData()">Lưu Cập Nhật</button>
@@ -237,8 +308,26 @@
     </div>
 </div>
 
-<!-- Modal Xem danh sách (Full chiều cao) -->
-<!-- Modal Xem danh sách - Đã rút gọn chỉ còn bước hiển thị -->
+<!-- Modal Quản lý Backup (Dành cho Màn hình chính) -->
+<div class="modal-overlay" id="manageModal">
+    <div class="modal-content" style="max-width: 450px; text-align: center;">
+        <h2 style="margin-top: 0; color: #8b5cf6;">Quản lý Dữ Liệu</h2>
+        <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 20px;">Backup gồm TẤT CẢ các gia phả. Xuất file <b>.json</b> để lưu trữ, hoặc xuất file <b>.html</b> để tạo một ứng dụng chạy Offline gửi cho người khác.</p>
+        <div style="display: flex; flex-direction: column; gap: 15px; margin: 25px 0;">
+            <button class="update-btn" style="background:#10b981;" onclick="exportJSON()">⬇️ Xuất Data Thuần (.json)</button>
+            <button class="update-btn" style="background:#f59e0b;" onclick="exportHTML()">⬇️ Xuất File App Chạy Offline (.html)</button>
+            <label class="upload-btn-wrapper" style="background:#3b82f6;">
+                ⬆️ Nhập Data Phục Hồi (.json)
+                <input type="file" accept=".json" style="display: none;" onchange="importJSON(event)">
+            </label>
+        </div>
+        <div style="text-align: right;">
+            <button class="update-btn" onclick="closeManageModal()" style="background:#475569;">Đóng</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xem danh sách thành viên -->
 <div class="modal-overlay" id="listModal">
     <div class="modal-content" style="height: 95vh;">
         <div id="step2" style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
@@ -267,7 +356,16 @@
 </div>
 
 <script>
+    /* ================= CẤU HÌNH DỮ LIỆU & BIẾN TOÀN CỤC ================= */
+    const defaultData = `Lê Văn Mạnh (Nam) (1920) [15/08]\n+ Nguyễn Thị B (Nữ) (1922) [02/01]\n    Lê Văn Bùng (Nam) (1950)\n    + Trần Thị C (Nữ) [20/12]\n        Lê Văn Bao (Nam) (1980)`;
+    
+    // Mảng lưu toàn bộ gia phả
+    let treesList = []; 
+    // ID của gia phả đang mở (null = đang ở màn hình Home / đang Tạo mới)
+    let currentTreeId = null; 
+
     const input = document.getElementById('dataInput');
+    const nameInput = document.getElementById('treeNameInput');
     const scrollContainer = document.getElementById('scrollContainer');
     const modal = document.getElementById('modal');
     
@@ -278,25 +376,139 @@
     let coupleColorMap = {};
     let colorIndex = 0;
 
-    function getCoupleColor(key) {
-        if (!coupleColorMap[key]) {
-            coupleColorMap[key] = coupleColors[colorIndex % coupleColors.length];
-            colorIndex++;
-        }
-        return coupleColorMap[key];
-    }
-
-    // Đóng modal khi bấm ra ngoài vùng đen
-    window.addEventListener('mousedown', function(event) {
-        if (event.target.classList.contains('modal-overlay')) {
-            event.target.style.display = 'none';
-        }
+    /* ================= KHỞI TẠO ỨNG DỤNG ================= */
+    window.addEventListener('DOMContentLoaded', () => {
+        loadDataFromStorage();
+        renderHome();
     });
 
+    function loadDataFromStorage() {
+        // Kiểm tra xem có dữ liệu nhúng sẵn từ tính năng Xuất HTML không
+        if (window.offlineBackupData) {
+            treesList = window.offlineBackupData;
+            saveTreesToStorage(); // Đồng bộ ngay lập tức vào trình duyệt hiện tại
+            window.offlineBackupData = null; // Reset lại
+        } else {
+            const savedList = localStorage.getItem('giaPhaList');
+            if (savedList) {
+                treesList = JSON.parse(savedList);
+            } else {
+                // Tự động chuyển đổi dữ liệu cũ (giaPhaData) thành cấu trúc mới nếu có
+                const oldSingleData = localStorage.getItem('giaPhaData');
+                treesList = [{
+                    id: Date.now(),
+                    name: "Gia phả mẫu",
+                    data: oldSingleData ? oldSingleData : defaultData
+                }];
+                saveTreesToStorage();
+            }
+        }
+    }
+
+    function saveTreesToStorage() {
+        localStorage.setItem('giaPhaList', JSON.stringify(treesList));
+    }
+
+    /* ================= ĐIỀU HƯỚNG MÀN HÌNH ================= */
+    function renderHome() {
+        const listContainer = document.getElementById('treeList');
+        listContainer.innerHTML = '';
+        
+        treesList.forEach(tree => {
+            listContainer.innerHTML += `
+                <div class="tree-card" onclick="openTree(${tree.id})">
+                    <h3>📁 ${tree.name}</h3>
+                    <p>Bấm vào để xem chi tiết gia phả</p>
+                </div>
+            `;
+        });
+    }
+
+    function openTree(id) {
+        currentTreeId = id;
+        const tree = treesList.find(t => t.id === id);
+        
+        // Setup dữ liệu cho màn hình cây
+        input.value = tree.data; 
+        
+        // Vẽ cây
+        renderView(); 
+        
+        // Chuyển UI
+        document.getElementById('homeScreen').style.display = 'none';
+        document.getElementById('treeScreen').style.display = 'block';
+    }
+
+    function closeTree() {
+        currentTreeId = null;
+        document.getElementById('homeScreen').style.display = 'block';
+        document.getElementById('treeScreen').style.display = 'none';
+        renderHome(); // Cập nhật lại danh sách lỡ có sửa tên
+    }
+
+    /* ================= QUẢN LÝ MODAL TẠO / SỬA / XOÁ ================= */
+    function openCreateModal() {
+        currentTreeId = null; // Bật cờ tạo mới
+        document.getElementById('modalTitle').innerText = "Tạo Gia Phả Mới";
+        nameInput.value = "";
+        input.value = defaultData; // Gợi ý mẫu dữ liệu
+        modal.style.display = 'flex';
+    }
+
+    function openEditModal() {
+        if(!currentTreeId) return;
+        const tree = treesList.find(t => t.id === currentTreeId);
+        document.getElementById('modalTitle').innerText = "Chỉnh sửa Gia Phả";
+        nameInput.value = tree.name;
+        input.value = tree.data;
+        modal.style.display = 'flex';
+    }
+
+    function deleteCurrentTree() {
+        if(!currentTreeId) return;
+        if(confirm("⚠️ Bạn có chắc chắn muốn XÓA gia phả này không? Hành động này không thể hoàn tác!")) {
+            treesList = treesList.filter(t => t.id !== currentTreeId);
+            saveTreesToStorage();
+            closeTree();
+        }
+    }
+
+    function closeModal() { modal.style.display = 'none'; }
+
+    function saveData() { 
+        const newName = nameInput.value.trim() || "Gia phả chưa đặt tên";
+        const newData = input.value; 
+
+        if (currentTreeId) {
+            // Chế độ CẬP NHẬT
+            const treeIndex = treesList.findIndex(t => t.id === currentTreeId);
+            if(treeIndex !== -1) {
+                treesList[treeIndex].name = newName;
+                treesList[treeIndex].data = newData;
+            }
+        } else {
+            // Chế độ TẠO MỚI
+            const newTree = {
+                id: Date.now(),
+                name: newName,
+                data: newData
+            };
+            treesList.push(newTree);
+            currentTreeId = newTree.id; // Gắn ID để tự động mở luôn
+        }
+
+        saveTreesToStorage();
+        closeModal(); 
+        
+        // Nếu đang ở cây thì render lại, nếu mới tạo thì tự động mở cây đó ra
+        openTree(currentTreeId);
+    }
+
+    /* ================= XỬ LÝ KÉO THẢ MÀN HÌNH ================= */
     let isDown = false;
     let startX, startY, scrollLeft, scrollTop;
     scrollContainer.addEventListener('mousedown', (e) => {
-        const ignoredTags = ['BUTTON', 'INPUT', 'TEXTAREA', 'LABEL', 'SELECT', 'OPTION'];
+        const ignoredTags = ['BUTTON', 'INPUT', 'TEXTAREA', 'LABEL', 'SELECT', 'OPTION', 'A'];
         if(ignoredTags.includes(e.target.tagName) || e.target.classList.contains('btn-toggle-compact')) return; 
         
         isDown = true;
@@ -318,21 +530,21 @@
         scrollContainer.scrollTop = scrollTop - walkY;
     });
 
-    const defaultData = `Lê Văn Mạnh (Nam) (1920) [15/08]
-+ Nguyễn Thị B (Nữ) (1922) [02/01]
-    Lê Văn Bùng (Nam) (1950)
-    + Trần Thị C (Nữ) [20/12]
-        Lê Văn Bao (Nam) (1980)`;
-
-    window.addEventListener('DOMContentLoaded', () => {
-        const savedData = localStorage.getItem('giaPhaData');
-        if (savedData) {
-            input.value = savedData;
-        } else {
-            input.value = defaultData;
+    // Đóng modal khi bấm ra ngoài vùng đen
+    window.addEventListener('mousedown', function(event) {
+        if (event.target.classList.contains('modal-overlay')) {
+            event.target.style.display = 'none';
         }
-        renderView(); 
     });
+
+    /* ================= LOGIC PARSE & HIỂN THỊ CÂY ================= */
+    function getCoupleColor(key) {
+        if (!coupleColorMap[key]) {
+            coupleColorMap[key] = coupleColors[colorIndex % coupleColors.length];
+            colorIndex++;
+        }
+        return coupleColorMap[key];
+    }
 
     function parseLine(line) {
         let text = line.trim();
@@ -344,23 +556,16 @@
 
         let dates = "";
         let dateMatch = text.match(/\((.*?)\)/);
-        if (dateMatch) {
-            dates = dateMatch[1].trim(); 
-            text = text.replace(dateMatch[0], ""); 
-        }
+        if (dateMatch) { dates = dateMatch[1].trim(); text = text.replace(dateMatch[0], ""); }
 
         let deathDate = "";
         let deathMatchArr = text.match(/\[(.*?)\]/);
-        if (deathMatchArr) {
-            deathDate = deathMatchArr[1].trim();
-            text = text.replace(deathMatchArr[0], "");
-        }
+        if (deathMatchArr) { deathDate = deathMatchArr[1].trim(); text = text.replace(deathMatchArr[0], ""); }
 
         let name = text.trim();
         return { name, dates, deathDate, gender, isWife };
     }
 
-    // ĐÃ SỬA: Lưu thêm thông tin node cha (parentObj) để truy ngược gia phả
     function buildTree(lines) {
         let roots = [], stack = [];
         window.treeData = roots; 
@@ -386,18 +591,16 @@
                         let husbandNode = stack[stack.length - 2].node;
                         node.bloodParentName = husbandNode.name;
                         node.coupleKey = husbandNode.name + "_" + parentNode.name; 
-                        node.parentObj = husbandNode; // Lưu node cha
+                        node.parentObj = husbandNode;
                     } else {
                         node.bloodParentName = parentNode.name;
                         node.coupleKey = parentNode.name + "_none"; 
-                        node.parentObj = parentNode; // Lưu node cha
+                        node.parentObj = parentNode;
                     }
                 }
                 parentNode.children.push(node);
             } else {
-                node.gen = 1;
-                node.bloodParentName = null;
-                node.coupleKey = "root_" + node.name;
+                node.gen = 1; node.bloodParentName = null; node.coupleKey = "root_" + node.name;
                 roots.push(node);
             }
             stack.push({ node, indent });
@@ -413,46 +616,27 @@
     }
 
     function toggleCompactNode(btn) {
-        const li = btn.closest('li');
-        const ul = li.querySelector(':scope > ul');
+        const li = btn.closest('li'); const ul = li.querySelector(':scope > ul');
         if (ul) {
-            if (ul.style.display === 'none') {
-                ul.style.display = 'block';
-                btn.innerText = '-';
-            } else {
-                ul.style.display = 'none';
-                btn.innerText = '+';
-            }
+            if (ul.style.display === 'none') { ul.style.display = 'block'; btn.innerText = '-'; } 
+            else { ul.style.display = 'none'; btn.innerText = '+'; }
         }
     }
 
     function expandAllCompact() {
-        const lists = document.querySelectorAll('#compactTreeView ul');
-        lists.forEach(ul => ul.style.display = 'block');
-        const btns = document.querySelectorAll('.btn-toggle-compact');
-        btns.forEach(btn => btn.innerText = '-');
+        document.querySelectorAll('#compactTreeView ul').forEach(ul => ul.style.display = 'block');
+        document.querySelectorAll('.btn-toggle-compact').forEach(btn => btn.innerText = '-');
     }
 
     function collapseToGen(targetGen) {
-        if(targetGen === 'all') {
-            expandAllCompact();
-            return;
-        }
+        if(targetGen === 'all') { expandAllCompact(); return; }
         targetGen = parseInt(targetGen);
-        const btns = document.querySelectorAll('.btn-toggle-compact');
-        
-        btns.forEach(btn => {
+        document.querySelectorAll('.btn-toggle-compact').forEach(btn => {
             let nodeGen = parseInt(btn.getAttribute('data-gen'));
             let ul = btn.closest('li').querySelector(':scope > ul');
             if(!ul) return;
-            
-            if(nodeGen < targetGen) {
-                ul.style.display = 'block';
-                btn.innerText = '-';
-            } else {
-                ul.style.display = 'none';
-                btn.innerText = '+';
-            }
+            if(nodeGen < targetGen) { ul.style.display = 'block'; btn.innerText = '-'; } 
+            else { ul.style.display = 'none'; btn.innerText = '+'; }
         });
     }
 
@@ -462,9 +646,9 @@
         let maxGen = Math.max(...list.map(n => n.gen));
         let select = document.getElementById('genCollapseSelect');
         select.innerHTML = '<option value="all">👁️ Mở hết (Tất cả)</option>';
-        for(let i = 1; i <= maxGen; i++) {
+        
+        for(let i = 1; i < maxGen; i++) {
             let text = `👇 Thu gọn đến đời ${i}`;
-            if(i === maxGen) text += ' (Cuối)';
             select.innerHTML += `<option value="${i}">${text}</option>`;
         }
     }
@@ -477,20 +661,11 @@
             let prefix = node.isWife ? '<span class="c-spouse-mark">+</span>' : '';
             let hasChildren = node.children && node.children.length > 0;
             
-            let toggleBtn = hasChildren 
-                ? `<span class="btn-toggle-compact" data-gen="${node.gen}" onclick="toggleCompactNode(this)">-</span>` 
-                : `<span class="btn-toggle-spacer"></span>`;
-                
+            let toggleBtn = hasChildren ? `<span class="btn-toggle-compact" data-gen="${node.gen}" onclick="toggleCompactNode(this)">-</span>` : `<span class="btn-toggle-spacer"></span>`;
             let displayName = buildDisplayNameHtml(node);
 
-            html += `<li>
-                <div class="compact-node">
-                    ${toggleBtn} ${prefix} <span class="${colorClass}">${displayName}</span>
-                </div>`;
-            
-            if (hasChildren) {
-                html += `<ul>${renderCompactTree(node.children)}</ul>`;
-            }
+            html += `<li><div class="compact-node">${toggleBtn} ${prefix} <span class="${colorClass}">${displayName}</span></div>`;
+            if (hasChildren) html += `<ul>${renderCompactTree(node.children)}</ul>`;
             html += `</li>`;
         });
         return html;
@@ -502,23 +677,20 @@
         updateGenSelect();
         onSearchInput(); 
     }
-    
-    function saveData() { 
-        const val = input.value; 
-        localStorage.setItem('giaPhaData', val); 
-        renderView(); 
-        closeModal(); 
-    }
 
-    function openModal() { modal.style.display = 'flex'; }
-    function closeModal() { modal.style.display = 'none'; }
+    /* ================= BACKUP VÀ KHÔI PHỤC ================= */
     function openManageModal() { document.getElementById('manageModal').style.display = 'flex'; }
     function closeManageModal() { document.getElementById('manageModal').style.display = 'none'; }
 
     function exportJSON() {
-        const dataToBackup = { appName: "GiaPhaThongMinh", version: "2.0", exportDate: new Date().toISOString(), giaPhaData: input.value };
+        const dataToBackup = { 
+            appName: "GiaPhaThongMinh_Multi", 
+            version: "3.0", 
+            exportDate: new Date().toISOString(), 
+            giaPhaList: treesList 
+        };
         const blob = new Blob([JSON.stringify(dataToBackup, null, 2)], {type: 'application/json'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Backup_GiaPha.json'; a.click();
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'DataGiaPha.json'; a.click();
     }
 
     function importJSON(event) {
@@ -527,168 +699,132 @@
         reader.onload = function(e) {
             try {
                 const json = JSON.parse(e.target.result);
-                if (json && json.giaPhaData !== undefined) {
-                    input.value = json.giaPhaData; saveData(); alert("Khôi phục thành công!"); closeManageModal();
-                } else { alert("Lỗi: File JSON không hợp lệ!"); }
+                if (json && json.giaPhaList) {
+                    treesList = json.giaPhaList;
+                    saveTreesToStorage();
+                    renderHome();
+                    alert("Khôi phục toàn bộ danh sách thành công!"); 
+                    closeManageModal();
+                } else { alert("Lỗi: File JSON không đúng định dạng đa gia phả!"); }
             } catch (error) { alert("Lỗi: Không thể đọc cấu trúc file JSON."); }
         };
         reader.readAsText(file); event.target.value = '';
     }
 
-    function exportDataHTML() {
-        document.getElementById('dataInput').innerHTML = input.value;
-        const htmlContent = "<!DOCTYPE html>\n<html lang=\"vi\">\n" + document.documentElement.innerHTML + "\n</html>";
-        const blob = new Blob([htmlContent], {type: 'text/html;charset=utf-8'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'GiaPha_Offline.html'; a.click();
+    function exportHTML() {
+        // Ẩn bảng manageModal để giao diện gọn gàng trước khi copy mã nguồn
+        closeManageModal();
+        
+        // Lấy cấu trúc HTML hiện tại của trang
+        let htmlString = "<!DOCTYPE html>\n<html lang=\"vi\">\n" + document.documentElement.innerHTML + "\n</html>";
+        
+        // Tạo đoạn mã nhúng biến chứa dữ liệu gia phả để inject vào file HTML tải về
+        let scriptTag = `<script id="offline-data-script">window.offlineBackupData = ${JSON.stringify(treesList)};<\/script>`;
+        
+        // Thay thế tag cũ (nếu có) hoặc chèn tag vào thẻ head
+        if(htmlString.includes('id="offline-data-script"')) {
+            htmlString = htmlString.replace(/<script id="offline-data-script">.*?<\/script>/, scriptTag);
+        } else {
+            htmlString = htmlString.replace('</head>', '    ' + scriptTag + '\n</head>');
+        }
+        
+        // Xuất file .html
+        const blob = new Blob([htmlString], {type: 'text/html;charset=utf-8'});
+        const a = document.createElement('a'); 
+        a.href = URL.createObjectURL(blob); 
+        a.download = 'AppGiaPha_Offline.html'; 
+        a.click();
     }
 
-    /* --- DANH SÁCH THÀNH VIÊN --- */
+    /* ================= CÁC CHỨC NĂNG PHỤ ================= */
     function getBloodRelatives() {
         let list = [];
-        function traverse(nodes) {
-            for (let node of nodes) { if (!node.isWife) list.push(node); traverse(node.children); }
-        }
+        function traverse(nodes) { for (let node of nodes) { if (!node.isWife) list.push(node); traverse(node.children); } }
         traverse(window.treeData); return list;
     }
 
     function getAllMembersWithDeathDate() {
         let list = [];
-        function traverse(nodes) {
-            for (let node of nodes) { 
-                if(node.deathDate) list.push(node);
-                if(node.children) traverse(node.children); 
-            }
-        }
+        function traverse(nodes) { for (let node of nodes) { if(node.deathDate) list.push(node); if(node.children) traverse(node.children); } }
         traverse(window.treeData); return list;
     }
 
-
-
     function openListModal() {
-    let list = getBloodRelatives(); 
-    if(list.length === 0) return;
-
-    // Lấy danh sách tất cả các đời hiện có
-    let allGens = [...new Set(list.map(node => node.gen))].sort((a, b) => a - b);
-    
-    let grouped = {}; 
-    let total = 0; 
-    allGens.forEach(g => grouped[g] = []);
-    list.forEach(node => { 
-        grouped[node.gen].push(node); 
-        total++; 
-    });
-    
-    document.getElementById('totalCount').innerText = total + " người";
-    let html = '';
-    
-    allGens.forEach(g => {
-        html += `<h3 style="color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-top: 25px; display: flex; justify-content: space-between;">
-                    Đời ${g} <span style="font-size: 14px; opacity: 0.7;">(${grouped[g].length} thành viên)</span>
-                </h3><ul style="list-style: none; padding-left: 5px;">`;
+        let list = getBloodRelatives(); 
+        if(list.length === 0) return;
+        let allGens = [...new Set(list.map(node => node.gen))].sort((a, b) => a - b);
+        let grouped = {}; let total = 0; 
+        allGens.forEach(g => grouped[g] = []);
+        list.forEach(node => { grouped[node.gen].push(node); total++; });
         
-        grouped[g].forEach((node, idx) => {
-            let nameColor = node.gender === 'male' ? '#3b82f6' : '#d946ef';
+        document.getElementById('totalCount').innerText = total + " người";
+        let html = '';
+        allGens.forEach(g => {
+            html += `<h3 style="color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-top: 25px; display: flex; justify-content: space-between;">
+                        Đời ${g} <span style="font-size: 14px; opacity: 0.7;">(${grouped[g].length} thành viên)</span>
+                    </h3><ul style="list-style: none; padding-left: 5px;">`;
             
-            // Xử lý hiển thị đường dẫn cha/ông theo yêu cầu trước
-            let extraInfo = '';
-            if (node.parentObj) {
-                let cColor = getCoupleColor(node.coupleKey);
-                let parent = node.parentObj;
-                let grandparent = parent.parentObj;
-                let pathText = grandparent 
-                    ? `Cháu/con của: ${grandparent.name} / ${parent.name}` 
-                    : `Con của: ${parent.name}`;
-                
-                extraInfo = ` <span style="color: ${cColor}; font-size: 14px; font-style: italic; margin-left: 10px;">( ${pathText} )</span>`;
-            }
-            
-            let displayName = buildDisplayNameHtml(node);
-            html += `<li style="margin-bottom: 12px; font-size: 17px; background: rgba(30,41,59, 0.5); padding: 8px 10px; border-radius: 6px;">
-                        <strong style="display:inline-block; width: 30px; color:#cbd5e1;">${idx + 1}.</strong> 
-                        <span style="color: ${nameColor}; font-weight: bold;">${displayName}</span>${extraInfo}
-                    </li>`;
+            grouped[g].forEach((node, idx) => {
+                let nameColor = node.gender === 'male' ? '#3b82f6' : '#d946ef';
+                let extraInfo = '';
+                if (node.parentObj) {
+                    let cColor = getCoupleColor(node.coupleKey);
+                    let parent = node.parentObj; let grandparent = parent.parentObj;
+                    let pathText = grandparent ? `Cháu/con của: ${grandparent.name} / ${parent.name}` : `Con của: ${parent.name}`;
+                    extraInfo = ` <span style="color: ${cColor}; font-size: 14px; font-style: italic; margin-left: 10px;">( ${pathText} )</span>`;
+                }
+                html += `<li style="margin-bottom: 12px; font-size: 17px; background: rgba(30,41,59, 0.5); padding: 8px 10px; border-radius: 6px;">
+                            <strong style="display:inline-block; width: 30px; color:#cbd5e1;">${idx + 1}.</strong> 
+                            <span style="color: ${nameColor}; font-weight: bold;">${buildDisplayNameHtml(node)}</span>${extraInfo}
+                        </li>`;
+            });
+            html += `</ul>`;
         });
-        html += `</ul>`;
-    });
-
-    document.getElementById('genListView').innerHTML = html;
-    document.getElementById('listModal').style.display = 'flex';
-}
+        document.getElementById('genListView').innerHTML = html;
+        document.getElementById('listModal').style.display = 'flex';
+    }
 
     function closeListModal() { document.getElementById('listModal').style.display = 'none'; }
 
-
-    /* --- DANH SÁCH NGÀY GIỖ --- */
     function openDeathModal() {
         let deadMembers = getAllMembersWithDeathDate();
-        
         deadMembers.sort((a, b) => {
-            let partsA = a.deathDate.split('/');
-            let partsB = b.deathDate.split('/');
-            
-            let dayA = parseInt(partsA[0]) || 0;
-            let monthA = parseInt(partsA[1]) || 0;
-            let dayB = parseInt(partsB[0]) || 0;
-            let monthB = parseInt(partsB[1]) || 0;
-
-            if (monthA !== monthB) return monthA - monthB;
-            return dayA - dayB;
+            let partsA = a.deathDate.split('/'); let partsB = b.deathDate.split('/');
+            let dayA = parseInt(partsA[0]) || 0; let monthA = parseInt(partsA[1]) || 0;
+            let dayB = parseInt(partsB[0]) || 0; let monthB = parseInt(partsB[1]) || 0;
+            if (monthA !== monthB) return monthA - monthB; return dayA - dayB;
         });
 
         document.getElementById('deathTotalCount').innerText = deadMembers.length + " người";
-
         let html = `<ul style="list-style: none; padding-left: 5px;">`;
-        if (deadMembers.length === 0) {
-            html += `<li style="color: #cbd5e1;">Chưa có thông tin ngày giỗ nào. Nhớ điền vào khung dữ liệu dạng [ngày/tháng].</li>`;
-        } else {
+        if (deadMembers.length === 0) { html += `<li style="color: #cbd5e1;">Chưa có thông tin ngày giỗ nào. Nhớ điền vào khung dữ liệu dạng [ngày/tháng].</li>`; } 
+        else {
             deadMembers.forEach((node, idx) => {
                 let nameColor = node.gender === 'male' ? '#3b82f6' : '#d946ef';
                 let roleText = node.isWife ? `(Vợ / Đời ${node.gen})` : `(Đời ${node.gen})`;
-                
-                html += `
-                <li style="margin-bottom: 12px; font-size: 17px; background: rgba(30,41,59, 0.5); padding: 12px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <strong style="display:inline-block; width: 35px; color:#cbd5e1;">${idx + 1}.</strong> 
-                        <span style="color: ${nameColor}; font-weight: bold; font-size: 18px;">${node.name}</span>
-                        <span style="font-size: 14px; color: #94a3b8; margin-left: 10px; font-style: italic;">${roleText}</span>
-                    </div>
-                    <div style="color: #ef4444; font-weight: bold; background: rgba(239, 68, 68, 0.15); padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.3);">
-                        Ngày giỗ: ${node.deathDate}
-                    </div>
+                html += `<li style="margin-bottom: 12px; font-size: 17px; background: rgba(30,41,59, 0.5); padding: 12px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                    <div><strong style="display:inline-block; width: 35px; color:#cbd5e1;">${idx + 1}.</strong> <span style="color: ${nameColor}; font-weight: bold; font-size: 18px;">${node.name}</span><span style="font-size: 14px; color: #94a3b8; margin-left: 10px; font-style: italic;">${roleText}</span></div>
+                    <div style="color: #ef4444; font-weight: bold; background: rgba(239, 68, 68, 0.15); padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.3);">Ngày giỗ: ${node.deathDate}</div>
                 </li>`;
             });
         }
         html += `</ul>`;
-        
         document.getElementById('deathListView').innerHTML = html;
         document.getElementById('deathModal').style.display = 'flex';
     }
 
-    /* --- TÌM KIẾM --- */
-    function clearSearchHighlights() {
-        document.querySelectorAll('.c-male, .c-female').forEach(n => n.classList.remove('highlight-compact', 'active-search-compact'));
-    }
-
+    function clearSearchHighlights() { document.querySelectorAll('.c-male, .c-female').forEach(n => n.classList.remove('highlight-compact', 'active-search-compact')); }
+    
     function onSearchInput() {
         const term = document.getElementById('searchInput').value.toLowerCase().trim();
         const countDisplay = document.getElementById('searchCount');
-        
-        clearSearchHighlights();
-        searchMatches = [];
-        currentMatchIndex = -1;
-
-        if (term === '') {
-            countDisplay.innerText = "0/0";
-            return;
-        }
+        clearSearchHighlights(); searchMatches = []; currentMatchIndex = -1;
+        if (term === '') { countDisplay.innerText = "0/0"; return; }
 
         document.querySelectorAll('.compact-node').forEach(node => {
             const nameSpan = node.querySelector('.c-male, .c-female');
             if (nameSpan && nameSpan.innerText.toLowerCase().includes(term)) {
-                searchMatches.push(nameSpan);
-                nameSpan.classList.add('highlight-compact');
-                
+                searchMatches.push(nameSpan); nameSpan.classList.add('highlight-compact');
                 let parentUl = node.closest('ul');
                 while (parentUl && parentUl.parentElement.closest('#compactTreeView')) {
                     parentUl.style.display = 'block';
@@ -698,48 +834,21 @@
                 }
             }
         });
-
-        if (searchMatches.length > 0) {
-            currentMatchIndex = 0;
-            updateSearchFocus();
-        } else {
-            countDisplay.innerText = "0/0";
-        }
+        if (searchMatches.length > 0) { currentMatchIndex = 0; updateSearchFocus(); } 
+        else { countDisplay.innerText = "0/0"; }
     }
 
     function updateSearchFocus() {
         if (searchMatches.length === 0) return;
         searchMatches.forEach(el => el.classList.remove('active-search-compact'));
-        
-        const activeEl = searchMatches[currentMatchIndex];
-        activeEl.classList.add('active-search-compact');
-        
+        const activeEl = searchMatches[currentMatchIndex]; activeEl.classList.add('active-search-compact');
         document.getElementById('searchCount').innerText = `${currentMatchIndex + 1}/${searchMatches.length}`;
         activeEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
     }
 
-    function nextMatch() {
-        if (searchMatches.length === 0) return;
-        currentMatchIndex = (currentMatchIndex + 1) % searchMatches.length;
-        updateSearchFocus();
-    }
-
-    function prevMatch() {
-        if (searchMatches.length === 0) return;
-        currentMatchIndex = (currentMatchIndex - 1 + searchMatches.length) % searchMatches.length;
-        updateSearchFocus();
-    }
-
-    function handleSearchKey(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault(); 
-            if (e.shiftKey) {
-                prevMatch(); 
-            } else {
-                nextMatch(); 
-            }
-        }
-    }
+    function nextMatch() { if (searchMatches.length === 0) return; currentMatchIndex = (currentMatchIndex + 1) % searchMatches.length; updateSearchFocus(); }
+    function prevMatch() { if (searchMatches.length === 0) return; currentMatchIndex = (currentMatchIndex - 1 + searchMatches.length) % searchMatches.length; updateSearchFocus(); }
+    function handleSearchKey(e) { if (e.key === 'Enter') { e.preventDefault(); if (e.shiftKey) { prevMatch(); } else { nextMatch(); } } }
 </script>
 </body>
 </html>

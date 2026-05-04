@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gia Phả Thông Minh - Cây Thư Mục</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --container-bg: #1e293b;
+            --text-color: #f8fafc;
+            --primary-color: #0ea5e9;
+            --border-color: #334155;
+            --tree-line: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding-bottom: 90px; 
+            font-size: 16px;
+            overflow: hidden;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        header {
+            text-align: center;
+            padding: 15px 30px;
+            background: linear-gradient(to bottom, #1e293b, var(--bg-color));
+            user-select: none;
+        }
+        
+        h1 { font-size: 26px; margin: 0; color: var(--primary-color); text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+
+        main { 
+            display: block;
+            flex-direction: column;
+            padding: 20px 40px; 
+            height: calc(100vh - 160px);
+            overflow: auto;
+            scrollbar-width: none;
+            position: relative;
+            cursor: grab; 
+        }
+        main:active {
+            cursor: grabbing;
+        }
+        main::-webkit-scrollbar { display: none; }
+
+        /* ---------------- FOOTER & TÌM KIẾM ---------------- */
+        footer { 
+            display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;
+            position: fixed; bottom: 0; width: 100%; background: var(--container-bg); 
+            padding: 15px; border-top: 1px solid var(--border-color); z-index: 100; cursor: default; box-sizing: border-box;
+        }
+        
+        .footer-buttons { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        
+        button.update-btn, select.update-btn, .upload-btn-wrapper { 
+            background: var(--primary-color); color: #fff; border: none; padding: 10px 20px; 
+            border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; 
+            transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.3); display: inline-block; 
+            text-align: center; box-sizing: border-box; outline: none; appearance: auto;
+        }
+        button.update-btn:hover, select.update-btn:hover, .upload-btn-wrapper:hover { filter: brightness(1.1); transform: translateY(-1px);}
+        button.list-btn { background: #10b981; }
+
+        select.update-btn option { background: var(--container-bg); color: var(--text-color); }
+
+        .search-wrapper {
+            display: flex; align-items: center; gap: 10px; width: 100%; max-width: 400px;
+            background: #0f172a; padding: 5px 15px; border-radius: 25px; border: 2px solid var(--border-color);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .search-wrapper:focus-within { border-color: var(--primary-color); box-shadow: 0 0 10px rgba(14, 165, 233, 0.4); }
+
+        #searchInput { flex: 1; border: none; background: transparent; color: var(--text-color); font-size: 16px; outline: none; padding: 5px 0; }
+        #searchCount { font-size: 14px; color: #cbd5e1; font-weight: bold; white-space: nowrap; }
+        
+        .nav-btn { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 16px; padding: 5px; border-radius: 4px; transition: 0.2s; }
+        .nav-btn:hover { background: #334155; color: white; }
+
+        .highlight-compact { background: #f59e0b !important; color: #fff !important; padding: 2px 6px; border-radius: 4px; }
+        .active-search-compact { background: #ef4444 !important; color: #fff !important; }
+
+        .gen-text { color: #f59e0b; font-size: 0.85em; font-weight: normal; margin-left: 5px; }
+        .date-text { color: #10b981; font-size: 0.85em; font-style: italic; font-weight: normal; margin-left: 5px; }
+        .death-text { color: #ef4444; font-size: 0.85em; font-weight: normal; margin-left: 5px; }
+
+        /* ------------------------------------------- */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); cursor: default; }
+       /* Điều chỉnh kích thước và vị trí của Popup */
+.modal-content {
+    background: var(--container-bg);
+    padding: 30px;
+    border-radius: 15px;
+    
+    /* Chiều rộng 70% và luôn ở chính giữa */
+    width: 70% !important; 
+    max-width: 70% !important; 
+    margin: auto; 
+    
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    
+    /* Tăng font chữ cơ bản của popup */
+    font-size: 18px; 
+}
+
+/* Tăng kích thước chữ cho danh sách thành viên */
+#genListView li {
+    font-size: 20px !important; /* Chữ tên thành viên to lên */
+    margin-bottom: 15px;
+    padding: 12px 15px !important;
+}
+
+/* Tăng kích thước các tiêu đề đời (Đời 1, Đời 2...) */
+#genListView h3 {
+    font-size: 24px !important;
+}
+
+/* Tăng kích thước chữ cho các checkbox chọn đời */
+#genCheckboxes label {
+    font-size: 20px !important;
+    margin: 15px 0 !important;
+}
+        textarea { width: 100%; height: 350px; background: #0f172a; color: #10b981; border: 1px solid var(--border-color); padding: 15px; font-size: 16px; margin: 15px 0; border-radius: 8px; box-sizing: border-box; }
+        
+        .custom-scroll::-webkit-scrollbar { width: 8px; height: 8px;}
+        .custom-scroll::-webkit-scrollbar-track { background: var(--bg-color); border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+
+        /* --- CSS CÂY THƯ MỤC TRÊN MÀN HÌNH CHÍNH --- */
+        .compact-tree-container {
+            width: max-content; 
+            min-width: 100%;
+            background: transparent; 
+            text-align: left;
+            font-family: 'Consolas', 'Courier New', monospace; 
+            font-size: 18px; 
+            line-height: 1.8;
+            margin: 0; 
+            padding-right: 50vw;
+            padding-bottom: 30vh;
+            box-sizing: border-box;
+        }
+        
+        .compact-tree-controls { position: fixed; top: 15px; right: 30px; z-index: 10; }
+        
+        .compact-tree-container ul { list-style-type: none; padding-left: 35px; margin: 0; transition: all 0.3s ease; }
+        .compact-tree-container > ul { padding-left: 0; }
+        .compact-tree-container li { position: relative; padding: 6px 0 6px 20px; }
+        .compact-tree-container li::before { content: ''; position: absolute; top: 0; bottom: 0; left: 0; border-left: 2px dashed #64748b; }
+        .compact-tree-container li::after { content: ''; position: absolute; top: 20px; left: 0; width: 15px; border-top: 2px dashed #64748b; }
+        .compact-tree-container li:last-child::before { height: 20px; bottom: auto; }
+        .compact-tree-container > ul > li::before, .compact-tree-container > ul > li::after { display: none; }
+        .compact-tree-container > ul > li { padding-left: 0; }
+
+        .compact-node { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 6px; transition: background 0.2s; background: rgba(30, 41, 59, 0.4); }
+        .compact-node:hover { background: rgba(255,255,255,0.1); }
+        
+        .btn-toggle-compact { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 1px solid #475569; background: #1e293b; color: #cbd5e1; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-right: 12px; user-select: none; transition: 0.2s; }
+        .btn-toggle-compact:hover { background: #3b82f6; color: white; border-color: #3b82f6; }
+        .btn-toggle-spacer { display: inline-block; width: 36px; }
+
+        .c-male { color: #38bdf8; font-weight: bold; transition: all 0.3s; }  
+        .c-female { color: #f472b6; font-weight: bold; transition: all 0.3s; } 
+        .c-spouse-mark { color: #fbbf24; font-weight: bold; margin-right: 8px; font-size: 20px; } 
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>GIA PHẢ DÒNG HỌ</h1>
+</header>
+
+<div class="compact-tree-controls">
+    <select id="genCollapseSelect" class="update-btn" style="background:#f59e0b; padding: 8px 15px; font-size: 14px;" onchange="collapseToGen(this.value)">
+    </select>
+</div>
+
+<main id="scrollContainer" class="custom-scroll">
+    <div id="compactTreeContainerMain" class="compact-tree-container">
+        <div id="compactTreeView"></div>
+    </div>
+</main>
+
+<footer>
+    <div class="search-wrapper">
+        <span style="font-size: 18px; margin-left: 5px;">🔍</span>
+        <input type="text" id="searchInput" placeholder="Tìm kiếm thành viên..." oninput="onSearchInput()" onkeydown="handleSearchKey(event)">
+        <span id="searchCount">0/0</span>
+        <button class="nav-btn" onclick="prevMatch()" title="Kết quả trước (Shift+Enter)">▲</button>
+        <button class="nav-btn" onclick="nextMatch()" title="Kết quả tiếp theo (Enter)">▼</button>
+    </div>
+    
+    <div class="footer-buttons">
+        <button class="update-btn list-btn" onclick="openListModal()">Danh sách</button>
+        <button class="update-btn" style="background:#e11d48;" onclick="openDeathModal()">Ngày Giỗ</button>
+        <button class="update-btn" onclick="openModal()">Cập Nhật</button>
+        <button class="update-btn" style="background:#8b5cf6;" onclick="openManageModal()">Quản lý Backup</button>
+    </div>
+</footer>
+
+<!-- Modal Quản lý -->
+<div class="modal-overlay" id="manageModal">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <h2 style="margin-top: 0; color: #8b5cf6;">Backup & Khôi Phục</h2>
+        <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 20px;">Dữ liệu luôn tự động lưu trên máy bạn. Bạn có thể xuất file JSON để lưu trữ hoặc chuyển máy.</p>
+        <div style="display: flex; flex-direction: column; gap: 15px; margin: 25px 0;">
+            <button class="update-btn" style="background:#10b981;" onclick="exportJSON()">Xuất Backup (.json)</button>
+            <label class="upload-btn-wrapper" style="background:#3b82f6;">
+                Nhập Backup (.json)
+                <input type="file" accept=".json" style="display: none;" onchange="importJSON(event)">
+            </label>
+            <button class="update-btn" style="background:#f59e0b;" onclick="exportDataHTML()">Xuất Offline (.html)</button>
+        </div>
+        <div style="text-align: right;">
+            <button class="update-btn" onclick="closeManageModal()" style="background:#475569;">Đóng</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cập nhật dữ liệu -->
+<div class="modal-overlay" id="modal">
+    <div class="modal-content">
+        <h2>Nhập dữ liệu Gia Phả</h2>
+        <textarea id="dataInput" class="custom-scroll"></textarea>
+        <div style="text-align: right;">
+            <button class="update-btn" onclick="closeModal()" style="background:#475569; margin-right:10px;">Hủy</button>
+            <button class="update-btn" onclick="saveData()">Lưu Cập Nhật</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xem danh sách (Full chiều cao) -->
+<!-- Modal Xem danh sách - Đã rút gọn chỉ còn bước hiển thị -->
+<div class="modal-overlay" id="listModal">
+    <div class="modal-content" style="height: 95vh;">
+        <div id="step2" style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
+            <h2 style="margin-top: 0; color: #10b981;">Thống kê thành viên
+                <span id="totalCount" style="font-size: 16px; background: #10b981; color: #fff; padding: 2px 12px; border-radius: 20px;">0 người</span>
+            </h2>
+            <div id="genListView" class="custom-scroll" style="text-align: left; margin: 20px 0; flex: 1; overflow-y: auto; color: var(--text-color); padding-right: 10px;"></div>
+            <div style="text-align: right; margin-top: 15px;">
+                <button class="update-btn" onclick="closeListModal()" style="background:#475569;">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Ngày giỗ -->
+<div class="modal-overlay" id="deathModal">
+    <div class="modal-content" style="max-width: 800px; height: 95vh;">
+        <h2 style="margin-top: 0; color: #ef4444;">Danh Sách Ngày Giỗ
+            <span id="deathTotalCount" style="font-size: 16px; background: #ef4444; color: #fff; padding: 2px 12px; border-radius: 20px;">0 người</span>
+        </h2>
+        <div id="deathListView" class="custom-scroll" style="text-align: left; margin: 20px 0; flex: 1; overflow-y: auto; color: var(--text-color); padding-right: 10px;"></div>
+        <div style="text-align: right; margin-top: 15px;">
+            <button class="update-btn" onclick="document.getElementById('deathModal').style.display='none'" style="background:#475569;">Đóng</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById('dataInput');
+    const scrollContainer = document.getElementById('scrollContainer');
+    const modal = document.getElementById('modal');
+    
+    let searchMatches = [];
+    let currentMatchIndex = -1;
+
+    const coupleColors = ['#f87171', '#fb923c', '#fbbf24', '#a3e635', '#34d399', '#2dd4bf', '#38bdf8', '#818cf8', '#a78bfa', '#e879f9', '#f43f5e', '#bef264', '#5eead4'];
+    let coupleColorMap = {};
+    let colorIndex = 0;
+
+    function getCoupleColor(key) {
+        if (!coupleColorMap[key]) {
+            coupleColorMap[key] = coupleColors[colorIndex % coupleColors.length];
+            colorIndex++;
+        }
+        return coupleColorMap[key];
+    }
+
+    // Đóng modal khi bấm ra ngoài vùng đen
+    window.addEventListener('mousedown', function(event) {
+        if (event.target.classList.contains('modal-overlay')) {
+            event.target.style.display = 'none';
+        }
+    });
+
+    let isDown = false;
+    let startX, startY, scrollLeft, scrollTop;
+    scrollContainer.addEventListener('mousedown', (e) => {
+        const ignoredTags = ['BUTTON', 'INPUT', 'TEXTAREA', 'LABEL', 'SELECT', 'OPTION'];
+        if(ignoredTags.includes(e.target.tagName) || e.target.classList.contains('btn-toggle-compact')) return; 
+        
+        isDown = true;
+        startX = e.pageX - scrollContainer.offsetLeft;
+        startY = e.pageY - scrollContainer.offsetTop;
+        scrollLeft = scrollContainer.scrollLeft;
+        scrollTop = scrollContainer.scrollTop;
+    });
+    scrollContainer.addEventListener('mouseleave', () => { isDown = false; });
+    scrollContainer.addEventListener('mouseup', () => { isDown = false; });
+    scrollContainer.addEventListener('mousemove', (e) => {
+        if (!isDown) return; 
+        e.preventDefault();
+        const x = e.pageX - scrollContainer.offsetLeft;
+        const y = e.pageY - scrollContainer.offsetTop;
+        const walkX = (x - startX);
+        const walkY = (y - startY);
+        scrollContainer.scrollLeft = scrollLeft - walkX;
+        scrollContainer.scrollTop = scrollTop - walkY;
+    });
+
+    const defaultData = `Lê Văn Mạnh (Nam) (1920) [15/08]
++ Nguyễn Thị B (Nữ) (1922) [02/01]
+    Lê Văn Bùng (Nam) (1950)
+    + Trần Thị C (Nữ) [20/12]
+        Lê Văn Bao (Nam) (1980)`;
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedData = localStorage.getItem('giaPhaData');
+        if (savedData) {
+            input.value = savedData;
+        } else {
+            input.value = defaultData;
+        }
+        renderView(); 
+    });
+
+    function parseLine(line) {
+        let text = line.trim();
+        let isWife = text.startsWith('+');
+        if (isWife) text = text.substring(1).trim();
+        
+        let gender = text.toLowerCase().includes('(nữ)') ? 'female' : 'male';
+        text = text.replace(/\(nam\)|\(nữ\)/gi, "").trim();
+
+        let dates = "";
+        let dateMatch = text.match(/\((.*?)\)/);
+        if (dateMatch) {
+            dates = dateMatch[1].trim(); 
+            text = text.replace(dateMatch[0], ""); 
+        }
+
+        let deathDate = "";
+        let deathMatchArr = text.match(/\[(.*?)\]/);
+        if (deathMatchArr) {
+            deathDate = deathMatchArr[1].trim();
+            text = text.replace(deathMatchArr[0], "");
+        }
+
+        let name = text.trim();
+        return { name, dates, deathDate, gender, isWife };
+    }
+
+    // ĐÃ SỬA: Lưu thêm thông tin node cha (parentObj) để truy ngược gia phả
+    function buildTree(lines) {
+        let roots = [], stack = [];
+        window.treeData = roots; 
+
+        lines.forEach(line => {
+            if (!line.trim()) return;
+            let indent = 0;
+            let match = line.match(/^\s*/)[0];
+            for(let c of match) indent += (c === '\t' ? 4 : 1);
+            let node = { ...parseLine(line), children: [], parentObj: null };
+            
+            while (stack.length > 0 && stack[stack.length - 1].indent >= indent) {
+                if (node.isWife && stack[stack.length - 1].indent === indent && !stack[stack.length - 1].node.isWife) break;
+                stack.pop();
+            }
+            
+            if (stack.length > 0) {
+                let parentNode = stack[stack.length - 1].node;
+                node.gen = node.isWife ? parentNode.gen : parentNode.gen + 1;
+                
+                if (!node.isWife) {
+                    if (parentNode.isWife) {
+                        let husbandNode = stack[stack.length - 2].node;
+                        node.bloodParentName = husbandNode.name;
+                        node.coupleKey = husbandNode.name + "_" + parentNode.name; 
+                        node.parentObj = husbandNode; // Lưu node cha
+                    } else {
+                        node.bloodParentName = parentNode.name;
+                        node.coupleKey = parentNode.name + "_none"; 
+                        node.parentObj = parentNode; // Lưu node cha
+                    }
+                }
+                parentNode.children.push(node);
+            } else {
+                node.gen = 1;
+                node.bloodParentName = null;
+                node.coupleKey = "root_" + node.name;
+                roots.push(node);
+            }
+            stack.push({ node, indent });
+        });
+        return roots;
+    }
+
+    function buildDisplayNameHtml(node) {
+        let genHtml = `<span class="gen-text">(đời ${node.gen})</span>`;
+        let dateHtml = node.dates ? `<span class="date-text">(${node.dates})</span>` : "";
+        let deathHtml = node.deathDate ? `<span class="death-text">[${node.deathDate}]</span>` : "";
+        return `${node.name} ${genHtml} ${dateHtml} ${deathHtml}`;
+    }
+
+    function toggleCompactNode(btn) {
+        const li = btn.closest('li');
+        const ul = li.querySelector(':scope > ul');
+        if (ul) {
+            if (ul.style.display === 'none') {
+                ul.style.display = 'block';
+                btn.innerText = '-';
+            } else {
+                ul.style.display = 'none';
+                btn.innerText = '+';
+            }
+        }
+    }
+
+    function expandAllCompact() {
+        const lists = document.querySelectorAll('#compactTreeView ul');
+        lists.forEach(ul => ul.style.display = 'block');
+        const btns = document.querySelectorAll('.btn-toggle-compact');
+        btns.forEach(btn => btn.innerText = '-');
+    }
+
+    function collapseToGen(targetGen) {
+        if(targetGen === 'all') {
+            expandAllCompact();
+            return;
+        }
+        targetGen = parseInt(targetGen);
+        const btns = document.querySelectorAll('.btn-toggle-compact');
+        
+        btns.forEach(btn => {
+            let nodeGen = parseInt(btn.getAttribute('data-gen'));
+            let ul = btn.closest('li').querySelector(':scope > ul');
+            if(!ul) return;
+            
+            if(nodeGen < targetGen) {
+                ul.style.display = 'block';
+                btn.innerText = '-';
+            } else {
+                ul.style.display = 'none';
+                btn.innerText = '+';
+            }
+        });
+    }
+
+    function updateGenSelect() {
+        let list = getBloodRelatives();
+        if(list.length === 0) return;
+        let maxGen = Math.max(...list.map(n => n.gen));
+        let select = document.getElementById('genCollapseSelect');
+        select.innerHTML = '<option value="all">👁️ Mở hết (Tất cả)</option>';
+        for(let i = 1; i <= maxGen; i++) {
+            let text = `👇 Thu gọn đến đời ${i}`;
+            if(i === maxGen) text += ' (Cuối)';
+            select.innerHTML += `<option value="${i}">${text}</option>`;
+        }
+    }
+
+    function renderCompactTree(nodes) {
+        if (!nodes || nodes.length === 0) return '';
+        let html = ``;
+        nodes.forEach(node => {
+            let colorClass = node.gender === 'male' ? 'c-male' : 'c-female';
+            let prefix = node.isWife ? '<span class="c-spouse-mark">+</span>' : '';
+            let hasChildren = node.children && node.children.length > 0;
+            
+            let toggleBtn = hasChildren 
+                ? `<span class="btn-toggle-compact" data-gen="${node.gen}" onclick="toggleCompactNode(this)">-</span>` 
+                : `<span class="btn-toggle-spacer"></span>`;
+                
+            let displayName = buildDisplayNameHtml(node);
+
+            html += `<li>
+                <div class="compact-node">
+                    ${toggleBtn} ${prefix} <span class="${colorClass}">${displayName}</span>
+                </div>`;
+            
+            if (hasChildren) {
+                html += `<ul>${renderCompactTree(node.children)}</ul>`;
+            }
+            html += `</li>`;
+        });
+        return html;
+    }
+
+    function renderView() { 
+        const parsedTree = buildTree(input.value.split('\n'));
+        document.getElementById('compactTreeView').innerHTML = `<ul>${renderCompactTree(parsedTree)}</ul>`;
+        updateGenSelect();
+        onSearchInput(); 
+    }
+    
+    function saveData() { 
+        const val = input.value; 
+        localStorage.setItem('giaPhaData', val); 
+        renderView(); 
+        closeModal(); 
+    }
+
+    function openModal() { modal.style.display = 'flex'; }
+    function closeModal() { modal.style.display = 'none'; }
+    function openManageModal() { document.getElementById('manageModal').style.display = 'flex'; }
+    function closeManageModal() { document.getElementById('manageModal').style.display = 'none'; }
+
+    function exportJSON() {
+        const dataToBackup = { appName: "GiaPhaThongMinh", version: "2.0", exportDate: new Date().toISOString(), giaPhaData: input.value };
+        const blob = new Blob([JSON.stringify(dataToBackup, null, 2)], {type: 'application/json'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Backup_GiaPha.json'; a.click();
+    }
+
+    function importJSON(event) {
+        const file = event.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const json = JSON.parse(e.target.result);
+                if (json && json.giaPhaData !== undefined) {
+                    input.value = json.giaPhaData; saveData(); alert("Khôi phục thành công!"); closeManageModal();
+                } else { alert("Lỗi: File JSON không hợp lệ!"); }
+            } catch (error) { alert("Lỗi: Không thể đọc cấu trúc file JSON."); }
+        };
+        reader.readAsText(file); event.target.value = '';
+    }
+
+    function exportDataHTML() {
+        document.getElementById('dataInput').innerHTML = input.value;
+        const htmlContent = "<!DOCTYPE html>\n<html lang=\"vi\">\n" + document.documentElement.innerHTML + "\n</html>";
+        const blob = new Blob([htmlContent], {type: 'text/html;charset=utf-8'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'GiaPha_Offline.html'; a.click();
+    }
+
+    /* --- DANH SÁCH THÀNH VIÊN --- */
+    function getBloodRelatives() {
+        let list = [];
+        function traverse(nodes) {
+            for (let node of nodes) { if (!node.isWife) list.push(node); traverse(node.children); }
+        }
+        traverse(window.treeData); return list;
+    }
+
+    function getAllMembersWithDeathDate() {
+        let list = [];
+        function traverse(nodes) {
+            for (let node of nodes) { 
+                if(node.deathDate) list.push(node);
+                if(node.children) traverse(node.children); 
+            }
+        }
+        traverse(window.treeData); return list;
+    }
+
+
+
+    function openListModal() {
+    let list = getBloodRelatives(); 
+    if(list.length === 0) return;
+
+    // Lấy danh sách tất cả các đời hiện có
+    let allGens = [...new Set(list.map(node => node.gen))].sort((a, b) => a - b);
+    
+    let grouped = {}; 
+    let total = 0; 
+    allGens.forEach(g => grouped[g] = []);
+    list.forEach(node => { 
+        grouped[node.gen].push(node); 
+        total++; 
+    });
+    
+    document.getElementById('totalCount').innerText = total + " người";
+    let html = '';
+    
+    allGens.forEach(g => {
+        html += `<h3 style="color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-top: 25px; display: flex; justify-content: space-between;">
+                    Đời ${g} <span style="font-size: 14px; opacity: 0.7;">(${grouped[g].length} thành viên)</span>
+                </h3><ul style="list-style: none; padding-left: 5px;">`;
+        
+        grouped[g].forEach((node, idx) => {
+            let nameColor = node.gender === 'male' ? '#3b82f6' : '#d946ef';
+            
+            // Xử lý hiển thị đường dẫn cha/ông theo yêu cầu trước
+            let extraInfo = '';
+            if (node.parentObj) {
+                let cColor = getCoupleColor(node.coupleKey);
+                let parent = node.parentObj;
+                let grandparent = parent.parentObj;
+                let pathText = grandparent 
+                    ? `Cháu/con của: ${grandparent.name} / ${parent.name}` 
+                    : `Con của: ${parent.name}`;
+                
+                extraInfo = ` <span style="color: ${cColor}; font-size: 14px; font-style: italic; margin-left: 10px;">( ${pathText} )</span>`;
+            }
+            
+            let displayName = buildDisplayNameHtml(node);
+            html += `<li style="margin-bottom: 12px; font-size: 17px; background: rgba(30,41,59, 0.5); padding: 8px 10px; border-radius: 6px;">
+                        <strong style="display:inline-block; width: 30px; color:#cbd5e1;">${idx + 1}.</strong> 
+                        <span style="color: ${nameColor}; font-weight: bold;">${displayName}</span>${extraInfo}
+                    </li>`;
+        });
+        html += `</ul>`;
+    });
+
+    document.getElementById('genListView').innerHTML = html;
+    document.getElementById('listModal').style.display = 'flex';
+}
+
+    function closeListModal() { document.getElementById('listModal').style.display = 'none'; }
+
+
+    /* --- DANH SÁCH NGÀY GIỖ --- */
+    function openDeathModal() {
+        let deadMembers = getAllMembersWithDeathDate();
+        
+        deadMembers.sort((a, b) => {
+            let partsA = a.deathDate.split('/');
+            let partsB = b.deathDate.split('/');
+            
+            let dayA = parseInt(partsA[0]) || 0;
+            let monthA = parseInt(partsA[1]) || 0;
+            let dayB = parseInt(partsB[0]) || 0;
+            let monthB = parseInt(partsB[1]) || 0;
+
+            if (monthA !== monthB) return monthA - monthB;
+            return dayA - dayB;
+        });
+
+        document.getElementById('deathTotalCount').innerText = deadMembers.length + " người";
+
+        let html = `<ul style="list-style: none; padding-left: 5px;">`;
+        if (deadMembers.length === 0) {
+            html += `<li style="color: #cbd5e1;">Chưa có thông tin ngày giỗ nào. Nhớ điền vào khung dữ liệu dạng [ngày/tháng].</li>`;
+        } else {
+            deadMembers.forEach((node, idx) => {
+                let nameColor = node.gender === 'male' ? '#3b82f6' : '#d946ef';
+                let roleText = node.isWife ? `(Vợ / Đời ${node.gen})` : `(Đời ${node.gen})`;
+                
+                html += `
+                <li style="margin-bottom: 12px; font-size: 17px; background: rgba(30,41,59, 0.5); padding: 12px 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong style="display:inline-block; width: 35px; color:#cbd5e1;">${idx + 1}.</strong> 
+                        <span style="color: ${nameColor}; font-weight: bold; font-size: 18px;">${node.name}</span>
+                        <span style="font-size: 14px; color: #94a3b8; margin-left: 10px; font-style: italic;">${roleText}</span>
+                    </div>
+                    <div style="color: #ef4444; font-weight: bold; background: rgba(239, 68, 68, 0.15); padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.3);">
+                        Ngày giỗ: ${node.deathDate}
+                    </div>
+                </li>`;
+            });
+        }
+        html += `</ul>`;
+        
+        document.getElementById('deathListView').innerHTML = html;
+        document.getElementById('deathModal').style.display = 'flex';
+    }
+
+    /* --- TÌM KIẾM --- */
+    function clearSearchHighlights() {
+        document.querySelectorAll('.c-male, .c-female').forEach(n => n.classList.remove('highlight-compact', 'active-search-compact'));
+    }
+
+    function onSearchInput() {
+        const term = document.getElementById('searchInput').value.toLowerCase().trim();
+        const countDisplay = document.getElementById('searchCount');
+        
+        clearSearchHighlights();
+        searchMatches = [];
+        currentMatchIndex = -1;
+
+        if (term === '') {
+            countDisplay.innerText = "0/0";
+            return;
+        }
+
+        document.querySelectorAll('.compact-node').forEach(node => {
+            const nameSpan = node.querySelector('.c-male, .c-female');
+            if (nameSpan && nameSpan.innerText.toLowerCase().includes(term)) {
+                searchMatches.push(nameSpan);
+                nameSpan.classList.add('highlight-compact');
+                
+                let parentUl = node.closest('ul');
+                while (parentUl && parentUl.parentElement.closest('#compactTreeView')) {
+                    parentUl.style.display = 'block';
+                    const toggleBtn = parentUl.parentElement.querySelector('.btn-toggle-compact');
+                    if (toggleBtn) toggleBtn.innerText = '-';
+                    parentUl = parentUl.parentElement.closest('ul');
+                }
+            }
+        });
+
+        if (searchMatches.length > 0) {
+            currentMatchIndex = 0;
+            updateSearchFocus();
+        } else {
+            countDisplay.innerText = "0/0";
+        }
+    }
+
+    function updateSearchFocus() {
+        if (searchMatches.length === 0) return;
+        searchMatches.forEach(el => el.classList.remove('active-search-compact'));
+        
+        const activeEl = searchMatches[currentMatchIndex];
+        activeEl.classList.add('active-search-compact');
+        
+        document.getElementById('searchCount').innerText = `${currentMatchIndex + 1}/${searchMatches.length}`;
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+    }
+
+    function nextMatch() {
+        if (searchMatches.length === 0) return;
+        currentMatchIndex = (currentMatchIndex + 1) % searchMatches.length;
+        updateSearchFocus();
+    }
+
+    function prevMatch() {
+        if (searchMatches.length === 0) return;
+        currentMatchIndex = (currentMatchIndex - 1 + searchMatches.length) % searchMatches.length;
+        updateSearchFocus();
+    }
+
+    function handleSearchKey(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); 
+            if (e.shiftKey) {
+                prevMatch(); 
+            } else {
+                nextMatch(); 
+            }
+        }
+    }
+</script>
+</body>
+</html>
