@@ -423,16 +423,24 @@
     }
 
 function hideMenu() {
+    const dropdown = document.querySelector('.dropdown');
     const menu = document.querySelector('.dropdown-content');
-    const dropdown = document.querySelector('.dropdown'); // Lấy thẻ bao ngoài menu
     
-    menu.classList.add('hide-force'); 
-    dropdown.style.pointerEvents = 'none'; // Ngắt trạng thái "kẹt hover" trên điện thoại
+    // 1. Ép menu biến mất ngay lập tức bằng CSS nội tuyến (cái này mạnh nhất, ghi đè mọi lỗi hover)
+    menu.style.display = 'none';
     
-    setTimeout(() => { 
-        menu.classList.remove('hide-force'); 
-        dropdown.style.pointerEvents = 'auto'; // Khôi phục lại tương tác
-    }, 500); 
+    // 2. Xóa trạng thái đang được chọn (focus) của các nút bấm trên điện thoại
+    if (document.activeElement) {
+        document.activeElement.blur();
+    }
+    
+    // 3. Phục hồi lại trạng thái bình thường CHỈ KHI bạn chủ động chạm hoặc đưa chuột lại vào nút Menu (☰)
+    dropdown.onmouseenter = function() { 
+        menu.style.display = ''; 
+    };
+    dropdown.ontouchstart = function() { 
+        menu.style.display = ''; 
+    };
 }
 
     function openCreateModal() {
