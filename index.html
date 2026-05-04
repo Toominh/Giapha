@@ -423,7 +423,7 @@
             }
         });
     });
-
+    
     function loadDataFromStorage() {
         if (window.offlineBackupData) {
             treesList = window.offlineBackupData;
@@ -839,6 +839,36 @@
             alert("Có lỗi xảy ra trong quá trình tạo ảnh!");
         });
     }
+    // Chức năng nhấn ESC để đóng "TẤT CẢ" (Popup, Chi tiết, Tìm kiếm)
+    document.onkeydown = function(evt) {
+        evt = evt || window.event;
+        const isEscape = (evt.key === "Escape" || evt.key === "Esc" || evt.keyCode === 27);
+        
+        if (isEscape) {
+            // 1. Đóng các popup quản lý (Soạn thảo, Danh sách, Ngày giỗ...)
+            const allModals = document.querySelectorAll('.modal-overlay');
+            allModals.forEach(m => m.style.display = 'none');
+
+            // 2. Đóng bảng CHI TIẾT GIA PHẢ (Thứ bạn đang cần)
+            const personDetails = document.getElementById('personDetails');
+            if (personDetails) {
+                personDetails.classList.remove('active'); // Nếu bạn dùng class active để hiện
+                personDetails.style.display = 'none';      // Hoặc nếu bạn dùng display
+            }
+
+            // 3. Đóng thanh tìm kiếm
+            if (typeof closeSearch === "function") {
+                closeSearch();
+            }
+
+            // 4. Thoát khỏi các ô đang nhập liệu
+            if (document.activeElement) {
+                document.activeElement.blur();
+            }
+            
+            console.log("Đã đóng toàn bộ giao diện đang mở");
+        }
+    };
 </script>
 </body>
 </html>
