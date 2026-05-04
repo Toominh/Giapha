@@ -42,19 +42,20 @@
         /* HEADER MỚI CỦA MÀN HÌNH CÂY GIA PHẢ */
         #treeHeader {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end; /* Dồn hết thành phần sang phải */
             align-items: center;
             padding: 12px 20px;
             background: var(--container-bg);
             border-bottom: 1px solid var(--border-color);
-            gap: 10px; /* Giảm gap để tối ưu mobile */
+            gap: 10px; 
             width: 100%;
             box-sizing: border-box;
-            flex-wrap: nowrap; /* BẮT BUỘC 1 HÀNG */
+            flex-wrap: nowrap; 
         }
 
-        /* DROPDOWN MENU ☰ */
-        .dropdown { position: relative; display: inline-block; }
+        /* Đẩy menu sang bên trái, tự động dồn thanh tìm kiếm và các icon sang góc phải */
+        .dropdown { margin-right: auto; position: relative; display: inline-block; }
+        
         .dropdown::after {
             content: ""; position: absolute; width: 100%; height: 15px;
             bottom: -15px; left: 0; background: transparent; z-index: 1001;
@@ -71,8 +72,6 @@
         }
         .dropdown-content a:hover { background-color: #334155; color: var(--primary-color); }
         .dropdown:hover .dropdown-content { display: block; }
-
-        /* Class ép ẩn dropdown cho mobile (fix lỗi dính hover) */
         .hide-force { display: none !important; }
 
         /* ---------------- MÀN HÌNH CHÍNH (DANH SÁCH) ---------------- */
@@ -122,29 +121,33 @@
         button.update-btn:hover, select.update-btn:hover, .upload-btn-wrapper:hover { filter: brightness(1.1); transform: translateY(-1px);}
         select.update-btn option { background: var(--container-bg); color: var(--text-color); }
 
-        /* ---------------- THANH TÌM KIẾM THU GỌN ---------------- */
+        /* ---------------- THANH TÌM KIẾM ---------------- */
         .search-wrapper {
             display: flex; align-items: center; gap: 5px; 
             background: #0f172a; padding: 5px 15px; border-radius: 25px; border: 2px solid var(--border-color);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); transition: all 0.3s ease; cursor: pointer;
-            width: 40px; overflow: hidden; box-sizing: border-box; justify-content: center;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); transition: all 0.3s ease;
+            box-sizing: border-box; justify-content: flex-start;
+            
+            /* TRÊN MÁY TÍNH: Luôn mở rộng 280px */
+            width: 280px; 
+            cursor: text;
         }
-        .search-wrapper.active { flex: 1; width: auto; justify-content: flex-start; cursor: text; }
+
         .search-wrapper:focus-within { border-color: var(--primary-color); box-shadow: 0 0 10px rgba(14, 165, 233, 0.4); }
 
-        #searchIconBtn { background: none; border: none; color: #cbd5e1; font-size: 16px; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; }
-        #searchInput { 
-            width: 0; opacity: 0; border: none; background: transparent; color: var(--text-color); font-size: 16px; outline: none; padding: 0; transition: all 0.3s ease;
-        }
-        .search-wrapper.active #searchInput { width: 100%; opacity: 1; padding: 5px 0; }
+        #searchIconBtn { background: none; border: none; color: #cbd5e1; font-size: 16px; padding: 0; display: flex; align-items: center; justify-content: center; }
         
-        .search-actions { display: none; align-items: center; gap: 5px; }
-        .search-wrapper.active .search-actions { display: flex; }
-        .search-wrapper.active #searchIconBtn { display: none; }
-
+        #searchInput { 
+            width: 100%; border: none; background: transparent; color: var(--text-color); font-size: 16px; outline: none; padding: 5px 0; transition: all 0.3s ease;
+        }
+        
+        .search-actions { display: flex; align-items: center; gap: 5px; }
         #searchCount { font-size: 14px; color: #cbd5e1; font-weight: bold; white-space: nowrap; }
         .nav-btn { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 16px; padding: 5px; border-radius: 4px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
         .nav-btn:hover { background: #334155; color: white; }
+        
+        /* Ẩn nút X đóng thanh tìm kiếm trên Desktop (do mặc định đã luôn mở) */
+        .close-search-btn { display: none; }
 
         .highlight-compact { background: #f59e0b !important; color: #fff !important; padding: 2px 6px; border-radius: 4px; }
         .active-search-compact { background: #ef4444 !important; color: #fff !important; }
@@ -222,18 +225,32 @@
             footer .update-btn { font-size: 14px !important; padding: 10px !important; flex: 1; white-space: nowrap; }
             .modal-content { width: 95% !important; padding: 15px; }
             
-            /* Ép header 1 hàng với kích thước nhỏ */
             #treeHeader { padding: 8px 5px; gap: 5px; }
             #treeHeader .update-btn { padding: 6px 10px !important; font-size: 14px !important; }
-            .search-wrapper { padding: 5px 10px; width: 35px; } 
-            .search-wrapper.active { width: auto; }
+            
+            /* THU GỌN THANH TÌM KIẾM TRÊN MOBILE */
+            .search-wrapper { 
+                width: 38px; padding: 5px; cursor: pointer; justify-content: center;
+            } 
+            .search-wrapper.active { 
+                flex: 1; width: auto; justify-content: flex-start; padding: 5px 10px;
+            }
+            
+            #searchInput { width: 0; opacity: 0; padding: 0; transition: none; }
+            .search-wrapper.active #searchInput { width: 100%; opacity: 1; padding: 5px 0; }
+            
+            .search-actions { display: none; }
+            .search-wrapper.active .search-actions { display: flex; }
+            
+            .search-wrapper.active #searchIconBtn { display: none; }
+            /* Hiện lại nút x để người dùng tắt search trên điện thoại */
+            .close-search-btn { display: flex; color: #ef4444; font-weight: bold; }
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
-<!-- ================= MÀN HÌNH CHỦ ================= -->
 <div id="homeScreen">
     <header>
         <h1>DANH SÁCH GIA PHẢ</h1>
@@ -245,10 +262,8 @@
     </footer>
 </div>
 
-<!-- ================= MÀN HÌNH CHI TIẾT CÂY GIA PHẢ ================= -->
 <div id="treeScreen">
     <header id="treeHeader">
-        <!-- 1. Menu -->
         <div class="dropdown">
             <button class="update-btn" style="background:#475569; padding: 8px 15px; font-size: 18px;">☰</button>
             <div class="dropdown-content">
@@ -261,7 +276,6 @@
             </div>
         </div>
 
-        <!-- 2. Thanh tìm kiếm (Mới) -->
         <div class="search-wrapper" id="searchWrapper" onclick="openSearch()">
             <button id="searchIconBtn">🔍</button>
             <input type="text" id="searchInput" placeholder="Tìm kiếm..." oninput="onSearchInput()" onkeydown="handleSearchKey(event)">
@@ -269,17 +283,14 @@
                 <span id="searchCount">0/0</span>
                 <button class="nav-btn" onclick="prevMatch(event)" title="Kết quả trước">▲</button>
                 <button class="nav-btn" onclick="nextMatch(event)" title="Kết quả tiếp theo">▼</button>
-                <button class="nav-btn" onclick="closeSearch(event)" title="Đóng" style="color: #ef4444; font-weight: bold;">✖</button>
+                <button class="nav-btn close-search-btn" onclick="closeSearch(event)" title="Đóng">✖</button>
             </div>
         </div>
         
-        <!-- 3. Combo box -->
         <select id="genCollapseSelect" class="update-btn" style="background:#f59e0b; padding: 8px 10px; font-size: 14px; text-align: center;" onchange="collapseToGen(this.value)"></select>
 
-        <!-- 4. Nút Toàn Màn Hình (Mới) -->
         <button class="update-btn" style="background:#3b82f6; padding: 8px 15px; font-size: 18px;" onclick="toggleFullScreen()" title="Toàn màn hình">⛶</button>
 
-        <!-- 5. Close -->
         <button class="update-btn" style="background:#ef4444; padding: 8px 15px; font-size: 18px;" onclick="closeTree()" title="Đóng">✖</button>
     </header>
 
@@ -290,7 +301,6 @@
     </main>
 </div>
 
-<!-- ================= MODALS ================= -->
 <div class="modal-overlay" id="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -412,12 +422,18 @@
         renderHome(); 
     }
 
-    // FIX LỖI MENU TRÊN MOBILE BẰNG CLASS
-    function hideMenu() {
-        const menu = document.querySelector('.dropdown-content');
-        menu.classList.add('hide-force'); // Ép ẩn ngay lập tức
-        setTimeout(() => { menu.classList.remove('hide-force'); }, 500); // Đợi modal mở xong mới gỡ
-    }
+function hideMenu() {
+    const menu = document.querySelector('.dropdown-content');
+    const dropdown = document.querySelector('.dropdown'); // Lấy thẻ bao ngoài menu
+    
+    menu.classList.add('hide-force'); 
+    dropdown.style.pointerEvents = 'none'; // Ngắt trạng thái "kẹt hover" trên điện thoại
+    
+    setTimeout(() => { 
+        menu.classList.remove('hide-force'); 
+        dropdown.style.pointerEvents = 'auto'; // Khôi phục lại tương tác
+    }, 500); 
+}
 
     function openCreateModal() {
         currentTreeId = null; document.getElementById('modalTitle').innerText = "Tạo Gia Phả Mới";
@@ -726,7 +742,6 @@
         activeEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
     }
 
-    // SỰ KIỆN THANH TÌM KIẾM MỚI
     function openSearch() {
         const wrapper = document.getElementById('searchWrapper');
         if (!wrapper.classList.contains('active')) {
@@ -747,7 +762,6 @@
     function prevMatch(e) { if(e) e.stopPropagation(); if (searchMatches.length === 0) return; currentMatchIndex = (currentMatchIndex - 1 + searchMatches.length) % searchMatches.length; updateSearchFocus(); }
     function handleSearchKey(e) { if (e.key === 'Enter') { e.preventDefault(); if (e.shiftKey) { prevMatch(e); } else { nextMatch(e); } } }
 
-    // SỰ KIỆN FULL SCREEN MỚI
     function toggleFullScreen() {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().catch(err => {
