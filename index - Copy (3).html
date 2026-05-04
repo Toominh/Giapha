@@ -39,7 +39,7 @@
         
         h1 { font-size: 26px; margin: 0; color: var(--primary-color); text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
-        /* HEADER MỚI CỦA MÀN HÌNH CÂY GIA PHẢ - FIXED 100% WIDTH */
+        /* HEADER MỚI CỦA MÀN HÌNH CÂY GIA PHẢ */
         #treeHeader {
             display: flex;
             justify-content: space-between;
@@ -48,9 +48,6 @@
             background: var(--container-bg);
             border-bottom: 1px solid var(--border-color);
             gap: 15px;
-            width: 100%;
-            box-sizing: border-box;
-            flex-wrap: wrap; /* Cho phép rớt dòng nếu màn hình quá nhỏ */
         }
 
         /* DROPDOWN MENU ☰ */
@@ -58,6 +55,7 @@
             position: relative;
             display: inline-block;
         }
+        /* Tạo cầu nối vô hình để chuột không bị trượt khi di chuyển từ nút xuống menu */
         .dropdown::after {
             content: "";
             position: absolute;
@@ -148,12 +146,14 @@
         #treeScreen main:active { cursor: grabbing; }
         #treeScreen main::-webkit-scrollbar { display: none; }
 
-        /* ---------------- FOOTER CHUNG ---------------- */
+        /* ---------------- FOOTER CHUNG (Chỉ dùng cho Home Screen) ---------------- */
         footer { 
             display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;
             position: fixed; bottom: 0; width: 100%; background: var(--container-bg); 
             padding: 15px; border-top: 1px solid var(--border-color); z-index: 100; cursor: default; box-sizing: border-box;
         }
+        
+        .footer-buttons { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
         
         button.update-btn, select.update-btn, .upload-btn-wrapper { 
             background: var(--primary-color); color: #fff; border: none; padding: 10px 20px; 
@@ -162,16 +162,17 @@
             text-align: center; box-sizing: border-box; outline: none; appearance: auto;
         }
         button.update-btn:hover, select.update-btn:hover, .upload-btn-wrapper:hover { filter: brightness(1.1); transform: translateY(-1px);}
+
         select.update-btn option { background: var(--container-bg); color: var(--text-color); }
 
         .search-wrapper {
-            display: flex; align-items: center; gap: 10px; flex: 1; min-width: 150px;
+            display: flex; align-items: center; gap: 10px; width: 100%;
             background: #0f172a; padding: 5px 15px; border-radius: 25px; border: 2px solid var(--border-color);
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
         }
         .search-wrapper:focus-within { border-color: var(--primary-color); box-shadow: 0 0 10px rgba(14, 165, 233, 0.4); }
 
-        #searchInput { flex: 1; border: none; background: transparent; color: var(--text-color); font-size: 16px; outline: none; padding: 5px 0; width: 100%;}
+        #searchInput { flex: 1; border: none; background: transparent; color: var(--text-color); font-size: 16px; outline: none; padding: 5px 0; }
         #searchCount { font-size: 14px; color: #cbd5e1; font-weight: bold; white-space: nowrap; }
         
         .nav-btn { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 16px; padding: 5px; border-radius: 4px; transition: 0.2s; }
@@ -184,30 +185,13 @@
         .date-text { color: #10b981; font-size: 0.85em; font-style: italic; font-weight: normal; margin-left: 5px; }
         .death-text { color: #ef4444; font-size: 0.85em; font-weight: normal; margin-left: 5px; }
 
-        /* ---------------- MODAL CHUNG ---------------- */
+        /* ------------------------------------------- */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); cursor: default; }
         .modal-content {
-            background: var(--container-bg); padding: 25px; border-radius: 15px;
-            width: 70%; max-width: 800px; margin: auto; 
+            background: var(--container-bg); padding: 30px; border-radius: 15px;
+            width: 70% !important; max-width: 70% !important; margin: auto; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; max-height: 90vh; font-size: 18px; 
-            box-sizing: border-box;
         }
-
-        /* HEADER CHO MODAL CHỨA DẤU X */
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-        }
-        .modal-header h2 { margin: 0; font-size: 22px; }
-        .close-x-btn {
-            background: transparent; border: none; color: #cbd5e1; font-size: 28px; 
-            font-weight: bold; cursor: pointer; padding: 0; line-height: 1; transition: 0.2s;
-        }
-        .close-x-btn:hover { color: #ef4444; }
 
         #genListView li { font-size: 20px !important; margin-bottom: 15px; padding: 12px 15px !important; }
         #genListView h3 { font-size: 24px !important; }
@@ -252,23 +236,6 @@
         .c-male { color: #38bdf8; font-weight: bold; transition: all 0.3s; }  
         .c-female { color: #f472b6; font-weight: bold; transition: all 0.3s; } 
         .c-spouse-mark { color: #fbbf24; font-weight: bold; margin-right: 8px; font-size: 20px; } 
-
-        /* TỐI ƯU GIAO DIỆN ĐIỆN THOẠI */
-        @media (max-width: 600px) {
-            footer {
-                padding: 10px;
-                gap: 10px;
-                flex-wrap: nowrap; /* Ép không xuống dòng */
-            }
-            footer .update-btn {
-                font-size: 14px !important;
-                padding: 10px !important;
-                flex: 1; /* Chia đều không gian 2 nút */
-                white-space: nowrap;
-            }
-            .modal-content { width: 95% !important; padding: 15px; }
-            #treeHeader { padding: 10px; }
-        }
     </style>
 </head>
 <body>
@@ -282,7 +249,7 @@
         <!-- Render danh sách qua JS -->
     </div>
     <footer>
-        <button class="update-btn" style="background: #10b981; font-size: 18px; padding: 12px 30px;" onclick="openCreateModal()">+ Tạo Gia Phả</button>
+        <button class="update-btn" style="background: #10b981; font-size: 18px; padding: 12px 30px;" onclick="openCreateModal()">+ Tạo Gia Phả Mới</button>
         <button class="update-btn" style="background:#8b5cf6;" onclick="openManageModal()">Quản lý Dữ Liệu</button>
     </footer>
 </div>
@@ -294,27 +261,25 @@
         <div class="dropdown">
             <button class="update-btn" style="background:#475569; padding: 8px 15px; font-size: 18px;">☰</button>
             <div class="dropdown-content">
-                <!-- Thêm hideMenu() vào onclick để khắc phục lỗi dính hover -->
-                <a onclick="hideMenu(); openEditModal()">✏️ Sửa Dữ Liệu</a>
-                <a onclick="hideMenu(); openListModal()">📋 Danh sách</a>
-                <a onclick="hideMenu(); openDeathModal()">🕯️ Ngày Giỗ</a>
-                <a onclick="hideMenu(); alert('Chức năng Tạo ảnh đang được phát triển!')">🖼️ Tạo ảnh</a>
+                <a onclick="openEditModal()">✏️ Sửa Dữ Liệu</a>
+                <a onclick="openListModal()">📋 Danh sách</a>
+                <a onclick="openDeathModal()">🕯️ Ngày Giỗ</a>
                 <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 5px 0;">
-                <a onclick="hideMenu(); deleteCurrentTree()" style="color: #ef4444;">🗑️ Xóa Gia Phả</a>
+                <a onclick="deleteCurrentTree()" style="color: #ef4444;">🗑️ Xóa Gia Phả</a>
             </div>
         </div>
 
         <!-- 2. Thanh tìm kiếm -->
-        <div class="search-wrapper">
-            <input type="text" id="searchInput" placeholder="Tìm kiếm..." oninput="onSearchInput()" onkeydown="handleSearchKey(event)">
+        <div class="search-wrapper" style="flex: 1;">
+            <span style="font-size: 18px; margin-left: 5px;">🔍</span>
+            <input type="text" id="searchInput" placeholder="Tìm kiếm thành viên..." oninput="onSearchInput()" onkeydown="handleSearchKey(event)">
             <span id="searchCount">0/0</span>
             <button class="nav-btn" onclick="prevMatch()" title="Kết quả trước (Shift+Enter)">▲</button>
             <button class="nav-btn" onclick="nextMatch()" title="Kết quả tiếp theo (Enter)">▼</button>
         </div>
         
         <!-- 3. Combo box (Thu gọn) -->
-        <select id="genCollapseSelect" class="update-btn" style="background:#f59e0b; padding: 8px 10px; font-size: 14px; text-align: center;" onchange="collapseToGen(this.value)">
-            <!-- Sẽ đổ dữ liệu bằng JS -->
+        <select id="genCollapseSelect" class="update-btn" style="background:#f59e0b; padding: 8px 15px; font-size: 14px;" onchange="collapseToGen(this.value)">
         </select>
 
         <!-- 4. Close (✖) -->
@@ -333,13 +298,11 @@
 <!-- Modal Tạo / Cập nhật dữ liệu -->
 <div class="modal-overlay" id="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <h2 id="modalTitle">Nhập dữ liệu Gia Phả</h2>
-            <button class="close-x-btn" onclick="closeModal()">&times;</button>
-        </div>
-        <input type="text" id="treeNameInput" class="custom-input" placeholder="Nhập tên gia phả (VD: Gia phả họ Lê...)">
+        <h2 id="modalTitle">Nhập dữ liệu Gia Phả</h2>
+        <input type="text" id="treeNameInput" class="custom-input" placeholder="Nhập tên gia phả (VD: Gia phả họ Lê, Gia phả Nguyễn Tộc...)">
         <textarea id="dataInput" class="custom-scroll" placeholder="Nhập cấu trúc dữ liệu..."></textarea>
         <div style="text-align: right;">
+            <button class="update-btn" onclick="closeModal()" style="background:#475569; margin-right:10px;">Hủy</button>
             <button class="update-btn" onclick="saveData()">Lưu Cập Nhật</button>
         </div>
     </div>
@@ -347,21 +310,19 @@
 
 <!-- Modal Quản lý Backup (Dành cho Màn hình chính) -->
 <div class="modal-overlay" id="manageModal">
-    <div class="modal-content" style="max-width: 450px;">
-        <div class="modal-header">
-            <h2 style="color: #8b5cf6;">Quản lý Dữ Liệu</h2>
-            <button class="close-x-btn" onclick="closeManageModal()">&times;</button>
+    <div class="modal-content" style="max-width: 450px; text-align: center;">
+        <h2 style="margin-top: 0; color: #8b5cf6;">Quản lý Dữ Liệu</h2>
+        <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 20px;">Backup gồm TẤT CẢ các gia phả. Xuất file <b>.json</b> để lưu trữ, hoặc xuất file <b>.html</b> để tạo một ứng dụng chạy Offline gửi cho người khác.</p>
+        <div style="display: flex; flex-direction: column; gap: 15px; margin: 25px 0;">
+            <button class="update-btn" style="background:#10b981;" onclick="exportJSON()">⬇️ Xuất Data Thuần (.json)</button>
+            <button class="update-btn" style="background:#f59e0b;" onclick="exportHTML()">⬇️ Xuất File App Chạy Offline (.html)</button>
+            <label class="upload-btn-wrapper" style="background:#3b82f6;">
+                ⬆️ Nhập Data Phục Hồi (.json)
+                <input type="file" accept=".json" style="display: none;" onchange="importJSON(event)">
+            </label>
         </div>
-        <div style="text-align: center;">
-            <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 20px;">Backup gồm TẤT CẢ các gia phả. Xuất file <b>.json</b> để lưu trữ, hoặc xuất file <b>.html</b> để tạo một ứng dụng chạy Offline.</p>
-            <div style="display: flex; flex-direction: column; gap: 15px; margin: 15px 0;">
-                <button class="update-btn" style="background:#10b981;" onclick="exportJSON()">⬇️ Xuất Data Thuần (.json)</button>
-                <button class="update-btn" style="background:#f59e0b;" onclick="exportHTML()">⬇️ Xuất File App Offline (.html)</button>
-                <label class="upload-btn-wrapper" style="background:#3b82f6;">
-                    ⬆️ Nhập Data Phục Hồi (.json)
-                    <input type="file" accept=".json" style="display: none;" onchange="importJSON(event)">
-                </label>
-            </div>
+        <div style="text-align: right;">
+            <button class="update-btn" onclick="closeManageModal()" style="background:#475569;">Đóng</button>
         </div>
     </div>
 </div>
@@ -369,26 +330,28 @@
 <!-- Modal Xem danh sách thành viên -->
 <div class="modal-overlay" id="listModal">
     <div class="modal-content" style="height: 95vh;">
-        <div class="modal-header">
-            <h2 style="color: #10b981;">Thống kê thành viên
+        <div id="step2" style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
+            <h2 style="margin-top: 0; color: #10b981;">Thống kê thành viên
                 <span id="totalCount" style="font-size: 16px; background: #10b981; color: #fff; padding: 2px 12px; border-radius: 20px;">0 người</span>
             </h2>
-            <button class="close-x-btn" onclick="closeListModal()">&times;</button>
+            <div id="genListView" class="custom-scroll" style="text-align: left; margin: 20px 0; flex: 1; overflow-y: auto; color: var(--text-color); padding-right: 10px;"></div>
+            <div style="text-align: right; margin-top: 15px;">
+                <button class="update-btn" onclick="closeListModal()" style="background:#475569;">Đóng</button>
+            </div>
         </div>
-        <div id="genListView" class="custom-scroll" style="text-align: left; flex: 1; overflow-y: auto; color: var(--text-color); padding-right: 10px;"></div>
     </div>
 </div>
 
 <!-- Modal Ngày giỗ -->
 <div class="modal-overlay" id="deathModal">
-    <div class="modal-content" style="height: 95vh;">
-        <div class="modal-header">
-            <h2 style="color: #ef4444;">Danh Sách Ngày Giỗ
-                <span id="deathTotalCount" style="font-size: 16px; background: #ef4444; color: #fff; padding: 2px 12px; border-radius: 20px;">0 người</span>
-            </h2>
-            <button class="close-x-btn" onclick="document.getElementById('deathModal').style.display='none'">&times;</button>
+    <div class="modal-content" style="max-width: 800px; height: 95vh;">
+        <h2 style="margin-top: 0; color: #ef4444;">Danh Sách Ngày Giỗ
+            <span id="deathTotalCount" style="font-size: 16px; background: #ef4444; color: #fff; padding: 2px 12px; border-radius: 20px;">0 người</span>
+        </h2>
+        <div id="deathListView" class="custom-scroll" style="text-align: left; margin: 20px 0; flex: 1; overflow-y: auto; color: var(--text-color); padding-right: 10px;"></div>
+        <div style="text-align: right; margin-top: 15px;">
+            <button class="update-btn" onclick="document.getElementById('deathModal').style.display='none'" style="background:#475569;">Đóng</button>
         </div>
-        <div id="deathListView" class="custom-scroll" style="text-align: left; flex: 1; overflow-y: auto; color: var(--text-color); padding-right: 10px;"></div>
     </div>
 </div>
 
@@ -396,7 +359,9 @@
     /* ================= CẤU HÌNH DỮ LIỆU & BIẾN TOÀN CỤC ================= */
     const defaultData = `Lê Văn Mạnh (Nam) (1920) [15/08]\n+ Nguyễn Thị B (Nữ) (1922) [02/01]\n    Lê Văn Bùng (Nam) (1950)\n    + Trần Thị C (Nữ) [20/12]\n        Lê Văn Bao (Nam) (1980)`;
     
+    // Mảng lưu toàn bộ gia phả
     let treesList = []; 
+    // ID của gia phả đang mở (null = đang ở màn hình Home / đang Tạo mới)
     let currentTreeId = null; 
 
     const input = document.getElementById('dataInput');
@@ -418,15 +383,17 @@
     });
 
     function loadDataFromStorage() {
+        // Kiểm tra xem có dữ liệu nhúng sẵn từ tính năng Xuất HTML không
         if (window.offlineBackupData) {
             treesList = window.offlineBackupData;
-            saveTreesToStorage(); 
-            window.offlineBackupData = null; 
+            saveTreesToStorage(); // Đồng bộ ngay lập tức vào trình duyệt hiện tại
+            window.offlineBackupData = null; // Reset lại
         } else {
             const savedList = localStorage.getItem('giaPhaList');
             if (savedList) {
                 treesList = JSON.parse(savedList);
             } else {
+                // Tự động chuyển đổi dữ liệu cũ (giaPhaData) thành cấu trúc mới nếu có
                 const oldSingleData = localStorage.getItem('giaPhaData');
                 treesList = [{
                     id: Date.now(),
@@ -460,8 +427,14 @@
     function openTree(id) {
         currentTreeId = id;
         const tree = treesList.find(t => t.id === id);
+        
+        // Setup dữ liệu cho màn hình cây
         input.value = tree.data; 
+        
+        // Vẽ cây
         renderView(); 
+        
+        // Chuyển UI
         document.getElementById('homeScreen').style.display = 'none';
         document.getElementById('treeScreen').style.display = 'block';
     }
@@ -470,22 +443,15 @@
         currentTreeId = null;
         document.getElementById('homeScreen').style.display = 'block';
         document.getElementById('treeScreen').style.display = 'none';
-        renderHome(); 
-    }
-
-    // Fix lỗi dính hover của menu
-    function hideMenu() {
-        const menu = document.querySelector('.dropdown-content');
-        menu.style.display = 'none';
-        setTimeout(() => menu.style.display = '', 100); 
+        renderHome(); // Cập nhật lại danh sách lỡ có sửa tên
     }
 
     /* ================= QUẢN LÝ MODAL TẠO / SỬA / XOÁ ================= */
     function openCreateModal() {
-        currentTreeId = null; 
+        currentTreeId = null; // Bật cờ tạo mới
         document.getElementById('modalTitle').innerText = "Tạo Gia Phả Mới";
         nameInput.value = "";
-        input.value = defaultData; 
+        input.value = defaultData; // Gợi ý mẫu dữ liệu
         modal.style.display = 'flex';
     }
 
@@ -514,23 +480,27 @@
         const newData = input.value; 
 
         if (currentTreeId) {
+            // Chế độ CẬP NHẬT
             const treeIndex = treesList.findIndex(t => t.id === currentTreeId);
             if(treeIndex !== -1) {
                 treesList[treeIndex].name = newName;
                 treesList[treeIndex].data = newData;
             }
         } else {
+            // Chế độ TẠO MỚI
             const newTree = {
                 id: Date.now(),
                 name: newName,
                 data: newData
             };
             treesList.push(newTree);
-            currentTreeId = newTree.id; 
+            currentTreeId = newTree.id; // Gắn ID để tự động mở luôn
         }
 
         saveTreesToStorage();
         closeModal(); 
+        
+        // Nếu đang ở cây thì render lại, nếu mới tạo thì tự động mở cây đó ra
         openTree(currentTreeId);
     }
 
@@ -560,6 +530,7 @@
         scrollContainer.scrollTop = scrollTop - walkY;
     });
 
+    // Đóng modal khi bấm ra ngoài vùng đen
     window.addEventListener('mousedown', function(event) {
         if (event.target.classList.contains('modal-overlay')) {
             event.target.style.display = 'none';
@@ -674,11 +645,11 @@
         if(list.length === 0) return;
         let maxGen = Math.max(...list.map(n => n.gen));
         let select = document.getElementById('genCollapseSelect');
-        // Chỉ để icon con mắt cho gọn
-        select.innerHTML = '<option value="all">👁️</option>';
+        select.innerHTML = '<option value="all">👁️ Mở hết (Tất cả)</option>';
         
         for(let i = 1; i < maxGen; i++) {
-            select.innerHTML += `<option value="${i}">👁️ ${i}</option>`;
+            let text = `👇 Thu gọn đến đời ${i}`;
+            select.innerHTML += `<option value="${i}">${text}</option>`;
         }
     }
 
@@ -741,16 +712,23 @@
     }
 
     function exportHTML() {
+        // Ẩn bảng manageModal để giao diện gọn gàng trước khi copy mã nguồn
         closeManageModal();
+        
+        // Lấy cấu trúc HTML hiện tại của trang
         let htmlString = "<!DOCTYPE html>\n<html lang=\"vi\">\n" + document.documentElement.innerHTML + "\n</html>";
+        
+        // Tạo đoạn mã nhúng biến chứa dữ liệu gia phả để inject vào file HTML tải về
         let scriptTag = `<script id="offline-data-script">window.offlineBackupData = ${JSON.stringify(treesList)};<\/script>`;
         
+        // Thay thế tag cũ (nếu có) hoặc chèn tag vào thẻ head
         if(htmlString.includes('id="offline-data-script"')) {
             htmlString = htmlString.replace(/<script id="offline-data-script">.*?<\/script>/, scriptTag);
         } else {
             htmlString = htmlString.replace('</head>', '    ' + scriptTag + '\n</head>');
         }
         
+        // Xuất file .html
         const blob = new Blob([htmlString], {type: 'text/html;charset=utf-8'});
         const a = document.createElement('a'); 
         a.href = URL.createObjectURL(blob); 
