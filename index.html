@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gia Phả Thông Minh - Quản Lý Nhiều Gia Phả</title>
     <style>
         :root {
@@ -39,7 +39,7 @@
         
         h1 { font-size: 26px; margin: 0; color: var(--primary-color); text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
-        /* HEADER MỚI CỦA MÀN HÌNH CÂY GIA PHẢ - FIXED 100% WIDTH */
+        /* HEADER MỚI CỦA MÀN HÌNH CÂY GIA PHẢ */
         #treeHeader {
             display: flex;
             justify-content: space-between;
@@ -47,86 +47,49 @@
             padding: 12px 20px;
             background: var(--container-bg);
             border-bottom: 1px solid var(--border-color);
-            gap: 15px;
+            gap: 10px; /* Giảm gap để tối ưu mobile */
             width: 100%;
             box-sizing: border-box;
-            flex-wrap: wrap; /* Cho phép rớt dòng nếu màn hình quá nhỏ */
+            flex-wrap: nowrap; /* BẮT BUỘC 1 HÀNG */
         }
 
         /* DROPDOWN MENU ☰ */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
+        .dropdown { position: relative; display: inline-block; }
         .dropdown::after {
-            content: "";
-            position: absolute;
-            width: 100%;
-            height: 15px;
-            bottom: -15px;
-            left: 0;
-            background: transparent;
-            z-index: 1001;
+            content: ""; position: absolute; width: 100%; height: 15px;
+            bottom: -15px; left: 0; background: transparent; z-index: 1001;
         }
         .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: var(--container-bg);
-            min-width: 180px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
-            z-index: 1002;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            top: calc(100% + 5px);
-            left: 0;
+            display: none; position: absolute; background-color: var(--container-bg);
+            min-width: 180px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+            z-index: 1002; border-radius: 8px; overflow: hidden;
+            border: 1px solid var(--border-color); top: calc(100% + 5px); left: 0;
         }
         .dropdown-content a {
-            color: var(--text-color);
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 15px;
-            text-align: left;
+            color: var(--text-color); padding: 12px 16px; text-decoration: none;
+            display: block; cursor: pointer; transition: 0.2s; font-size: 15px; text-align: left;
         }
-        .dropdown-content a:hover {
-            background-color: #334155;
-            color: var(--primary-color);
-        }
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
+        .dropdown-content a:hover { background-color: #334155; color: var(--primary-color); }
+        .dropdown:hover .dropdown-content { display: block; }
+
+        /* Class ép ẩn dropdown cho mobile (fix lỗi dính hover) */
+        .hide-force { display: none !important; }
 
         /* ---------------- MÀN HÌNH CHÍNH (DANH SÁCH) ---------------- */
-        #homeScreen {
-            height: 100vh;
-            overflow-y: auto;
-            padding-bottom: 80px;
-        }
+        #homeScreen { height: 100vh; overflow-y: auto; padding-bottom: 80px; }
 
         .tree-list-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 30px;
-            max-width: 1200px;
-            margin: 0 auto;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px; padding: 30px; max-width: 1200px; margin: 0 auto;
         }
 
         .tree-card {
-            background: var(--container-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
+            background: var(--container-bg); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         .tree-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary-color);
+            transform: translateY(-5px); border-color: var(--primary-color);
             box-shadow: 0 8px 15px rgba(14, 165, 233, 0.2);
         }
         .tree-card h3 { margin: 0 0 10px 0; color: #10b981; font-size: 20px; }
@@ -136,14 +99,9 @@
         #treeScreen { display: none; height: 100vh; }
 
         #treeScreen main { 
-            display: block;
-            flex-direction: column;
-            padding: 20px 40px; 
-            height: calc(100vh - 75px);
-            overflow: auto;
-            scrollbar-width: none;
-            position: relative;
-            cursor: grab; 
+            display: block; flex-direction: column; padding: 20px 40px; 
+            height: calc(100vh - 75px); overflow: auto; scrollbar-width: none;
+            position: relative; cursor: grab; 
         }
         #treeScreen main:active { cursor: grabbing; }
         #treeScreen main::-webkit-scrollbar { display: none; }
@@ -164,17 +122,28 @@
         button.update-btn:hover, select.update-btn:hover, .upload-btn-wrapper:hover { filter: brightness(1.1); transform: translateY(-1px);}
         select.update-btn option { background: var(--container-bg); color: var(--text-color); }
 
+        /* ---------------- THANH TÌM KIẾM THU GỌN ---------------- */
         .search-wrapper {
-            display: flex; align-items: center; gap: 10px; flex: 1; min-width: 150px;
+            display: flex; align-items: center; gap: 5px; 
             background: #0f172a; padding: 5px 15px; border-radius: 25px; border: 2px solid var(--border-color);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); transition: all 0.3s ease; cursor: pointer;
+            width: 40px; overflow: hidden; box-sizing: border-box; justify-content: center;
         }
+        .search-wrapper.active { flex: 1; width: auto; justify-content: flex-start; cursor: text; }
         .search-wrapper:focus-within { border-color: var(--primary-color); box-shadow: 0 0 10px rgba(14, 165, 233, 0.4); }
 
-        #searchInput { flex: 1; border: none; background: transparent; color: var(--text-color); font-size: 16px; outline: none; padding: 5px 0; width: 100%;}
-        #searchCount { font-size: 14px; color: #cbd5e1; font-weight: bold; white-space: nowrap; }
+        #searchIconBtn { background: none; border: none; color: #cbd5e1; font-size: 16px; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; }
+        #searchInput { 
+            width: 0; opacity: 0; border: none; background: transparent; color: var(--text-color); font-size: 16px; outline: none; padding: 0; transition: all 0.3s ease;
+        }
+        .search-wrapper.active #searchInput { width: 100%; opacity: 1; padding: 5px 0; }
         
-        .nav-btn { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 16px; padding: 5px; border-radius: 4px; transition: 0.2s; }
+        .search-actions { display: none; align-items: center; gap: 5px; }
+        .search-wrapper.active .search-actions { display: flex; }
+        .search-wrapper.active #searchIconBtn { display: none; }
+
+        #searchCount { font-size: 14px; color: #cbd5e1; font-weight: bold; white-space: nowrap; }
+        .nav-btn { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 16px; padding: 5px; border-radius: 4px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
         .nav-btn:hover { background: #334155; color: white; }
 
         .highlight-compact { background: #f59e0b !important; color: #fff !important; padding: 2px 6px; border-radius: 4px; }
@@ -193,14 +162,9 @@
             box-sizing: border-box;
         }
 
-        /* HEADER CHO MODAL CHỨA DẤU X */
         .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 15px;
-            margin-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 15px;
         }
         .modal-header h2 { margin: 0; font-size: 22px; }
         .close-x-btn {
@@ -214,8 +178,7 @@
 
         .custom-input {
             width: 100%; padding: 15px; font-size: 18px; background: #0f172a; color: #fff;
-            border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 15px; box-sizing: border-box;
-            outline: none;
+            border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; outline: none;
         }
         .custom-input:focus { border-color: var(--primary-color); }
 
@@ -255,32 +218,27 @@
 
         /* TỐI ƯU GIAO DIỆN ĐIỆN THOẠI */
         @media (max-width: 600px) {
-            footer {
-                padding: 10px;
-                gap: 10px;
-                flex-wrap: nowrap; /* Ép không xuống dòng */
-            }
-            footer .update-btn {
-                font-size: 14px !important;
-                padding: 10px !important;
-                flex: 1; /* Chia đều không gian 2 nút */
-                white-space: nowrap;
-            }
+            footer { padding: 10px; gap: 10px; flex-wrap: nowrap; }
+            footer .update-btn { font-size: 14px !important; padding: 10px !important; flex: 1; white-space: nowrap; }
             .modal-content { width: 95% !important; padding: 15px; }
-            #treeHeader { padding: 10px; }
+            
+            /* Ép header 1 hàng với kích thước nhỏ */
+            #treeHeader { padding: 8px 5px; gap: 5px; }
+            #treeHeader .update-btn { padding: 6px 10px !important; font-size: 14px !important; }
+            .search-wrapper { padding: 5px 10px; width: 35px; } 
+            .search-wrapper.active { width: auto; }
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
-<!-- ================= MÀN HÌNH CHỦ (DANH SÁCH GIA PHẢ) ================= -->
+<!-- ================= MÀN HÌNH CHỦ ================= -->
 <div id="homeScreen">
     <header>
         <h1>DANH SÁCH GIA PHẢ</h1>
     </header>
-    <div id="treeList" class="tree-list-container">
-        <!-- Render danh sách qua JS -->
-    </div>
+    <div id="treeList" class="tree-list-container"></div>
     <footer>
         <button class="update-btn" style="background: #10b981; font-size: 18px; padding: 12px 30px;" onclick="openCreateModal()">+ Tạo Gia Phả</button>
         <button class="update-btn" style="background:#8b5cf6;" onclick="openManageModal()">Quản lý Dữ Liệu</button>
@@ -290,34 +248,38 @@
 <!-- ================= MÀN HÌNH CHI TIẾT CÂY GIA PHẢ ================= -->
 <div id="treeScreen">
     <header id="treeHeader">
-        <!-- 1. Menu (Sửa, Danh sách, Ngày giỗ, Xóa) -->
+        <!-- 1. Menu -->
         <div class="dropdown">
             <button class="update-btn" style="background:#475569; padding: 8px 15px; font-size: 18px;">☰</button>
             <div class="dropdown-content">
-                <!-- Thêm hideMenu() vào onclick để khắc phục lỗi dính hover -->
                 <a onclick="hideMenu(); openEditModal()">✏️ Sửa Dữ Liệu</a>
                 <a onclick="hideMenu(); openListModal()">📋 Danh sách</a>
                 <a onclick="hideMenu(); openDeathModal()">🕯️ Ngày Giỗ</a>
-                <a onclick="hideMenu(); alert('Chức năng Tạo ảnh đang được phát triển!')">🖼️ Tạo ảnh</a>
+                <a onclick="hideMenu(); captureTree()">🖼️ Tạo ảnh</a>
                 <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 5px 0;">
                 <a onclick="hideMenu(); deleteCurrentTree()" style="color: #ef4444;">🗑️ Xóa Gia Phả</a>
             </div>
         </div>
 
-        <!-- 2. Thanh tìm kiếm -->
-        <div class="search-wrapper">
+        <!-- 2. Thanh tìm kiếm (Mới) -->
+        <div class="search-wrapper" id="searchWrapper" onclick="openSearch()">
+            <button id="searchIconBtn">🔍</button>
             <input type="text" id="searchInput" placeholder="Tìm kiếm..." oninput="onSearchInput()" onkeydown="handleSearchKey(event)">
-            <span id="searchCount">0/0</span>
-            <button class="nav-btn" onclick="prevMatch()" title="Kết quả trước (Shift+Enter)">▲</button>
-            <button class="nav-btn" onclick="nextMatch()" title="Kết quả tiếp theo (Enter)">▼</button>
+            <div class="search-actions">
+                <span id="searchCount">0/0</span>
+                <button class="nav-btn" onclick="prevMatch(event)" title="Kết quả trước">▲</button>
+                <button class="nav-btn" onclick="nextMatch(event)" title="Kết quả tiếp theo">▼</button>
+                <button class="nav-btn" onclick="closeSearch(event)" title="Đóng" style="color: #ef4444; font-weight: bold;">✖</button>
+            </div>
         </div>
         
-        <!-- 3. Combo box (Thu gọn) -->
-        <select id="genCollapseSelect" class="update-btn" style="background:#f59e0b; padding: 8px 10px; font-size: 14px; text-align: center;" onchange="collapseToGen(this.value)">
-            <!-- Sẽ đổ dữ liệu bằng JS -->
-        </select>
+        <!-- 3. Combo box -->
+        <select id="genCollapseSelect" class="update-btn" style="background:#f59e0b; padding: 8px 10px; font-size: 14px; text-align: center;" onchange="collapseToGen(this.value)"></select>
 
-        <!-- 4. Close (✖) -->
+        <!-- 4. Nút Toàn Màn Hình (Mới) -->
+        <button class="update-btn" style="background:#3b82f6; padding: 8px 15px; font-size: 18px;" onclick="toggleFullScreen()" title="Toàn màn hình">⛶</button>
+
+        <!-- 5. Close -->
         <button class="update-btn" style="background:#ef4444; padding: 8px 15px; font-size: 18px;" onclick="closeTree()" title="Đóng">✖</button>
     </header>
 
@@ -329,8 +291,6 @@
 </div>
 
 <!-- ================= MODALS ================= -->
-
-<!-- Modal Tạo / Cập nhật dữ liệu -->
 <div class="modal-overlay" id="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -345,7 +305,6 @@
     </div>
 </div>
 
-<!-- Modal Quản lý Backup (Dành cho Màn hình chính) -->
 <div class="modal-overlay" id="manageModal">
     <div class="modal-content" style="max-width: 450px;">
         <div class="modal-header">
@@ -353,7 +312,7 @@
             <button class="close-x-btn" onclick="closeManageModal()">&times;</button>
         </div>
         <div style="text-align: center;">
-            <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 20px;">Backup gồm TẤT CẢ các gia phả. Xuất file <b>.json</b> để lưu trữ, hoặc xuất file <b>.html</b> để tạo một ứng dụng chạy Offline.</p>
+            <p style="font-size: 14px; color: #cbd5e1; margin-bottom: 20px;">Backup gồm TẤT CẢ các gia phả. Xuất file <b>.json</b> để lưu trữ, hoặc xuất file <b>.html</b> để tạo ứng dụng chạy Offline.</p>
             <div style="display: flex; flex-direction: column; gap: 15px; margin: 15px 0;">
                 <button class="update-btn" style="background:#10b981;" onclick="exportJSON()">⬇️ Xuất Data Thuần (.json)</button>
                 <button class="update-btn" style="background:#f59e0b;" onclick="exportHTML()">⬇️ Xuất File App Offline (.html)</button>
@@ -366,7 +325,6 @@
     </div>
 </div>
 
-<!-- Modal Xem danh sách thành viên -->
 <div class="modal-overlay" id="listModal">
     <div class="modal-content" style="height: 95vh;">
         <div class="modal-header">
@@ -379,7 +337,6 @@
     </div>
 </div>
 
-<!-- Modal Ngày giỗ -->
 <div class="modal-overlay" id="deathModal">
     <div class="modal-content" style="height: 95vh;">
         <div class="modal-header">
@@ -393,12 +350,9 @@
 </div>
 
 <script>
-    /* ================= CẤU HÌNH DỮ LIỆU & BIẾN TOÀN CỤC ================= */
     const defaultData = `Lê Văn Mạnh (Nam) (1920) [15/08]\n+ Nguyễn Thị B (Nữ) (1922) [02/01]\n    Lê Văn Bùng (Nam) (1950)\n    + Trần Thị C (Nữ) [20/12]\n        Lê Văn Bao (Nam) (1980)`;
-    
     let treesList = []; 
     let currentTreeId = null; 
-
     const input = document.getElementById('dataInput');
     const nameInput = document.getElementById('treeNameInput');
     const scrollContainer = document.getElementById('scrollContainer');
@@ -406,12 +360,10 @@
     
     let searchMatches = [];
     let currentMatchIndex = -1;
-
     const coupleColors = ['#f87171', '#fb923c', '#fbbf24', '#a3e635', '#34d399', '#2dd4bf', '#38bdf8', '#818cf8', '#a78bfa', '#e879f9', '#f43f5e', '#bef264', '#5eead4'];
     let coupleColorMap = {};
     let colorIndex = 0;
 
-    /* ================= KHỞI TẠO ỨNG DỤNG ================= */
     window.addEventListener('DOMContentLoaded', () => {
         loadDataFromStorage();
         renderHome();
@@ -420,48 +372,35 @@
     function loadDataFromStorage() {
         if (window.offlineBackupData) {
             treesList = window.offlineBackupData;
-            saveTreesToStorage(); 
-            window.offlineBackupData = null; 
+            saveTreesToStorage(); window.offlineBackupData = null; 
         } else {
             const savedList = localStorage.getItem('giaPhaList');
-            if (savedList) {
-                treesList = JSON.parse(savedList);
-            } else {
+            if (savedList) { treesList = JSON.parse(savedList); } 
+            else {
                 const oldSingleData = localStorage.getItem('giaPhaData');
-                treesList = [{
-                    id: Date.now(),
-                    name: "Gia phả mẫu",
-                    data: oldSingleData ? oldSingleData : defaultData
-                }];
+                treesList = [{ id: Date.now(), name: "Gia phả mẫu", data: oldSingleData ? oldSingleData : defaultData }];
                 saveTreesToStorage();
             }
         }
     }
 
-    function saveTreesToStorage() {
-        localStorage.setItem('giaPhaList', JSON.stringify(treesList));
-    }
+    function saveTreesToStorage() { localStorage.setItem('giaPhaList', JSON.stringify(treesList)); }
 
-    /* ================= ĐIỀU HƯỚNG MÀN HÌNH ================= */
     function renderHome() {
         const listContainer = document.getElementById('treeList');
         listContainer.innerHTML = '';
-        
         treesList.forEach(tree => {
             listContainer.innerHTML += `
                 <div class="tree-card" onclick="openTree(${tree.id})">
                     <h3>📁 ${tree.name}</h3>
                     <p>Bấm vào để xem chi tiết gia phả</p>
-                </div>
-            `;
+                </div>`;
         });
     }
 
     function openTree(id) {
-        currentTreeId = id;
-        const tree = treesList.find(t => t.id === id);
-        input.value = tree.data; 
-        renderView(); 
+        currentTreeId = id; const tree = treesList.find(t => t.id === id);
+        input.value = tree.data; renderView(); 
         document.getElementById('homeScreen').style.display = 'none';
         document.getElementById('treeScreen').style.display = 'block';
     }
@@ -473,37 +412,30 @@
         renderHome(); 
     }
 
-    // Fix lỗi dính hover của menu
+    // FIX LỖI MENU TRÊN MOBILE BẰNG CLASS
     function hideMenu() {
         const menu = document.querySelector('.dropdown-content');
-        menu.style.display = 'none';
-        setTimeout(() => menu.style.display = '', 100); 
+        menu.classList.add('hide-force'); // Ép ẩn ngay lập tức
+        setTimeout(() => { menu.classList.remove('hide-force'); }, 500); // Đợi modal mở xong mới gỡ
     }
 
-    /* ================= QUẢN LÝ MODAL TẠO / SỬA / XOÁ ================= */
     function openCreateModal() {
-        currentTreeId = null; 
-        document.getElementById('modalTitle').innerText = "Tạo Gia Phả Mới";
-        nameInput.value = "";
-        input.value = defaultData; 
-        modal.style.display = 'flex';
+        currentTreeId = null; document.getElementById('modalTitle').innerText = "Tạo Gia Phả Mới";
+        nameInput.value = ""; input.value = defaultData; modal.style.display = 'flex';
     }
 
     function openEditModal() {
         if(!currentTreeId) return;
         const tree = treesList.find(t => t.id === currentTreeId);
         document.getElementById('modalTitle').innerText = "Chỉnh sửa Gia Phả";
-        nameInput.value = tree.name;
-        input.value = tree.data;
-        modal.style.display = 'flex';
+        nameInput.value = tree.name; input.value = tree.data; modal.style.display = 'flex';
     }
 
     function deleteCurrentTree() {
         if(!currentTreeId) return;
         if(confirm("⚠️ Bạn có chắc chắn muốn XÓA gia phả này không? Hành động này không thể hoàn tác!")) {
             treesList = treesList.filter(t => t.id !== currentTreeId);
-            saveTreesToStorage();
-            closeTree();
+            saveTreesToStorage(); closeTree();
         }
     }
 
@@ -515,94 +447,57 @@
 
         if (currentTreeId) {
             const treeIndex = treesList.findIndex(t => t.id === currentTreeId);
-            if(treeIndex !== -1) {
-                treesList[treeIndex].name = newName;
-                treesList[treeIndex].data = newData;
-            }
+            if(treeIndex !== -1) { treesList[treeIndex].name = newName; treesList[treeIndex].data = newData; }
         } else {
-            const newTree = {
-                id: Date.now(),
-                name: newName,
-                data: newData
-            };
-            treesList.push(newTree);
-            currentTreeId = newTree.id; 
+            const newTree = { id: Date.now(), name: newName, data: newData };
+            treesList.push(newTree); currentTreeId = newTree.id; 
         }
-
-        saveTreesToStorage();
-        closeModal(); 
-        openTree(currentTreeId);
+        saveTreesToStorage(); closeModal(); openTree(currentTreeId);
     }
 
-    /* ================= XỬ LÝ KÉO THẢ MÀN HÌNH ================= */
-    let isDown = false;
-    let startX, startY, scrollLeft, scrollTop;
+    let isDown = false; let startX, startY, scrollLeft, scrollTop;
     scrollContainer.addEventListener('mousedown', (e) => {
         const ignoredTags = ['BUTTON', 'INPUT', 'TEXTAREA', 'LABEL', 'SELECT', 'OPTION', 'A'];
         if(ignoredTags.includes(e.target.tagName) || e.target.classList.contains('btn-toggle-compact')) return; 
-        
-        isDown = true;
-        startX = e.pageX - scrollContainer.offsetLeft;
-        startY = e.pageY - scrollContainer.offsetTop;
-        scrollLeft = scrollContainer.scrollLeft;
-        scrollTop = scrollContainer.scrollTop;
+        isDown = true; startX = e.pageX - scrollContainer.offsetLeft; startY = e.pageY - scrollContainer.offsetTop;
+        scrollLeft = scrollContainer.scrollLeft; scrollTop = scrollContainer.scrollTop;
     });
     scrollContainer.addEventListener('mouseleave', () => { isDown = false; });
     scrollContainer.addEventListener('mouseup', () => { isDown = false; });
     scrollContainer.addEventListener('mousemove', (e) => {
-        if (!isDown) return; 
-        e.preventDefault();
-        const x = e.pageX - scrollContainer.offsetLeft;
-        const y = e.pageY - scrollContainer.offsetTop;
-        const walkX = (x - startX);
-        const walkY = (y - startY);
-        scrollContainer.scrollLeft = scrollLeft - walkX;
-        scrollContainer.scrollTop = scrollTop - walkY;
+        if (!isDown) return; e.preventDefault();
+        const x = e.pageX - scrollContainer.offsetLeft; const y = e.pageY - scrollContainer.offsetTop;
+        const walkX = (x - startX); const walkY = (y - startY);
+        scrollContainer.scrollLeft = scrollLeft - walkX; scrollContainer.scrollTop = scrollTop - walkY;
     });
 
     window.addEventListener('mousedown', function(event) {
-        if (event.target.classList.contains('modal-overlay')) {
-            event.target.style.display = 'none';
-        }
+        if (event.target.classList.contains('modal-overlay')) { event.target.style.display = 'none'; }
     });
 
-    /* ================= LOGIC PARSE & HIỂN THỊ CÂY ================= */
     function getCoupleColor(key) {
-        if (!coupleColorMap[key]) {
-            coupleColorMap[key] = coupleColors[colorIndex % coupleColors.length];
-            colorIndex++;
-        }
+        if (!coupleColorMap[key]) { coupleColorMap[key] = coupleColors[colorIndex % coupleColors.length]; colorIndex++; }
         return coupleColorMap[key];
     }
 
     function parseLine(line) {
-        let text = line.trim();
-        let isWife = text.startsWith('+');
+        let text = line.trim(); let isWife = text.startsWith('+');
         if (isWife) text = text.substring(1).trim();
-        
         let gender = text.toLowerCase().includes('(nữ)') ? 'female' : 'male';
         text = text.replace(/\(nam\)|\(nữ\)/gi, "").trim();
-
-        let dates = "";
-        let dateMatch = text.match(/\((.*?)\)/);
+        let dates = ""; let dateMatch = text.match(/\((.*?)\)/);
         if (dateMatch) { dates = dateMatch[1].trim(); text = text.replace(dateMatch[0], ""); }
-
-        let deathDate = "";
-        let deathMatchArr = text.match(/\[(.*?)\]/);
+        let deathDate = ""; let deathMatchArr = text.match(/\[(.*?)\]/);
         if (deathMatchArr) { deathDate = deathMatchArr[1].trim(); text = text.replace(deathMatchArr[0], ""); }
-
         let name = text.trim();
         return { name, dates, deathDate, gender, isWife };
     }
 
     function buildTree(lines) {
-        let roots = [], stack = [];
-        window.treeData = roots; 
-
+        let roots = [], stack = []; window.treeData = roots; 
         lines.forEach(line => {
             if (!line.trim()) return;
-            let indent = 0;
-            let match = line.match(/^\s*/)[0];
+            let indent = 0; let match = line.match(/^\s*/)[0];
             for(let c of match) indent += (c === '\t' ? 4 : 1);
             let node = { ...parseLine(line), children: [], parentObj: null };
             
@@ -610,27 +505,20 @@
                 if (node.isWife && stack[stack.length - 1].indent === indent && !stack[stack.length - 1].node.isWife) break;
                 stack.pop();
             }
-            
             if (stack.length > 0) {
                 let parentNode = stack[stack.length - 1].node;
                 node.gen = node.isWife ? parentNode.gen : parentNode.gen + 1;
-                
                 if (!node.isWife) {
                     if (parentNode.isWife) {
                         let husbandNode = stack[stack.length - 2].node;
-                        node.bloodParentName = husbandNode.name;
-                        node.coupleKey = husbandNode.name + "_" + parentNode.name; 
-                        node.parentObj = husbandNode;
+                        node.bloodParentName = husbandNode.name; node.coupleKey = husbandNode.name + "_" + parentNode.name; node.parentObj = husbandNode;
                     } else {
-                        node.bloodParentName = parentNode.name;
-                        node.coupleKey = parentNode.name + "_none"; 
-                        node.parentObj = parentNode;
+                        node.bloodParentName = parentNode.name; node.coupleKey = parentNode.name + "_none"; node.parentObj = parentNode;
                     }
                 }
                 parentNode.children.push(node);
             } else {
-                node.gen = 1; node.bloodParentName = null; node.coupleKey = "root_" + node.name;
-                roots.push(node);
+                node.gen = 1; node.bloodParentName = null; node.coupleKey = "root_" + node.name; roots.push(node);
             }
             stack.push({ node, indent });
         });
@@ -670,16 +558,11 @@
     }
 
     function updateGenSelect() {
-        let list = getBloodRelatives();
-        if(list.length === 0) return;
+        let list = getBloodRelatives(); if(list.length === 0) return;
         let maxGen = Math.max(...list.map(n => n.gen));
         let select = document.getElementById('genCollapseSelect');
-        // Chỉ để icon con mắt cho gọn
         select.innerHTML = '<option value="all">👁️</option>';
-        
-        for(let i = 1; i < maxGen; i++) {
-            select.innerHTML += `<option value="${i}">👁️ ${i}</option>`;
-        }
+        for(let i = 1; i < maxGen; i++) { select.innerHTML += `<option value="${i}">👁️ ${i}</option>`; }
     }
 
     function renderCompactTree(nodes) {
@@ -689,10 +572,8 @@
             let colorClass = node.gender === 'male' ? 'c-male' : 'c-female';
             let prefix = node.isWife ? '<span class="c-spouse-mark">+</span>' : '';
             let hasChildren = node.children && node.children.length > 0;
-            
             let toggleBtn = hasChildren ? `<span class="btn-toggle-compact" data-gen="${node.gen}" onclick="toggleCompactNode(this)">-</span>` : `<span class="btn-toggle-spacer"></span>`;
             let displayName = buildDisplayNameHtml(node);
-
             html += `<li><div class="compact-node">${toggleBtn} ${prefix} <span class="${colorClass}">${displayName}</span></div>`;
             if (hasChildren) html += `<ul>${renderCompactTree(node.children)}</ul>`;
             html += `</li>`;
@@ -703,21 +584,14 @@
     function renderView() { 
         const parsedTree = buildTree(input.value.split('\n'));
         document.getElementById('compactTreeView').innerHTML = `<ul>${renderCompactTree(parsedTree)}</ul>`;
-        updateGenSelect();
-        onSearchInput(); 
+        updateGenSelect(); onSearchInput(); 
     }
 
-    /* ================= BACKUP VÀ KHÔI PHỤC ================= */
     function openManageModal() { document.getElementById('manageModal').style.display = 'flex'; }
     function closeManageModal() { document.getElementById('manageModal').style.display = 'none'; }
 
     function exportJSON() {
-        const dataToBackup = { 
-            appName: "GiaPhaThongMinh_Multi", 
-            version: "3.0", 
-            exportDate: new Date().toISOString(), 
-            giaPhaList: treesList 
-        };
+        const dataToBackup = { appName: "GiaPhaThongMinh_Multi", version: "3.0", exportDate: new Date().toISOString(), giaPhaList: treesList };
         const blob = new Blob([JSON.stringify(dataToBackup, null, 2)], {type: 'application/json'});
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'DataGiaPha.json'; a.click();
     }
@@ -729,11 +603,8 @@
             try {
                 const json = JSON.parse(e.target.result);
                 if (json && json.giaPhaList) {
-                    treesList = json.giaPhaList;
-                    saveTreesToStorage();
-                    renderHome();
-                    alert("Khôi phục toàn bộ danh sách thành công!"); 
-                    closeManageModal();
+                    treesList = json.giaPhaList; saveTreesToStorage(); renderHome();
+                    alert("Khôi phục toàn bộ danh sách thành công!"); closeManageModal();
                 } else { alert("Lỗi: File JSON không đúng định dạng đa gia phả!"); }
             } catch (error) { alert("Lỗi: Không thể đọc cấu trúc file JSON."); }
         };
@@ -744,21 +615,12 @@
         closeManageModal();
         let htmlString = "<!DOCTYPE html>\n<html lang=\"vi\">\n" + document.documentElement.innerHTML + "\n</html>";
         let scriptTag = `<script id="offline-data-script">window.offlineBackupData = ${JSON.stringify(treesList)};<\/script>`;
-        
-        if(htmlString.includes('id="offline-data-script"')) {
-            htmlString = htmlString.replace(/<script id="offline-data-script">.*?<\/script>/, scriptTag);
-        } else {
-            htmlString = htmlString.replace('</head>', '    ' + scriptTag + '\n</head>');
-        }
-        
+        if(htmlString.includes('id="offline-data-script"')) { htmlString = htmlString.replace(/<script id="offline-data-script">.*?<\/script>/, scriptTag); } 
+        else { htmlString = htmlString.replace('</head>', '    ' + scriptTag + '\n</head>'); }
         const blob = new Blob([htmlString], {type: 'text/html;charset=utf-8'});
-        const a = document.createElement('a'); 
-        a.href = URL.createObjectURL(blob); 
-        a.download = 'AppGiaPha_Offline.html'; 
-        a.click();
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'AppGiaPha_Offline.html'; a.click();
     }
 
-    /* ================= CÁC CHỨC NĂNG PHỤ ================= */
     function getBloodRelatives() {
         let list = [];
         function traverse(nodes) { for (let node of nodes) { if (!node.isWife) list.push(node); traverse(node.children); } }
@@ -772,8 +634,7 @@
     }
 
     function openListModal() {
-        let list = getBloodRelatives(); 
-        if(list.length === 0) return;
+        let list = getBloodRelatives(); if(list.length === 0) return;
         let allGens = [...new Set(list.map(node => node.gen))].sort((a, b) => a - b);
         let grouped = {}; let total = 0; 
         allGens.forEach(g => grouped[g] = []);
@@ -785,13 +646,11 @@
             html += `<h3 style="color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-top: 25px; display: flex; justify-content: space-between;">
                         Đời ${g} <span style="font-size: 14px; opacity: 0.7;">(${grouped[g].length} thành viên)</span>
                     </h3><ul style="list-style: none; padding-left: 5px;">`;
-            
             grouped[g].forEach((node, idx) => {
                 let nameColor = node.gender === 'male' ? '#3b82f6' : '#d946ef';
                 let extraInfo = '';
                 if (node.parentObj) {
-                    let cColor = getCoupleColor(node.coupleKey);
-                    let parent = node.parentObj; let grandparent = parent.parentObj;
+                    let cColor = getCoupleColor(node.coupleKey); let parent = node.parentObj; let grandparent = parent.parentObj;
                     let pathText = grandparent ? `Cháu/con của: ${grandparent.name} / ${parent.name}` : `Con của: ${parent.name}`;
                     extraInfo = ` <span style="color: ${cColor}; font-size: 14px; font-style: italic; margin-left: 10px;">( ${pathText} )</span>`;
                 }
@@ -816,7 +675,6 @@
             let dayB = parseInt(partsB[0]) || 0; let monthB = parseInt(partsB[1]) || 0;
             if (monthA !== monthB) return monthA - monthB; return dayA - dayB;
         });
-
         document.getElementById('deathTotalCount').innerText = deadMembers.length + " người";
         let html = `<ul style="list-style: none; padding-left: 5px;">`;
         if (deadMembers.length === 0) { html += `<li style="color: #cbd5e1;">Chưa có thông tin ngày giỗ nào. Nhớ điền vào khung dữ liệu dạng [ngày/tháng].</li>`; } 
@@ -868,9 +726,56 @@
         activeEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
     }
 
-    function nextMatch() { if (searchMatches.length === 0) return; currentMatchIndex = (currentMatchIndex + 1) % searchMatches.length; updateSearchFocus(); }
-    function prevMatch() { if (searchMatches.length === 0) return; currentMatchIndex = (currentMatchIndex - 1 + searchMatches.length) % searchMatches.length; updateSearchFocus(); }
-    function handleSearchKey(e) { if (e.key === 'Enter') { e.preventDefault(); if (e.shiftKey) { prevMatch(); } else { nextMatch(); } } }
+    // SỰ KIỆN THANH TÌM KIẾM MỚI
+    function openSearch() {
+        const wrapper = document.getElementById('searchWrapper');
+        if (!wrapper.classList.contains('active')) {
+            wrapper.classList.add('active');
+            setTimeout(() => { document.getElementById('searchInput').focus(); }, 150);
+        }
+    }
+
+    function closeSearch(event) {
+        if (event) event.stopPropagation();
+        const wrapper = document.getElementById('searchWrapper');
+        wrapper.classList.remove('active');
+        document.getElementById('searchInput').value = '';
+        onSearchInput(); 
+    }
+
+    function nextMatch(e) { if(e) e.stopPropagation(); if (searchMatches.length === 0) return; currentMatchIndex = (currentMatchIndex + 1) % searchMatches.length; updateSearchFocus(); }
+    function prevMatch(e) { if(e) e.stopPropagation(); if (searchMatches.length === 0) return; currentMatchIndex = (currentMatchIndex - 1 + searchMatches.length) % searchMatches.length; updateSearchFocus(); }
+    function handleSearchKey(e) { if (e.key === 'Enter') { e.preventDefault(); if (e.shiftKey) { prevMatch(e); } else { nextMatch(e); } } }
+
+    // SỰ KIỆN FULL SCREEN MỚI
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.log(`Lỗi chế độ toàn màn hình: ${err.message}`);
+            });
+        } else {
+            if (document.exitFullscreen) { document.exitFullscreen(); }
+        }
+    }
+
+    function captureTree() {
+        const target = document.getElementById('compactTreeContainerMain');
+        if (!target) return;
+        const oldPaddingRight = target.style.paddingRight; const oldPaddingBottom = target.style.paddingBottom;
+        target.style.paddingRight = '30px'; target.style.paddingBottom = '30px';
+
+        html2canvas(target, { backgroundColor: '#0f172a', scale: 2 }).then(canvas => {
+            target.style.paddingRight = oldPaddingRight; target.style.paddingBottom = oldPaddingBottom;
+            const treeName = treesList.find(t => t.id === currentTreeId)?.name || 'Gia-Pha';
+            const link = document.createElement('a');
+            link.download = treeName + '.jpg'; 
+            link.href = canvas.toDataURL('image/jpeg', 0.85); 
+            link.click();
+        }).catch(err => {
+            target.style.paddingRight = oldPaddingRight; target.style.paddingBottom = oldPaddingBottom;
+            alert("Có lỗi xảy ra trong quá trình tạo ảnh!");
+        });
+    }
 </script>
 </body>
 </html>
