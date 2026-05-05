@@ -69,7 +69,10 @@
             display: block; cursor: pointer; transition: 0.2s; font-size: 15px; text-align: left;
         }
         .dropdown-content a:hover { background-color: #334155; color: var(--primary-color); }
-        .dropdown-content.show { display: block !important; }
+        /*.dropdown:hover .dropdown-content { display: block; }*/
+        .dropdown-content.show { 
+       display: block !important; 
+   }
         .hide-force { display: none !important; }
 
         /* ---------------- MÀN HÌNH CHÍNH (DANH SÁCH) ---------------- */
@@ -128,9 +131,9 @@
         }
         .search-wrapper:focus-within { border-color: var(--primary-color); box-shadow: 0 0 10px rgba(14, 165, 233, 0.4); }
         #searchIconBtn { background: none; border: none; color: #cbd5e1; font-size: 16px; padding: 0; display: flex; align-items: center; justify-content: center; }
-        #searchInput, #listSearchInput { width: 100%; border: none; background: transparent; color: var(--text-color); font-size: 16px; outline: none; padding: 5px 0; }
+        #searchInput { width: 100%; border: none; background: transparent; color: var(--text-color); font-size: 16px; outline: none; padding: 5px 0; }
         .search-actions { display: flex; align-items: center; gap: 5px; }
-        #searchCount, #listSearchCount { font-size: 14px; color: #cbd5e1; font-weight: bold; white-space: nowrap; }
+        #searchCount { font-size: 14px; color: #cbd5e1; font-weight: bold; white-space: nowrap; }
         .nav-btn { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 16px; padding: 5px; border-radius: 4px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
         .nav-btn:hover { background: #334155; color: white; }
         .close-search-btn { display: none; }
@@ -151,18 +154,19 @@
             box-sizing: border-box;
         }
 
+        /* Full Màn Hình cho modal Sửa/Tạo */
         /* Full Màn Hình cho modal Sửa/Tạo, Thống Kê và Ngày Giỗ */
-        #modal .modal-content, 
-        #listModal .modal-content, 
-        #deathModal .modal-content { 
-            width: 100vw !important; 
-            height: 100vh !important; 
-            max-width: 100vw !important; 
-            max-height: 100vh !important; 
-            border-radius: 0; 
-            margin: 0; 
-            padding: 20px; 
-        }
+#modal .modal-content, 
+#listModal .modal-content, 
+#deathModal .modal-content { 
+    width: 100vw !important; 
+    height: 100vh !important; 
+    max-width: 100vw !important; 
+    max-height: 100vh !important; 
+    border-radius: 0; 
+    margin: 0; 
+    padding: 20px; 
+}
 
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 15px; }
         .modal-header h2 { margin: 0; font-size: 22px; }
@@ -215,11 +219,11 @@
             #treeHeader { padding: 8px 5px; gap: 5px; flex-wrap: nowrap; }
             #treeHeader .update-btn { padding: 6px 8px !important; }
             .search-wrapper { flex: 1; width: auto; padding: 5px 8px; justify-content: flex-start; } 
-            #searchInput, #listSearchInput { width: 100%; opacity: 1; padding: 5px 0; font-size: 14px;}
+            #searchInput { width: 100%; opacity: 1; padding: 5px 0; font-size: 14px;}
             .search-actions { display: flex; }
             #searchIconBtn { display: none; }
             .close-search-btn { display: none !important; }
-            #searchCount, #listSearchCount { font-size: 12px; }
+            #searchCount { font-size: 12px; }
 
             /* Fix Thống kê & Ngày giỗ cho Mobile */
             #genListView h3 { font-size: 16px !important; flex-wrap: wrap; }
@@ -232,77 +236,146 @@
             .death-item-date { font-size: 15px !important; padding: 5px 10px !important; }
             .modal-header h2 { font-size: 18px !important; }
         }
-        
-        /* Tăng cỡ chữ Họ tên trong popup Thống kê */
-        #genListView li > span:first-of-type {
-            font-size: 20px !important; 
-            display: inline-block;
-            margin-bottom: 5px;
-        }
+/* Tăng cỡ chữ Họ tên trong popup Thống kê */
+#genListView li > span:first-of-type {
+    font-size: 20px !important; /* Chỉnh độ to của tên theo ý bạn */
+    display: inline-block;
+    margin-bottom: 5px;
+}
 
-        /* Giữ nguyên cỡ chữ của các thông tin đi kèm trong popup */
-        #genListView .gen-text, 
-        #genListView .date-text, 
-        #genListView .death-text {
-            font-size: 14px !important; 
-            font-weight: normal;
-        }
+/* Giữ nguyên cỡ chữ của các thông tin đi kèm trong popup */
+#genListView .gen-text, 
+#genListView .date-text, 
+#genListView .death-text {
+    font-size: 14px !important; /* Kích thước xấp xỉ ban đầu (0.85em của 17px) */
+    font-weight: normal;
+}
 
-        /* Giữ nguyên cỡ chữ của phần "Con của.../Cháu của..." */
-        #genListView li span:not(:first-of-type) {
-            font-size: 15px !important;
-        }
+/* Giữ nguyên cỡ chữ của phần "Con của.../Cháu của..." */
+#genListView li span:not(:first-of-type) {
+    font-size: 15px !important;
+}
+/* --- THÊM CON TRỞ BÀN TAY CHO DANH SÁCH VÀ NGÀY GIỖ --- */
+#genListView, #deathListView {
+    cursor: grab;
+}
+#genListView:active, #deathListView:active {
+    cursor: grabbing;
+}
+/* --- FIX LỖI HEADER BỊ TRÔI LÊN TRÊN KHI VUỐT TRÊN IOS --- */
 
-        /* --- THÊM CON TRỞ BÀN TAY CHO DANH SÁCH VÀ NGÀY GIỖ --- */
-        #genListView, #deathListView {
-            cursor: grab;
-        }
-        #genListView:active, #deathListView:active {
-            cursor: grabbing;
-        }
+/* 1. Khóa chặt khung nội dung modal, không cho phép cuộn vượt rào */
+.modal-content {
+    overflow: hidden !important; 
+}
 
-        /* --- FIX LỖI HEADER BỊ TRÔI LÊN TRÊN KHI VUỐT TRÊN IOS --- */
-        .modal-content { overflow: hidden !important; }
-        .modal-header { flex-shrink: 0 !important; position: relative; z-index: 10; }
-        #genListView, #deathListView { -webkit-overflow-scrolling: touch !important; flex-grow: 1; padding-bottom: 30px; }
+/* 2. Đảm bảo Header không bao giờ bị bóp nhỏ hay bị đẩy đi */
+.modal-header {
+    flex-shrink: 0 !important; 
+    position: relative;
+    z-index: 10;
+}
 
-        /* FIX POPUP DANH SÁCH & NGÀY GIỖ GIỐNG TRANG CHI TIẾT */
-        #listModal .modal-content, 
-        #deathModal .modal-content { 
-            width: 100% !important; height: 100% !important; max-width: 100% !important; max-height: 100% !important; 
-            border-radius: 0 !important; margin: 0 !important; padding: 0 !important; 
-            background-color: var(--bg-color) !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; 
-        }
+/* 3. Kích hoạt tính năng cuộn mượt (momentum scrolling) độc lập trên iOS cho 2 danh sách */
+#genListView, #deathListView {
+    -webkit-overflow-scrolling: touch !important; 
+    flex-grow: 1; /* Cho phép danh sách chiếm hết phần không gian còn lại */
+    padding-bottom: 30px; /* Thêm chút khoảng trống ở đáy để dễ vuốt hơn */
+}
+/* --------------------------------------------------- */
+/* FIX POPUP DANH SÁCH & NGÀY GIỖ GIỐNG TRANG CHI TIẾT */
+/* --------------------------------------------------- */
 
-        #listModal .modal-header, #deathModal .modal-header {
-            background: var(--container-bg) !important; padding: 12px 20px !important;
-            border-bottom: 1px solid var(--border-color) !important; margin-bottom: 0 !important;
-            flex-shrink: 0 !important; position: relative !important; z-index: 10 !important;
-            display: flex; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box;
-        }
+/* 1. Chỉnh khung Popup bám sát viền, dùng 100% thay vì 100vh để trị dứt điểm lỗi iOS */
+#listModal .modal-content, 
+#deathModal .modal-content { 
+    width: 100% !important; 
+    height: 100% !important; 
+    max-width: 100% !important; 
+    max-height: 100% !important; 
+    border-radius: 0 !important; 
+    margin: 0 !important; 
+    padding: 0 !important; /* Bỏ padding tổng để Header dính sát lề giống #treeHeader */
+    background-color: var(--bg-color) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important; /* Khóa tuyệt đối không cho cuộn tràn trang */
+}
 
-        #genListView, #deathListView {
-            flex: 1 !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch !important; 
-            padding: 20px !important; padding-bottom: 50px !important; box-sizing: border-box !important;
-        }
+/* 2. Style lại Header của 2 popup này giống hệt header của trang Gia phả */
+#listModal .modal-header,
+#deathModal .modal-header {
+    background: var(--container-bg) !important;
+    padding: 12px 20px !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    margin-bottom: 0 !important;
+    flex-shrink: 0 !important; /* Khóa cứng chiều cao, không cho phép bị bóp méo hay trôi lên */
+    position: relative !important;
+    z-index: 10 !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
 
-        /* Style cho nút icon thu gọn/mở rộng tất cả */
-        .icon-toggle-btn { background: transparent; border: none; cursor: pointer; padding: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; color: #ffffff; margin-left: auto; margin-right: 10px; border-radius: 50%; }
-        .icon-toggle-btn:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.1); }
-        .icon-toggle-btn svg { width: 24px; height: 24px; stroke: currentColor; }
+/* 3. Vùng cuộn nội dung độc lập (Bù lại padding đã xóa ở bước 1) */
+#genListView, 
+#deathListView {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important; /* Kích hoạt vuốt mượt bằng gia tốc trên iPhone */
+    padding: 20px !important; 
+    padding-bottom: 50px !important; /* Dư giả không gian đáy để vuốt không bị cấn */
+    box-sizing: border-box !important;
+}
+/* Style cho nút icon thu gọn/mở rộng tất cả */
+.icon-toggle-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    color: #ffffff; /* Màu trắng */
+    margin-left: auto;
+    margin-right: 10px;
+    border-radius: 50%;
+}
 
-        /* Sửa lại khoảng cách margin-top cho H3 theo yêu cầu mới */
-        div#genListView h3 {
-            margin-top: 25px !important; 
-            font-size: 22px !important;
-        }
-        /* Ép riêng tiêu đề Đời 1 sát lên trên */
-        div#genListView h3:first-of-type {
-            margin-top: 0px !important;
-        }
+.icon-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
 
-        .close-x-btn { background: transparent; border: none; color: #ffffff !important; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1; transition: 0.2s; -webkit-appearance: none; -webkit-text-fill-color: #ffffff; }
-        .close-x-btn:hover { color: #ef4444 !important; }
+.icon-toggle-btn svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor; /* Lấy màu từ color của icon-toggle-btn */
+}
+div#genListView h3 {
+    margin-top: 74px !important;
+    font-size: 22px !important;
+}
+.close-x-btn {
+    background: transparent;
+    border: none;
+    color: #ffffff !important; /* Ép màu trắng */
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    transition: 0.2s;
+    /* Khử hoàn toàn định dạng mặc định của iPhone */
+    -webkit-appearance: none;
+    -webkit-text-fill-color: #ffffff; 
+}
+
+.close-x-btn:hover {
+    color: #ef4444 !important;
+}
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
@@ -322,6 +395,7 @@
 <div id="treeScreen">
     <header id="treeHeader">
     <div class="dropdown">
+        <!-- Đã tăng padding và font-size (24px) để nút to và dễ bấm hơn -->
         <button class="update-btn" style="background:#475569; padding: 10px 18px; font-size: 24px;" onclick="toggleDropdown(event)">☰</button>
         <div class="dropdown-content">
             <a onclick="hideMenu(); openListModal()">📋 Danh sách</a>
@@ -338,6 +412,7 @@
     <div class="search-wrapper" id="searchWrapper">
         <input type="text" id="searchInput" placeholder="Tìm kiếm tên thành viên..." oninput="onSearchInput()" onkeydown="handleSearchKey(event)">
         <div class="search-actions">
+            <!-- Đã xóa 2 button mũi tên lên/xuống cho rộng rãi -->
             <span id="searchCount">0/0</span>
         </div>
     </div>
@@ -350,8 +425,11 @@
         </div>
     </div>
 
-    <button class="close-x-btn" style="padding: 0 10px; margin-left: 10px; font-size: 32px;" onclick="closeTree()" title="Đóng">&times;</button>
-    </header>
+    <!-- Thay thế nút đóng cũ ở treeHeader -->
+<button class="close-x-btn" 
+        style="padding: 0 10px; margin-left: 10px; font-size: 32px;" 
+        onclick="closeTree()" 
+        title="Đóng">&times;</button></header>
 
     <main id="scrollContainer" class="custom-scroll">
         <div id="compactTreeContainerMain" class="compact-tree-container">
@@ -412,40 +490,24 @@
     </div>
 </div>
 
-<!-- Modal Thống Kê (Đã tối ưu cùng 1 hàng) -->
 <div class="modal-overlay" id="listModal">
     <div class="modal-content" style="height: 95vh;">
-        <div class="modal-header" style="padding: 10px 15px !important;">
-            <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
-                <!-- Tiêu đề và số lượng -->
-                <h2 style="color: #10b981; font-size: 18px; margin: 0; white-space: nowrap; display: flex; align-items: center; gap: 8px;">
-                    
-                    <span id="totalCount" style="font-size: 13px; background: #10b981; color: #fff; padding: 2px 8px; border-radius: 12px;">0 người</span>
-                </h2>
-
-                <!-- Thanh tìm kiếm nằm ở giữa -->
-                <div class="search-wrapper" style="flex: 1; margin: 0 10px; border-radius: 6px; padding: 2px 10px; min-width: 150px;">
-                    <input type="text" id="listSearchInput" placeholder="Tìm tên..." oninput="onListSearchInput()" onkeydown="handleListSearchKey(event)" style="font-size: 14px;">
-                    <div class="search-actions">
-                        <span id="listSearchCount" style="font-size: 12px; min-width: 30px; text-align: center;">0/0</span>
-                        
-                    </div>
-                </div>
-
-                <!-- Cụm nút đóng/thu gọn bên phải -->
-                <div style="display: flex; align-items: center; gap: 5px; flex-shrink: 0;">
-                    <button id="toggleAllBtn" class="icon-toggle-btn" onclick="toggleAllGens()" data-state="expanded" style="padding: 4px; margin:0;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px; height:20px;">
-                            <polyline points="7 13 12 8 17 13"></polyline>
-                            <polyline points="7 17 12 12 17 17"></polyline>
-                        </svg>
-                    </button>
-                    <button class="close-x-btn" onclick="closeListModal()" style="font-size: 24px; margin:0;">&times;</button>
-                </div>
-            </div>
+        <div class="modal-header">
+            <h2 style="color: #10b981; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; width: 100%;">
+                Thống kê
+                <span id="totalCount" style="font-size: 16px; background: #10b981; color: #fff; padding: 2px 12px; border-radius: 20px;">0 người</span>
+                
+                <!-- Nút Thu gọn/Mở rộng tất cả -->
+                <button id="toggleAllBtn" class="icon-toggle-btn" onclick="toggleAllGens()" data-state="expanded" title="Thu gọn/Mở rộng tất cả">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="7 13 12 8 17 13"></polyline>
+        <polyline points="7 17 12 12 17 17"></polyline>
+    </svg>
+</button>
+            </h2>
+            <button class="close-x-btn" onclick="closeListModal()">&times;</button>
         </div>
-        
-        <div id="genListView" class="custom-scroll" style="text-align: left; flex: 1; overflow-y: auto; color: var(--text-color); padding: 15px;"></div>
+        <div id="genListView" class="custom-scroll" style="text-align: left; flex: 1; overflow-y: auto; color: var(--text-color); padding-right: 10px;"></div>
     </div>
 </div>
 
@@ -505,6 +567,7 @@
             if (savedList) { treesList = JSON.parse(savedList); } 
             else {
                 const oldSingleData = localStorage.getItem('giaPhaData');
+                // Khởi tạo thêm isLocked: false cho dữ liệu mặc định
                 treesList = [{ id: Date.now(), name: "Gia phả mẫu", data: oldSingleData ? oldSingleData : defaultData, isLocked: false, docName: "", docLink: "" }];
                 saveTreesToStorage();
             }
@@ -538,6 +601,7 @@
         const btnLock = document.getElementById('btnLock');
         const btnDownloadDoc = document.getElementById('btnDownloadDoc');
         
+        // Hiển thị nút Tải Tư liệu nếu có Link
         if (tree.docLink && tree.docLink.trim() !== '') {
             btnDownloadDoc.style.display = 'block';
             btnDownloadDoc.href = tree.docLink;
@@ -563,6 +627,8 @@
         document.getElementById('treeScreen').style.display = 'none';
         renderHome(); 
     }
+
+
 
     function openCreateModal() {
         currentTreeId = null; document.getElementById('modalTitle').innerText = "Tạo Gia Phả Mới";
@@ -654,6 +720,7 @@
         saveTreesToStorage(); closeModal(); openTree(currentTreeId);
     }
 
+// HÀM DÙNG CHUNG ĐỂ KÉO CUỘN BẰNG CHUỘT
     function enableDragScroll(element) {
         if (!element) return;
         let isDown = false; 
@@ -672,7 +739,7 @@
         element.addEventListener('mouseup', () => { isDown = false; });
         element.addEventListener('mousemove', (e) => {
             if (!isDown) return; 
-            e.preventDefault();
+            e.preventDefault(); // Ngăn chặn bôi đen text khi kéo
             const x = e.pageX - element.offsetLeft; 
             const y = e.pageY - element.offsetTop;
             const walkX = (x - startX); 
@@ -682,6 +749,7 @@
         });
     }
 
+    // Áp dụng tính năng kéo cho cả 3 vùng
     enableDragScroll(document.getElementById('scrollContainer'));
     enableDragScroll(document.getElementById('genListView'));
     enableDragScroll(document.getElementById('deathListView'));
@@ -740,13 +808,13 @@
         return roots;
     }
 
-    function buildDisplayNameHtml(node, showGen = true) {
-        let genHtml = showGen ? `<span class="gen-text">(đời ${node.gen})</span>` : "";
-        let dateHtml = node.dates ? `<span class="date-text">(${node.dates})</span>` : "";
-        let deathHtml = node.deathDate ? `<span class="death-text">[${node.deathDate}]</span>` : "";
-        return `${node.name} ${genHtml} ${dateHtml} ${deathHtml}`;
-    }
-
+function buildDisplayNameHtml(node, showGen = true) {
+    // Nếu showGen = false thì sẽ không render text (đời x)
+    let genHtml = showGen ? `<span class="gen-text">(đời ${node.gen})</span>` : "";
+    let dateHtml = node.dates ? `<span class="date-text">(${node.dates})</span>` : "";
+    let deathHtml = node.deathDate ? `<span class="death-text">[${node.deathDate}]</span>` : "";
+    return `${node.name} ${genHtml} ${dateHtml} ${deathHtml}`;
+}
     function toggleCompactNode(btn) {
         const li = btn.closest('li'); const ul = li.querySelector(':scope > ul');
         if (ul) {
@@ -855,107 +923,112 @@
     }
 
     function openListModal() {
-        let list = getBloodRelatives(); if(list.length === 0) return;
-        let allGens = [...new Set(list.map(node => node.gen))].sort((a, b) => a - b);
-        let grouped = {}; let total = 0; 
-        allGens.forEach(g => grouped[g] = []);
-        list.forEach(node => { grouped[node.gen].push(node); total++; });
-        
-        document.getElementById('totalCount').innerText = total + " người";
-        let html = '';
-        
-        allGens.forEach(g => {
-            html += `<h3 onclick="toggleGenList(${g})" style="cursor: pointer; color: #cecece; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; user-select: none;">
-                        <div>
-                            <span id="icon-gen-${g}" style="display:inline-block; width: 20px; transition: 0.3s; color: var(--primary-color);">▾</span>
-                            Đời ${g} <span style="font-size: 14px; opacity: 0.7;">(${grouped[g].length} thành viên)</span>
-                        </div>
-                    </h3>
-                    <ul id="list-gen-${g}" style="list-style: none; padding-left: 5px; transition: all 0.3s ease;">`;
-                    
-            grouped[g].forEach((node, idx) => {
-                let nameColor = node.gender === 'male' ? '#629dff' : '#df5969';
-                let extraInfo = '';
-                if (node.parentObj) {
-                    let cColor = getCoupleColor(node.coupleKey); let parent = node.parentObj; let grandparent = parent.parentObj;
-                    let pathText = grandparent ? `${grandparent.name} / ${parent.name}` : `${parent.name}`;
-                    extraInfo = ` <span style="color: ${cColor}; font-size: 16px; font-style: italic; margin-left: 10px;">( ${pathText} )</span>`;
-                }
+    let list = getBloodRelatives(); if(list.length === 0) return;
+    let allGens = [...new Set(list.map(node => node.gen))].sort((a, b) => a - b);
+    let grouped = {}; let total = 0; 
+    allGens.forEach(g => grouped[g] = []);
+    list.forEach(node => { grouped[node.gen].push(node); total++; });
+    
+    document.getElementById('totalCount').innerText = total + " người";
+    let html = '';
+    
+    allGens.forEach(g => {
+        // Thêm sự kiện onclick và icon toggle vào tiêu đề
+        html += `<h3 onclick="toggleGenList(${g})" style="cursor: pointer; color: #cecece; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+                    <div>
+                        <span id="icon-gen-${g}" style="display:inline-block; width: 20px; transition: 0.3s; color: var(--primary-color);">▾</span>
+                        Đời ${g} <span style="font-size: 14px; opacity: 0.7;">(${grouped[g].length} thành viên)</span>
+                    </div>
+                </h3>
+                <ul id="list-gen-${g}" style="list-style: none; padding-left: 5px; transition: all 0.3s ease;">`;
                 
-                html += `<li style="margin-bottom: 12px; font-size: 17px; background: rgba(30,41,59, 0.5); padding: 8px 10px; border-radius: 6px;">
-                            <strong style="display:inline-block; color:#cbd5e1; width: 45px;">${g}.${idx + 1}.</strong> 
-                            <span class="list-member-name" style="color: ${nameColor}; font-weight: bold;">${buildDisplayNameHtml(node, false)}</span>${extraInfo}
-                        </li>`;
-            });
-            html += `</ul>`;
+        grouped[g].forEach((node, idx) => {
+            let nameColor = node.gender === 'male' ? '#629dff' : '#df5969';
+            let extraInfo = '';
+            if (node.parentObj) {
+                let cColor = getCoupleColor(node.coupleKey); let parent = node.parentObj; let grandparent = parent.parentObj;
+                let pathText = grandparent ? `${grandparent.name} / ${parent.name}` : `${parent.name}`;
+                extraInfo = ` <span style="color: ${cColor}; font-size: 16px; font-style: italic; margin-left: 10px;">( ${pathText} )</span>`;
+            }
+            
+            // Sửa số thứ tự thành g.idx (VD: 1.1, 2.1) và truyền 'false' để ẩn (đời x)
+            html += `<li style="margin-bottom: 12px; font-size: 17px; background: rgba(30,41,59, 0.5); padding: 8px 10px; border-radius: 6px;">
+                        <strong style="display:inline-block; color:#cbd5e1; width: 45px;">${g}.${idx + 1}.</strong> 
+                        <span style="color: ${nameColor}; font-weight: bold;">${buildDisplayNameHtml(node, false)}</span>${extraInfo}
+                    </li>`;
         });
-        
-        document.getElementById('genListView').innerHTML = html;
-        
-        let toggleBtn = document.getElementById('toggleAllBtn');
-        if(toggleBtn) {
-            toggleBtn.innerHTML = `
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="7 13 12 8 17 13"></polyline>
-                    <polyline points="7 17 12 12 17 17"></polyline>
-                </svg>`;
-            toggleBtn.dataset.state = 'expanded';
-            toggleBtn.title = "Thu gọn tất cả";
-        }
+        html += `</ul>`;
+    });
+    
+    document.getElementById('genListView').innerHTML = html;
+    
+    // Reset lại trạng thái của nút "Thu gọn tất cả" khi mở Modal
+  // Đoạn mới đã sửa:
+let toggleBtn = document.getElementById('toggleAllBtn');
+if(toggleBtn) {
+    // Nạp lại icon Thu gọn (mũi tên đôi hướng lên) thay vì nạp chữ
+    toggleBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="7 13 12 8 17 13"></polyline>
+            <polyline points="7 17 12 12 17 17"></polyline>
+        </svg>`;
+    toggleBtn.dataset.state = 'expanded';
+    toggleBtn.title = "Thu gọn tất cả";
+}
 
-        document.getElementById('listModal').style.display = 'flex';
-        
-        // Reset thanh tìm kiếm
-        document.getElementById('listSearchInput').value = '';
-        let countDisplay = document.getElementById('listSearchCount');
-        if(countDisplay) countDisplay.innerText = "0/0";
-    }
+    document.getElementById('listModal').style.display = 'flex';
+}
 
     function closeListModal() { document.getElementById('listModal').style.display = 'none'; }
 
-    function toggleGenList(gen) {
-        let list = document.getElementById(`list-gen-${gen}`);
-        let icon = document.getElementById(`icon-gen-${gen}`);
-        if (list.style.display === 'none') {
-            list.style.display = 'block';
-            icon.innerText = '▾';
-        } else {
-            list.style.display = 'none';
-            icon.innerText = '▸';
-        }
+// Hàm thu gọn/mở rộng từng đời khi bấm vào tiêu đề
+function toggleGenList(gen) {
+    let list = document.getElementById(`list-gen-${gen}`);
+    let icon = document.getElementById(`icon-gen-${gen}`);
+    if (list.style.display === 'none') {
+        list.style.display = 'block';
+        icon.innerText = '▾';
+    } else {
+        list.style.display = 'none';
+        icon.innerText = '▸';
     }
+}
 
-    function toggleAllGens() {
-        const btn = document.getElementById('toggleAllBtn');
-        const isExpanded = btn.dataset.state === 'expanded';
-        const allLists = document.querySelectorAll('[id^="list-gen-"]');
-        const allIcons = document.querySelectorAll('[id^="icon-gen-"]');
+// Hàm thu gọn/mở rộng tất cả các đời trên nút Header
+function toggleAllGens() {
+    const btn = document.getElementById('toggleAllBtn');
+    const isExpanded = btn.dataset.state === 'expanded';
+    const allLists = document.querySelectorAll('[id^="list-gen-"]');
+    const allIcons = document.querySelectorAll('[id^="icon-gen-"]');
 
-        const iconCollapseAll = `
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="7 13 12 8 17 13"></polyline>
-                <polyline points="7 17 12 12 17 17"></polyline>
-            </svg>`;
-        const iconExpandAll = `
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="7 11 12 16 17 11"></polyline>
-                <polyline points="7 7 12 12 17 7"></polyline>
-            </svg>`;
+    // Khai báo 2 mẫu icon SVG trắng, mảnh
+    const iconCollapseAll = `
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="7 13 12 8 17 13"></polyline>
+            <polyline points="7 17 12 12 17 17"></polyline>
+        </svg>`;
+    const iconExpandAll = `
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="7 11 12 16 17 11"></polyline>
+            <polyline points="7 7 12 12 17 7"></polyline>
+        </svg>`;
 
-        if (isExpanded) {
-            allLists.forEach(list => list.style.display = 'none');
-            allIcons.forEach(icon => icon.innerText = '▸');
-            btn.innerHTML = iconExpandAll; 
-            btn.dataset.state = 'collapsed';
-            btn.title = "Mở rộng tất cả";
-        } else {
-            allLists.forEach(list => list.style.display = 'block');
-            allIcons.forEach(icon => icon.innerText = '▾');
-            btn.innerHTML = iconCollapseAll; 
-            btn.dataset.state = 'expanded';
-            btn.title = "Thu gọn tất cả";
-        }
+    if (isExpanded) {
+        // Thu gọn tất cả
+        allLists.forEach(list => list.style.display = 'none');
+        allIcons.forEach(icon => icon.innerText = '▸');
+        btn.innerHTML = iconExpandAll; // Đổi sang icon Mở rộng
+        btn.dataset.state = 'collapsed';
+        btn.title = "Mở rộng tất cả";
+    } else {
+        // Mở rộng tất cả
+        allLists.forEach(list => list.style.display = 'block');
+        allIcons.forEach(icon => icon.innerText = '▾');
+        btn.innerHTML = iconCollapseAll; // Đổi sang icon Thu gọn
+        btn.dataset.state = 'expanded';
+        btn.title = "Thu gọn tất cả";
     }
+}
 
     function openDeathModal() {
         let deadMembers = getAllMembersWithDeathDate();
@@ -1076,108 +1149,40 @@
             if (document.activeElement) { document.activeElement.blur(); }
         }
     };
-
-    function toggleDropdown(event) {
-        event.stopPropagation(); 
-        let currentMenu = event.target.nextElementSibling;
-        document.querySelectorAll('.dropdown-content').forEach(menu => {
-            if (menu !== currentMenu) { menu.classList.remove('show'); }
-        });
-        currentMenu.classList.toggle('show');
-    }
-
-    window.addEventListener('click', function(event) {
-        if (!event.target.matches('.update-btn') && !event.target.closest('.dropdown-content')) {
-            document.querySelectorAll('.dropdown-content').forEach(menu => {
-                menu.classList.remove('show');
-            });
+   // Hàm bật/tắt menu khi bấm vào nút
+function toggleDropdown(event) {
+    event.stopPropagation(); // Ngăn sự kiện click bị lan ra ngoài
+    
+    // Tìm khối menu ngay bên dưới nút vừa bấm
+    let currentMenu = event.target.nextElementSibling;
+    
+    // Đóng tất cả các menu khác nếu đang mở
+    document.querySelectorAll('.dropdown-content').forEach(menu => {
+        if (menu !== currentMenu) {
+            menu.classList.remove('show');
         }
     });
+    
+    // Bật/tắt menu hiện tại
+    currentMenu.classList.toggle('show');
+}
 
-    function hideMenu() {
+// Đóng menu khi bấm vào bất kỳ đâu bên ngoài
+window.addEventListener('click', function(event) {
+    // Nếu click không trúng vào nút bấm menu hoặc nội dung menu
+    if (!event.target.matches('.update-btn') && !event.target.closest('.dropdown-content')) {
         document.querySelectorAll('.dropdown-content').forEach(menu => {
             menu.classList.remove('show');
         });
     }
+});
 
-    // --- LOGIC TÌM KIẾM TRONG POPUP DANH SÁCH GIỐNG CHROME ---
-    let listSearchMatches = [];
-    let currentListMatchIndex = -1;
-
-    function clearListSearchHighlights() {
-        document.querySelectorAll('#genListView .list-member-name').forEach(n => {
-            n.classList.remove('highlight-compact', 'active-search-compact');
-        });
-    }
-
-    function onListSearchInput() {
-        const term = document.getElementById('listSearchInput').value.toLowerCase().trim();
-        const countDisplay = document.getElementById('listSearchCount');
-        clearListSearchHighlights();
-        listSearchMatches = [];
-        currentListMatchIndex = -1;
-
-        if (term === '') {
-            countDisplay.innerText = "0/0";
-            return;
-        }
-
-        document.querySelectorAll('#genListView .list-member-name').forEach(node => {
-            if (node.innerText.toLowerCase().includes(term)) {
-                listSearchMatches.push(node);
-                node.classList.add('highlight-compact');
-
-                // Tự động mở rộng nhánh Đời nếu nó đang bị thu gọn
-                let parentUl = node.closest('ul');
-                if (parentUl && parentUl.style.display === 'none') {
-                    parentUl.style.display = 'block';
-                    let genId = parentUl.id.replace('list-gen-', '');
-                    let icon = document.getElementById(`icon-gen-${genId}`);
-                    if (icon) icon.innerText = '▾';
-                }
-            }
-        });
-
-        if (listSearchMatches.length > 0) {
-            currentListMatchIndex = 0;
-            updateListSearchFocus();
-        } else {
-            countDisplay.innerText = "0/0";
-        }
-    }
-
-    function updateListSearchFocus() {
-        if (listSearchMatches.length === 0) return;
-        listSearchMatches.forEach(el => el.classList.remove('active-search-compact'));
-        const activeEl = listSearchMatches[currentListMatchIndex];
-        activeEl.classList.add('active-search-compact');
-        document.getElementById('listSearchCount').innerText = `${currentListMatchIndex + 1}/${listSearchMatches.length}`;
-        
-        // Tự động trượt danh sách đến đúng người đang focus
-        activeEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-    }
-
-    function nextListMatch(e) {
-        if (e) e.stopPropagation();
-        if (listSearchMatches.length === 0) return;
-        currentListMatchIndex = (currentListMatchIndex + 1) % listSearchMatches.length;
-        updateListSearchFocus();
-    }
-
-    function prevListMatch(e) {
-        if (e) e.stopPropagation();
-        if (listSearchMatches.length === 0) return;
-        currentListMatchIndex = (currentListMatchIndex - 1 + listSearchMatches.length) % listSearchMatches.length;
-        updateListSearchFocus();
-    }
-
-    function handleListSearchKey(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            if (e.shiftKey) { prevListMatch(e); } 
-            else { nextListMatch(e); }
-        }
-    }
+// Hàm ẩn menu dùng chung (gọi khi bấm vào các mục con bên trong menu)
+function hideMenu() {
+    document.querySelectorAll('.dropdown-content').forEach(menu => {
+        menu.classList.remove('show');
+    });
+}
 </script>
 </body>
 </html>
