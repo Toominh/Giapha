@@ -214,7 +214,7 @@
             footer .update-btn { font-size: 14px !important; padding: 10px !important; flex: 1; white-space: nowrap; }
             .modal-content { width: 95% !important; padding: 15px; }
             #treeHeader { padding: 8px 5px; gap: 5px; flex-wrap: nowrap; }
-            #treeHeader .update-btn { padding: 6px 8px !important; font-size: 13px !important; }
+            #treeHeader .update-btn { padding: 6px 8px !important; }
             .search-wrapper { flex: 1; width: auto; padding: 5px 8px; justify-content: flex-start; } 
             #searchInput { width: 100%; opacity: 1; padding: 5px 0; font-size: 14px;}
             .search-actions { display: flex; }
@@ -226,13 +226,39 @@
             #genListView h3 { font-size: 16px !important; flex-wrap: wrap; }
             #genListView li { font-size: 14px !important; margin-bottom: 8px !important; padding: 8px 10px !important; line-height: 1.4; }
             #genListView li span { font-size: 14px !important; }
-            #deathListView li { flex-direction: column !important; align-items: flex-start !important; padding: 12px !important; gap: 8px !important; }
-            .death-item-name { font-size: 16px !important; }
+            
+            #deathListView li { align-items: flex-start !important; padding: 12px !important; gap: 8px !important; }
+            .death-item-name { font-size: 18px !important; }
             .death-item-role { font-size: 12px !important; margin-left: 0 !important; }
             .death-item-date { font-size: 15px !important; padding: 5px 10px !important; }
             .modal-header h2 { font-size: 18px !important; }
         }
+/* Tăng cỡ chữ Họ tên trong popup Thống kê */
+#genListView li > span:first-of-type {
+    font-size: 20px !important; /* Chỉnh độ to của tên theo ý bạn */
+    display: inline-block;
+    margin-bottom: 5px;
+}
 
+/* Giữ nguyên cỡ chữ của các thông tin đi kèm trong popup */
+#genListView .gen-text, 
+#genListView .date-text, 
+#genListView .death-text {
+    font-size: 14px !important; /* Kích thước xấp xỉ ban đầu (0.85em của 17px) */
+    font-weight: normal;
+}
+
+/* Giữ nguyên cỡ chữ của phần "Con của.../Cháu của..." */
+#genListView li span:not(:first-of-type) {
+    font-size: 15px !important;
+}
+/* --- THÊM CON TRỞ BÀN TAY CHO DANH SÁCH VÀ NGÀY GIỖ --- */
+#genListView, #deathListView {
+    cursor: grab;
+}
+#genListView:active, #deathListView:active {
+    cursor: grabbing;
+}
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
@@ -255,11 +281,11 @@
         <!-- Đã tăng padding và font-size (24px) để nút to và dễ bấm hơn -->
         <button class="update-btn" style="background:#475569; padding: 10px 18px; font-size: 24px;">☰</button>
         <div class="dropdown-content">
-            <a id="btnEdit" onclick="hideMenu(); openEditModal()">✏️ Sửa Dữ Liệu</a>
             <a onclick="hideMenu(); openListModal()">📋 Danh sách</a>
             <a onclick="hideMenu(); openDeathModal()">🕯️ Ngày Giỗ</a>
             <a id="btnDownloadDoc" target="_blank" style="display: none; color: #10b981;">📚 Tải Tư liệu</a>
             <a onclick="hideMenu(); captureTree()">🖼️ Tạo ảnh</a>
+            <a id="btnEdit" onclick="hideMenu(); openEditModal()">✏️ Sửa Dữ Liệu</a>
             <a class="btnLocka" id="btnLock" onclick="hideMenu(); toggleLockTree()">🔒 Khóa Gia Phả</a>
             <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 5px 0;">
             <a id="btnDelete" onclick="hideMenu(); deleteCurrentTree()" style="color: #ef4444;">🗑️ Xóa Gia Phả</a>
@@ -586,21 +612,39 @@ function hideMenu() {
         saveTreesToStorage(); closeModal(); openTree(currentTreeId);
     }
 
-    let isDown = false; let startX, startY, scrollLeft, scrollTop;
-    scrollContainer.addEventListener('mousedown', (e) => {
-        const ignoredTags = ['BUTTON', 'INPUT', 'TEXTAREA', 'LABEL', 'SELECT', 'OPTION', 'A'];
-        if(ignoredTags.includes(e.target.tagName) || e.target.classList.contains('btn-toggle-compact')) return; 
-        isDown = true; startX = e.pageX - scrollContainer.offsetLeft; startY = e.pageY - scrollContainer.offsetTop;
-        scrollLeft = scrollContainer.scrollLeft; scrollTop = scrollContainer.scrollTop;
-    });
-    scrollContainer.addEventListener('mouseleave', () => { isDown = false; });
-    scrollContainer.addEventListener('mouseup', () => { isDown = false; });
-    scrollContainer.addEventListener('mousemove', (e) => {
-        if (!isDown) return; e.preventDefault();
-        const x = e.pageX - scrollContainer.offsetLeft; const y = e.pageY - scrollContainer.offsetTop;
-        const walkX = (x - startX); const walkY = (y - startY);
-        scrollContainer.scrollLeft = scrollLeft - walkX; scrollContainer.scrollTop = scrollTop - walkY;
-    });
+// HÀM DÙNG CHUNG ĐỂ KÉO CUỘN BẰNG CHUỘT
+    function enableDragScroll(element) {
+        if (!element) return;
+        let isDown = false; 
+        let startX, startY, scrollLeft, scrollTop;
+
+        element.addEventListener('mousedown', (e) => {
+            const ignoredTags = ['BUTTON', 'INPUT', 'TEXTAREA', 'LABEL', 'SELECT', 'OPTION', 'A'];
+            if(ignoredTags.includes(e.target.tagName) || e.target.classList.contains('btn-toggle-compact')) return; 
+            isDown = true; 
+            startX = e.pageX - element.offsetLeft; 
+            startY = e.pageY - element.offsetTop;
+            scrollLeft = element.scrollLeft; 
+            scrollTop = element.scrollTop;
+        });
+        element.addEventListener('mouseleave', () => { isDown = false; });
+        element.addEventListener('mouseup', () => { isDown = false; });
+        element.addEventListener('mousemove', (e) => {
+            if (!isDown) return; 
+            e.preventDefault(); // Ngăn chặn bôi đen text khi kéo
+            const x = e.pageX - element.offsetLeft; 
+            const y = e.pageY - element.offsetTop;
+            const walkX = (x - startX); 
+            const walkY = (y - startY);
+            element.scrollLeft = scrollLeft - walkX; 
+            element.scrollTop = scrollTop - walkY;
+        });
+    }
+
+    // Áp dụng tính năng kéo cho cả 3 vùng
+    enableDragScroll(document.getElementById('scrollContainer'));
+    enableDragScroll(document.getElementById('genListView'));
+    enableDragScroll(document.getElementById('deathListView'));
 
     window.addEventListener('mousedown', function(event) {
         if (event.target.classList.contains('modal-overlay')) { event.target.style.display = 'none'; }
