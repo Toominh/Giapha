@@ -359,17 +359,22 @@ div#genListView h3 {
     margin-top: 74px !important;
     font-size: 22px !important;
 }
-/* Khử thuộc tính mặc định của Safari trên iOS */
-button.update-btn {
-    -webkit-appearance: none; /* Xóa bỏ style mặc định của iPhone */
-    color: white !important;   /* Ép màu trắng */
-    opacity: 1 !important;     /* Đảm bảo không bị mờ */
+.close-x-btn {
+    background: transparent;
+    border: none;
+    color: #ffffff !important; /* Ép màu trắng */
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    transition: 0.2s;
+    /* Khử hoàn toàn định dạng mặc định của iPhone */
+    -webkit-appearance: none;
+    -webkit-text-fill-color: #ffffff; 
 }
 
-/* Riêng nút đóng nếu muốn trắng tinh khi nền trong suốt */
-button[title="Đóng"] {
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff; /* Đặc trị cho một số phiên bản iOS cũ */
+.close-x-btn:hover {
+    color: #ef4444 !important;
 }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -420,8 +425,11 @@ button[title="Đóng"] {
         </div>
     </div>
 
-    <button class="update-btn" style="background:transparent; padding: 8px 15px; font-size: 18px;" onclick="closeTree()" title="Đóng">✖</button>
-</header>
+    <!-- Thay thế nút đóng cũ ở treeHeader -->
+<button class="close-x-btn" 
+        style="padding: 0 10px; margin-left: 10px; font-size: 32px;" 
+        onclick="closeTree()" 
+        title="Đóng">&times;</button></header>
 
     <main id="scrollContainer" class="custom-scroll">
         <div id="compactTreeContainerMain" class="compact-tree-container">
