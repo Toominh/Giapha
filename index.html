@@ -279,6 +279,53 @@
     flex-grow: 1; /* Cho phép danh sách chiếm hết phần không gian còn lại */
     padding-bottom: 30px; /* Thêm chút khoảng trống ở đáy để dễ vuốt hơn */
 }
+/* --------------------------------------------------- */
+/* FIX POPUP DANH SÁCH & NGÀY GIỖ GIỐNG TRANG CHI TIẾT */
+/* --------------------------------------------------- */
+
+/* 1. Chỉnh khung Popup bám sát viền, dùng 100% thay vì 100vh để trị dứt điểm lỗi iOS */
+#listModal .modal-content, 
+#deathModal .modal-content { 
+    width: 100% !important; 
+    height: 100% !important; 
+    max-width: 100% !important; 
+    max-height: 100% !important; 
+    border-radius: 0 !important; 
+    margin: 0 !important; 
+    padding: 0 !important; /* Bỏ padding tổng để Header dính sát lề giống #treeHeader */
+    background-color: var(--bg-color) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important; /* Khóa tuyệt đối không cho cuộn tràn trang */
+}
+
+/* 2. Style lại Header của 2 popup này giống hệt header của trang Gia phả */
+#listModal .modal-header,
+#deathModal .modal-header {
+    background: var(--container-bg) !important;
+    padding: 12px 20px !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    margin-bottom: 0 !important;
+    flex-shrink: 0 !important; /* Khóa cứng chiều cao, không cho phép bị bóp méo hay trôi lên */
+    position: relative !important;
+    z-index: 10 !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 3. Vùng cuộn nội dung độc lập (Bù lại padding đã xóa ở bước 1) */
+#genListView, 
+#deathListView {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important; /* Kích hoạt vuốt mượt bằng gia tốc trên iPhone */
+    padding: 20px !important; 
+    padding-bottom: 50px !important; /* Dư giả không gian đáy để vuốt không bị cấn */
+    box-sizing: border-box !important;
+}
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
