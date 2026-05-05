@@ -359,6 +359,18 @@ div#genListView h3 {
     margin-top: 74px !important;
     font-size: 22px !important;
 }
+/* Khử thuộc tính mặc định của Safari trên iOS */
+button.update-btn {
+    -webkit-appearance: none; /* Xóa bỏ style mặc định của iPhone */
+    color: white !important;   /* Ép màu trắng */
+    opacity: 1 !important;     /* Đảm bảo không bị mờ */
+}
+
+/* Riêng nút đóng nếu muốn trắng tinh khi nền trong suốt */
+button[title="Đóng"] {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff; /* Đặc trị cho một số phiên bản iOS cũ */
+}
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
