@@ -462,21 +462,24 @@
         renderHome(); 
     }
 
-    function hideMenu() {
-        // Tìm TẤT CẢ các menu dropdown trên trang
-        const menus = document.querySelectorAll('.dropdown-content');
+function hideMenu() {
+        // Lấy tất cả các khối dropdown trên trang
+        const dropdowns = document.querySelectorAll('.dropdown');
         
-        menus.forEach(menu => {
-            // Thêm class ép ẩn ngay lập tức (hiệu quả tuyệt đối trên cả Mobile)
-            menu.classList.add('hide-force'); 
-            
-            // Gỡ bỏ class ép ẩn sau 300ms để lần sau rê chuột/chạm vào nó vẫn hiện lên bình thường
-            setTimeout(() => {
-                menu.classList.remove('hide-force');
-            }, 300);
+        dropdowns.forEach(dropdown => {
+            const menu = dropdown.querySelector('.dropdown-content');
+            if (menu) {
+                // 1. Ép ẩn menu ngay lập tức bằng inline style (cái này sẽ ghi đè CSS hover)
+                menu.style.display = 'none';
+                
+                // 2. Chỉ khôi phục lại khả năng hiển thị khi người dùng thực sự
+                // rê chuột lại (PC) hoặc chạm lại (Mobile) vào nút menu này vào lần tiếp theo
+                dropdown.onmouseenter = function() { menu.style.display = ''; };
+                dropdown.ontouchstart = function() { menu.style.display = ''; };
+            }
         });
 
-        // Bỏ focus để giải phóng trạng thái "đang chạm" trên điện thoại
+        // Xóa trạng thái focus/active trên thiết bị di động
         if (document.activeElement) { 
             document.activeElement.blur(); 
         }
