@@ -259,6 +259,26 @@
 #genListView:active, #deathListView:active {
     cursor: grabbing;
 }
+/* --- FIX LỖI HEADER BỊ TRÔI LÊN TRÊN KHI VUỐT TRÊN IOS --- */
+
+/* 1. Khóa chặt khung nội dung modal, không cho phép cuộn vượt rào */
+.modal-content {
+    overflow: hidden !important; 
+}
+
+/* 2. Đảm bảo Header không bao giờ bị bóp nhỏ hay bị đẩy đi */
+.modal-header {
+    flex-shrink: 0 !important; 
+    position: relative;
+    z-index: 10;
+}
+
+/* 3. Kích hoạt tính năng cuộn mượt (momentum scrolling) độc lập trên iOS cho 2 danh sách */
+#genListView, #deathListView {
+    -webkit-overflow-scrolling: touch !important; 
+    flex-grow: 1; /* Cho phép danh sách chiếm hết phần không gian còn lại */
+    padding-bottom: 30px; /* Thêm chút khoảng trống ở đáy để dễ vuốt hơn */
+}
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
