@@ -139,7 +139,7 @@
         .active-search-compact { background: #ef4444 !important; color: #fff !important; }
 
         .gen-text { color: #f59e0b; font-size: 0.85em; font-weight: normal; margin-left: 5px; }
-        .date-text { color: #10b981; font-size: 0.85em; font-style: italic; font-weight: normal; margin-left: 5px; }
+        .date-text { color: #ffd49a; font-size: 0.85em; font-style: italic; font-weight: normal; margin-left: 5px; }
         .death-text { color: #ef4444; font-size: 0.85em; font-weight: normal; margin-left: 5px; }
 
         /* ---------------- MODAL CHUNG ---------------- */
@@ -221,6 +221,11 @@
             .death-item-date { font-size: 15px !important; padding: 5px 10px !important; }
             .modal-header h2 { font-size: 18px !important; }
         }
+        #genCollapseMenu.force-hide {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
@@ -897,6 +902,23 @@
             if (document.activeElement) { document.activeElement.blur(); }
         }
     };
+    document.addEventListener('DOMContentLoaded', function() {
+    const menu = document.getElementById('genCollapseMenu');
+    // Tìm phần tử cha chứa cả nút bấm và menu (thường là div có class dropdown hoặc tương tự)
+    const menuWrapper = menu.parentElement; 
+
+    // 1. Khi click vào bất kỳ đâu trong menu
+    menu.addEventListener('click', function() {
+        // Thêm class để ẩn menu ngay lập tức
+        menu.classList.add('force-hide');
+    });
+
+    // 2. Khi chuột rời khỏi khu vực menu và nút bấm
+    menuWrapper.addEventListener('mouseleave', function() {
+        // Gỡ bỏ class để menu có thể hiển thị lại ở lần hover sau
+        menu.classList.remove('force-hide');
+    });
+});
 </script>
 </body>
 </html>
