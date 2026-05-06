@@ -151,7 +151,7 @@
 
         .gen-text { color: #f59e0b; font-size: 0.85em; font-weight: normal; margin-left: 5px; }
         .date-text { color: #ffd49a; font-size: 0.85em; font-style: italic; font-weight: normal; margin-left: 5px; }
-        .death-text { color: #37497d; font-size: 0.85em; font-weight: normal; margin-left: 5px; }
+        .death-text { color: #6c85cc; font-size: 0.85em; font-weight: normal; margin-left: 5px; }
 
         /* ---------------- MODAL CHUNG ---------------- */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); cursor: default; }
@@ -673,15 +673,26 @@
 
     function saveTreesToStorage() { localStorage.setItem('giaPhaList', JSON.stringify(treesList)); }
 
-    function renderHome() {
+function renderHome() {
         const listContainer = document.getElementById('treeList');
         listContainer.innerHTML = '';
         treesList.forEach(tree => {
             const icon = tree.isLocked ? "🔒" : "📁";
             const lockStatus = tree.isLocked ? '<span style="color:#ef4444; font-size:14px; margin-left: 5px;">(Đã khóa)</span>' : '';
+            
+            // --- XỬ LÝ ĐẾM SỐ THÀNH VIÊN ---
+            // Tách dữ liệu thành các dòng, lọc bỏ các dòng trống và đếm số lượng
+            const memberCount = tree.data ? tree.data.split('\n').filter(line => line.trim() !== '').length : 0;
+            
+            // Tạo một thẻ span (badge) để hiển thị số lượng với viền xanh bo tròn đẹp mắt
+            const countBadge = `<span style="font-size: 13px; background: #10b981; color: #fff; padding: 2px 8px; border-radius: 12px; white-space: nowrap;">${memberCount} người</span>`;
+            // -------------------------------
+
             listContainer.innerHTML += `
                 <div class="tree-card" onclick="openTree(${tree.id})">
-                    <h3>${icon} ${tree.name} ${lockStatus}</h3>
+                    <h3 style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        ${icon} ${tree.name} ${countBadge} ${lockStatus}
+                    </h3>
                     <p>Bấm vào để xem chi tiết gia phả</p>
                 </div>`;
         });
