@@ -369,7 +369,43 @@
     gap: 8px;
     height: 100%; /* Đảm bảo nhóm này chiếm hết chiều cao header */
 }
+/* --- FIX LỖI TÊN GIA PHẢ DÀI BỊ TRÀN MÀN HÌNH --- */
+@media (max-width: 600px) {
+    /* 1. Sửa lỗi trong bảng Danh sách (như trong ảnh bạn chụp) */
+    #listTreeNameDisplay {
+        display: inline-block !important;
+        max-width: 35vw !important; /* Giới hạn chiều rộng khoảng 35% màn hình */
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important; /* Thêm dấu 3 chấm khi chữ quá dài */
+        vertical-align: bottom;
+    }
 
+    /* Đảm bảo khung xanh lá "x người" không bị ép nhỏ lại */
+    #totalCount {
+        flex-shrink: 0 !important;
+    }
+
+    /* 2. Sửa lỗi tương tự cho tiêu đề ở màn hình chính (đề phòng lỗi) */
+    .tree-title-display {
+        max-width: 40vw;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+/* --- STYLE CHO THÔNG TIN THỐNG KÊ (VỢ, CON, CHÁU) --- */
+.member-stats {
+    color: #fcd34d; /* Màu vàng nhạt */
+    font-size: 14px !important;
+    margin-left: 8px;
+    font-style: normal;
+    background: rgba(245, 158, 11, 0.15);
+    padding: 2px 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    display: inline-block;
+}
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
@@ -922,7 +958,42 @@ function toggleCompactNode(element) {
         }
         menu.innerHTML = html;
     }
+// Hàm tính số lượng Vợ/Chồng, Con, Cháu của một người
+function getMemberStats(node) {
+    let spouses = 0;
+    let children = 0;
+    let grandchildren = 0;
 
+    if (!node.children) return { spouses, children, grandchildren };
+
+    // Đếm số vợ/chồng (là những node con có cờ isWife = true)
+    let spouseNodes = node.children.filter(c => c.isWife);
+    spouses = spouseNodes.length;
+
+    // Đếm số con (con trực tiếp hoặc con nằm dưới node vợ/chồng)
+    let childNodes = node.children.filter(c => !c.isWife);
+    spouseNodes.forEach(s => {
+        if(s.children) {
+            childNodes = childNodes.concat(s.children.filter(c => !c.isWife));
+        }
+    });
+    children = childNodes.length;
+
+    // Đếm số cháu (con của những đứa con ở trên)
+    childNodes.forEach(c => {
+        if (!c.children) return;
+        let gc = c.children.filter(x => !x.isWife);
+        let cSpouses = c.children.filter(x => x.isWife);
+        cSpouses.forEach(cs => {
+            if(cs.children) {
+                gc = gc.concat(cs.children.filter(x => !x.isWife));
+            }
+        });
+        grandchildren += gc.length;
+    });
+
+    return { spouses, children, grandchildren };
+}
 function renderCompactTree(nodes) {
     if (!nodes || nodes.length === 0) return '';
     let html = ``;
@@ -1027,20 +1098,36 @@ function renderCompactTree(nodes) {
                     </h3>
                     <ul id="list-gen-${g}" style="list-style: none; padding-left: 5px; transition: all 0.3s ease;">`;
                     
-            grouped[g].forEach((node, idx) => {
-                let nameColor = node.gender === 'male' ? '#629dff' : '#df5969';
-                let extraInfo = '';
-                if (node.parentObj) {
-                    let cColor = getCoupleColor(node.coupleKey); let parent = node.parentObj; let grandparent = parent.parentObj;
-                    let pathText = grandparent ? `${grandparent.name} / ${parent.name}` : `${parent.name}`;
-                    extraInfo = ` <span style="color: ${cColor}; font-size: 16px; font-style: italic; margin-left: 10px;">( ${pathText} )</span>`;
-                }
-                
-                html += `<li style="margin-bottom: 12px; font-size: 17px; background: rgba(30,41,59, 0.5); padding: 8px 10px; border-radius: 6px;">
-                            <strong style="display:inline-block; color:#cbd5e1; width: 45px;">${g}.${idx + 1}.</strong> 
-                            <span class="list-member-name" style="color: ${nameColor}; font-weight: bold;">${buildDisplayNameHtml(node, false)}</span>${extraInfo}
-                        </li>`;
-            });
+grouped[g].forEach((node, idx) => {
+            let nameColor = node.gender === 'male' ? '#629dff' : '#df5969';
+            let extraInfo = '';
+            if (node.parentObj) {
+                let cColor = getCoupleColor(node.coupleKey); let parent = node.parentObj; let grandparent = parent.parentObj;
+                let pathText = grandparent ? `${grandparent.name} / ${parent.name}` : `${parent.name}`;
+                extraInfo = ` <span style="color: ${cColor}; font-size: 16px; font-style: italic; margin-left: 10px;">( ${pathText} )</span>`;
+            }
+            
+            // --- XỬ LÝ THÔNG TIN THỐNG KÊ ---
+            let stats = getMemberStats(node);
+            let statsArr = [];
+            let spouseLabel = node.gender === 'male' ? 'vợ' : 'chồng';
+            if (stats.spouses > 0) statsArr.push(`${stats.spouses} ${spouseLabel}`);
+            if (stats.children > 0) statsArr.push(`${stats.children} con`);
+            if (stats.grandchildren > 0) statsArr.push(`${stats.grandchildren} cháu`);
+            
+            let statsHtml = '';
+            if (statsArr.length > 0) {
+                statsHtml = `<span class="member-stats">(${statsArr.join(', ')})</span>`;
+            }
+            // --------------------------------
+
+            html += `<li style="margin-bottom: 12px; font-size: 17px; background: rgba(30,41,59, 0.5); padding: 8px 10px; border-radius: 6px;">
+                        <strong style="display:inline-block; color:#cbd5e1; width: 45px;">${g}.${idx + 1}.</strong> 
+                        <span class="list-member-name" style="color: ${nameColor}; font-weight: bold;">${buildDisplayNameHtml(node, false)}</span>
+                        ${statsHtml}
+                        ${extraInfo}
+                    </li>`;
+        });
             html += `</ul>`;
         });
         
@@ -1322,7 +1409,7 @@ function closeListSearch() {
     }
 }
 
-    function onListSearchInput() {
+   function onListSearchInput() {
         const term = document.getElementById('listSearchInput').value.toLowerCase().trim();
         const countDisplay = document.getElementById('listSearchCount');
         clearListSearchHighlights();
@@ -1334,13 +1421,16 @@ function closeListSearch() {
             return;
         }
 
-        document.querySelectorAll('#genListView .list-member-name').forEach(node => {
-            if (node.innerText.toLowerCase().includes(term)) {
-                listSearchMatches.push(node);
-                node.classList.add('highlight-compact');
+        // TÌM KIẾM TRÊN TOÀN BỘ TEXT CỦA THẺ <li> (Bao gồm Họ tên, Thống kê và Tên Ông/Cha)
+        document.querySelectorAll('#genListView li').forEach(liNode => {
+            const nameSpan = liNode.querySelector('.list-member-name');
+            
+            if (liNode.innerText.toLowerCase().includes(term)) {
+                listSearchMatches.push(liNode); // Lưu toàn bộ thẻ li để trượt màn hình tới
+                if (nameSpan) nameSpan.classList.add('highlight-compact'); // Vẫn chỉ bôi nền màu phần Họ Tên cho đẹp
 
                 // Tự động mở rộng nhánh Đời nếu nó đang bị thu gọn
-                let parentUl = node.closest('ul');
+                let parentUl = liNode.closest('ul');
                 if (parentUl && parentUl.style.display === 'none') {
                     parentUl.style.display = 'block';
                     let genId = parentUl.id.replace('list-gen-', '');
@@ -1360,13 +1450,18 @@ function closeListSearch() {
 
     function updateListSearchFocus() {
         if (listSearchMatches.length === 0) return;
-        listSearchMatches.forEach(el => el.classList.remove('active-search-compact'));
-        const activeEl = listSearchMatches[currentListMatchIndex];
-        activeEl.classList.add('active-search-compact');
+        
+        // Xóa highlight đỏ cũ
+        document.querySelectorAll('#genListView .list-member-name.active-search-compact').forEach(el => el.classList.remove('active-search-compact'));
+        
+        const activeLi = listSearchMatches[currentListMatchIndex];
+        const activeNameSpan = activeLi.querySelector('.list-member-name');
+        
+        if (activeNameSpan) activeNameSpan.classList.add('active-search-compact');
         document.getElementById('listSearchCount').innerText = `${currentListMatchIndex + 1}/${listSearchMatches.length}`;
         
         // Tự động trượt danh sách đến đúng người đang focus
-        activeEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+        activeLi.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
     }
 
     function nextListMatch(e) {
