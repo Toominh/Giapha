@@ -140,7 +140,7 @@
 
         .gen-text { color: #f59e0b; font-size: 0.85em; font-weight: normal; margin-left: 5px; }
         .date-text { color: #ffd49a; font-size: 0.85em; font-style: italic; font-weight: normal; margin-left: 5px; }
-        .death-text { color: #ef4444; font-size: 0.85em; font-weight: normal; margin-left: 5px; }
+        .death-text { color: #37497d; font-size: 0.85em; font-weight: normal; margin-left: 5px; }
 
         /* ---------------- MODAL CHUNG ---------------- */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); cursor: default; }
@@ -193,7 +193,9 @@
         .compact-tree-container > ul > li::before, .compact-tree-container > ul > li::after { display: none; }
         .compact-tree-container > ul > li { padding-left: 0; }
 
-        .compact-node { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 6px; transition: background 0.2s; background: rgba(30, 41, 59, 0.4); }
+        .compact-node { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 6px; transition: background 0.2s; 
+            /*background: rgba(30, 41, 59, 0.4); */
+        }
         .compact-node:hover { background: rgba(255,255,255,0.1); }
         
         .btn-toggle-compact { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 1px solid #475569; background: #1e293b; color: #cbd5e1; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-right: 12px; user-select: none; transition: 0.2s; }
@@ -232,6 +234,16 @@
             .death-item-date { font-size: 18px !important; padding: 5px 10px !important; }
             .modal-header h2 { font-size: 18px !important; }
             .hide-text-mobile span { display: none; }
+            /* Ẩn chữ bên trong các nút có class hide-text-mobile */
+            .hide-text-mobile span { 
+                display: none; 
+            }
+            
+    /* Điều chỉnh nút cho cân đối khi chỉ còn Icon */
+    .hide-text-mobile {
+        padding: 8px 12px !important;
+        justify-content: center;
+    }
         }
         
         /* Tăng cỡ chữ Họ tên trong popup Thống kê */
@@ -353,13 +365,19 @@
     </svg>
     <span>Danh sách</span>
 </button>
-    <div class="dropdown">
-       <button class="update-btn" style="background:#f59e0b; padding: 8px 15px; font-size: 14px; white-space: nowrap;" onclick="toggleDropdown(event)">
-    Mở rộng ▾
-</button>
-        <div class="dropdown-content" id="genCollapseMenu" style="right: 0; left: auto; min-width: 150px;">
-        </div>
+  <div class="dropdown">
+    <button class="update-btn hide-text-mobile" style="background:#f59e0b; padding: 8px 15px; font-size: 14px; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px;" onclick="toggleDropdown(event)">
+        <!-- Icon SVG Mở rộng (Chevrons Down) -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+            <path d="m7 13 5 5 5-5"></path>
+            <path d="m7 6 5 5 5-5"></path>
+        </svg>
+        <span>Mở rộng</span>
+    </button>
+    <div class="dropdown-content" id="genCollapseMenu" style="right: 0; left: auto; min-width: 150px;">
+        <!-- Nội dung menu giữ nguyên -->
     </div>
+</div>
 
     <button class="close-x-btn" style="padding: 0 10px; margin-left: 10px; font-size: 32px;" onclick="closeTree()" title="Đóng">&times;</button>
     </header>
@@ -758,13 +776,23 @@
         return `${node.name} ${genHtml} ${dateHtml} ${deathHtml}`;
     }
 
-    function toggleCompactNode(btn) {
-        const li = btn.closest('li'); const ul = li.querySelector(':scope > ul');
-        if (ul) {
-            if (ul.style.display === 'none') { ul.style.display = 'block'; btn.innerText = '-'; } 
-            else { ul.style.display = 'none'; btn.innerText = '+'; }
+function toggleCompactNode(element) {
+    const li = element.closest('li'); 
+    const ul = li.querySelector(':scope > ul');
+    // Tìm đúng nút +/- của dòng hiện tại để thay đổi text, tránh làm đổi text của Họ tên
+    const btn = li.querySelector(':scope > .compact-node .btn-toggle-compact');
+
+    if (ul) {
+        if (ul.style.display === 'none') { 
+            ul.style.display = 'block'; 
+            if (btn) btn.innerText = '-'; 
+        } 
+        else { 
+            ul.style.display = 'none'; 
+            if (btn) btn.innerText = '+'; 
         }
     }
+}
 
     function expandAllCompact() {
         document.querySelectorAll('#compactTreeView ul').forEach(ul => ul.style.display = 'block');
@@ -797,21 +825,30 @@
         menu.innerHTML = html;
     }
 
-    function renderCompactTree(nodes) {
-        if (!nodes || nodes.length === 0) return '';
-        let html = ``;
-        nodes.forEach(node => {
-            let colorClass = node.gender === 'male' ? 'c-male' : 'c-female';
-            let prefix = node.isWife ? '<span class="c-spouse-mark">+</span>' : '';
-            let hasChildren = node.children && node.children.length > 0;
-            let toggleBtn = hasChildren ? `<span class="btn-toggle-compact" data-gen="${node.gen}" onclick="toggleCompactNode(this)">-</span>` : `<span class="btn-toggle-spacer"></span>`;
-            let displayName = buildDisplayNameHtml(node);
-            html += `<li><div class="compact-node">${toggleBtn} ${prefix} <span class="${colorClass}">${displayName}</span></div>`;
-            if (hasChildren) html += `<ul>${renderCompactTree(node.children)}</ul>`;
-            html += `</li>`;
-        });
-        return html;
-    }
+function renderCompactTree(nodes) {
+    if (!nodes || nodes.length === 0) return '';
+    let html = ``;
+    nodes.forEach(node => {
+        let colorClass = node.gender === 'male' ? 'c-male' : 'c-female';
+        let prefix = node.isWife ? '<span class="c-spouse-mark">+</span>' : '';
+        let hasChildren = node.children && node.children.length > 0;
+        
+        // Nút +/-
+        let toggleBtn = hasChildren ? `<span class="btn-toggle-compact" data-gen="${node.gen}" onclick="toggleCompactNode(this)">-</span>` : `<span class="btn-toggle-spacer"></span>`;
+        
+        let displayName = buildDisplayNameHtml(node);
+
+        // THÊM MỚI: Nếu có con thì gắn sự kiện click và con trỏ chuột hình bàn tay vào Họ Tên
+        let nameClickAttr = hasChildren ? `onclick="toggleCompactNode(this)" style="cursor: pointer; user-select: none;" title="Bấm để mở/thu gọn"` : ``;
+
+        // Gắn nameClickAttr vào thẻ span chứa tên
+        html += `<li><div class="compact-node">${toggleBtn} ${prefix} <span class="${colorClass}" ${nameClickAttr}>${displayName}</span></div>`;
+        
+        if (hasChildren) html += `<ul>${renderCompactTree(node.children)}</ul>`;
+        html += `</li>`;
+    });
+    return html;
+}
 
     function renderView() { 
         const parsedTree = buildTree(input.value.split('\n'));
@@ -1088,14 +1125,17 @@
         }
     };
 
-    function toggleDropdown(event) {
-        event.stopPropagation(); 
-        let currentMenu = event.target.nextElementSibling;
-        document.querySelectorAll('.dropdown-content').forEach(menu => {
-            if (menu !== currentMenu) { menu.classList.remove('show'); }
-        });
-        currentMenu.classList.toggle('show');
-    }
+function toggleDropdown(event) {
+    event.stopPropagation(); 
+    // Luôn lấy phần tử chứa sự kiện (chính là cái nút button)
+    let btn = event.currentTarget; 
+    let currentMenu = btn.nextElementSibling;
+    
+    document.querySelectorAll('.dropdown-content').forEach(menu => {
+        if (menu !== currentMenu) { menu.classList.remove('show'); }
+    });
+    currentMenu.classList.toggle('show');
+}
 
     window.addEventListener('click', function(event) {
         if (!event.target.matches('.update-btn') && !event.target.closest('.dropdown-content')) {
