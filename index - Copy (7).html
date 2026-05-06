@@ -41,7 +41,7 @@
 
         #treeHeader {
             display: flex;
-            justify-content: space-between; 
+            justify-content: flex-end; 
             align-items: center;
             padding: 12px 20px;
             background: var(--container-bg);
@@ -51,17 +51,6 @@
             box-sizing: border-box;
             flex-wrap: nowrap; 
         }
-        .header-left {
-    display: flex;
-    align-items: center;
-    gap: 15px; /* Khoảng cách giữa nút Menu và Tên */
-}
-.tree-title-display {
-    color: #ffffff;
-    font-size: 26px;
-    font-weight: bold;
-    margin: 0;
-}
 
         .dropdown { position: relative; display: inline-block; }
         
@@ -349,7 +338,7 @@
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
+    
     z-index: 2000; /* Tăng z-index lên cao hẳn để đè lên mọi Header Modal */
 }
 
@@ -363,12 +352,7 @@
     background: #334155 !important;
     color: #fff !important;
 }
-.header-right {
-    display: flex;
-    align-items: center; /* Căn giữa tất cả các phần tử con theo chiều dọc */
-    gap: 8px;
-    height: 100%; /* Đảm bảo nhóm này chiếm hết chiều cao header */
-}
+
 
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -388,7 +372,6 @@
 
 <div id="treeScreen">
     <header id="treeHeader">
-        <div class="header-left">
     <div class="dropdown">
         <button class="update-btn" style="background:#475569; padding: 10px 18px; font-size: 24px;" onclick="toggleDropdown(event)">☰</button>
         <div class="dropdown-content">
@@ -400,28 +383,12 @@
             <a class="btnLocka" id="btnLock" onclick="hideMenu(); toggleLockTree()">🔒 Khóa Gia Phả</a>
             <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 5px 0;">
             <a id="btnDelete" onclick="hideMenu(); deleteCurrentTree()" style="color: #ef4444;">🗑️ Xóa Gia Phả</a>
-
         </div>
     </div>
-    <h2 id="currentTreeTitle" class="tree-title-display">Tên Gia Phả</h2>
-    </div>
-    <!-- Nhóm bên phải -->
-    <div class="header-right">
+
    <!-- Nút bấm mở tìm kiếm (Chỉ hiện Icon) -->
-<button id="searchToggleBtn" class="update-btn" 
-    style="background: transparent; 
-           padding: 0; 
-           border: 1px solid var(--border-color); 
-           color: #cbd5e1; 
-           border-radius: 8px; 
-           width: 38px; 
-           height: 38px; 
-           display: flex; 
-           align-items: center; 
-           justify-content: center;" 
-    onclick="toggleSearch(event)" title="Tìm kiếm">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+<button id="searchToggleBtn" class="update-btn" style="background: transparent; padding: 8px; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: #cbd5e1; border-radius: 8px;" onclick="toggleSearch(event)" title="Tìm kiếm">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
     </svg>
@@ -461,7 +428,6 @@
 </div>
 
     <button class="close-x-btn" style="padding: 0 10px; margin-left: 10px; font-size: 32px;" onclick="closeTree()" title="Đóng">&times;</button>
-    </div>
     </header>
 
     <main id="scrollContainer" class="custom-scroll">
@@ -527,45 +493,40 @@
 <div class="modal-overlay" id="listModal">
     <div class="modal-content" style="height: 95vh;">
         <div class="modal-header" style="padding: 10px 15px !important;">
-            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                
-                <!-- Nhóm các phần tử bên trái -->
-                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 10px; width: 100%;">
+                <!-- Tiêu đề và số lượng -->
+                <h2 style="color: #10b981; font-size: 18px; margin: 0; white-space: nowrap; display: flex; align-items: center; gap: 8px;">
                     
-                    <!-- Tiêu đề và số lượng -->
-                    <h2 style="color: #10b981; font-size: 18px; margin: 0; white-space: nowrap; display: flex; align-items: center; gap: 8px;">
-                        <span id="listTreeNameDisplay" style="color: #ffffff; font-weight: bold; font-size: 18px;"></span>
-                        <span id="totalCount" style="font-size: 13px; background: #10b981; color: #fff; padding: 2px 8px; border-radius: 12px;">0 người</span>
-                    </h2>
+                    <span id="totalCount" style="font-size: 13px; background: #10b981; color: #fff; padding: 2px 8px; border-radius: 12px;">0 người</span>
+                </h2>
 
-                    <!-- Nút Icon Kính lúp cho Danh sách -->
-                    <button id="listSearchToggleBtn" class="update-btn" style="background: transparent; padding: 6px; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: #10b981; border-radius: 8px;" onclick="toggleListSearch(event)">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
-                    </button>
+                <!-- Thanh tìm kiếm nằm ở giữa -->
+                <!-- Nút Icon Kính lúp cho Danh sách -->
+<button id="listSearchToggleBtn" class="update-btn" style="background: transparent; padding: 6px; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: #10b981; border-radius: 8px; margin-right: 10px;" onclick="toggleListSearch(event)">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+</button>
 
-                    <!-- Khung tìm kiếm trôi xuống của Danh sách -->
-                    <div id="listSearchWrapper" class="search-floating-wrapper" style="max-width: 300px; border-color: #10b981;" onclick="event.stopPropagation()">
-                        <input type="text" id="listSearchInput" placeholder="Tìm tên..." oninput="onListSearchInput()" onkeydown="handleListSearchKey(event)" style="font-size: 14px;">
-                        <div class="search-actions">
-                            <span id="listSearchCount" style="font-size: 12px; min-width: 30px; text-align: center;">0/0</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Nút thu gọn / mở rộng -->
+<!-- Khung tìm kiếm trôi xuống của Danh sách -->
+<div id="listSearchWrapper" class="search-floating-wrapper" style="max-width: 300px; border-color: #10b981;" onclick="event.stopPropagation()">
+    <input type="text" id="listSearchInput" placeholder="Tìm tên..." oninput="onListSearchInput()" onkeydown="handleListSearchKey(event)" style="font-size: 14px;">
+    <div class="search-actions">
+        <span id="listSearchCount" style="font-size: 12px; min-width: 30px; text-align: center;">0/0</span>
+    </div>
+</div>
+
+                <!-- Cụm nút đóng/thu gọn bên phải -->
+                <div style="display: flex; align-items: center; gap: 5px; flex-shrink: 0;">
                     <button id="toggleAllBtn" class="icon-toggle-btn" onclick="toggleAllGens()" data-state="expanded" style="padding: 4px; margin:0;">
                         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px; height:20px;">
                             <polyline points="7 13 12 8 17 13"></polyline>
                             <polyline points="7 17 12 12 17 17"></polyline>
                         </svg> 
                     </button>
-
+                    <button class="close-x-btn" onclick="closeListModal()" style="font-size: 24px; margin:0;">&times;</button>
                 </div>
-
-                <!-- Nút close bên phải -->
-                <button class="close-x-btn" onclick="closeListModal()" style="font-size: 24px; margin:0; flex-shrink: 0;">&times;</button>
             </div>
         </div>
         
@@ -653,9 +614,6 @@
 
     function openTree(id) {
         currentTreeId = id; const tree = treesList.find(t => t.id === id);
-        // Dòng quan trọng: Cập nhật tên vào thẻ h2 đã tạo ở Bước 1
-    document.getElementById('currentTreeTitle').innerText = tree.name;
-    
         input.value = tree.data; renderView(); 
         document.getElementById('homeScreen').style.display = 'none';
         document.getElementById('treeScreen').style.display = 'block';
@@ -1002,14 +960,6 @@ function renderCompactTree(nodes) {
 
     function openListModal() {
         let list = getBloodRelatives(); if(list.length === 0) return;
-        
-        // Thêm tính năng hiển thị Tên gia phả hiện tại
-        const currentTree = treesList.find(t => t.id === currentTreeId);
-        if (currentTree) {
-            const nameDisplay = document.getElementById('listTreeNameDisplay');
-            if (nameDisplay) nameDisplay.innerText = currentTree.name;
-        }
-
         let allGens = [...new Set(list.map(node => node.gen))].sort((a, b) => a - b);
         let grouped = {}; let total = 0; 
         allGens.forEach(g => grouped[g] = []);
@@ -1065,10 +1015,7 @@ function renderCompactTree(nodes) {
         if(countDisplay) countDisplay.innerText = "0/0";
     }
 
-    function closeListModal() { 
-        closeListSearch(); // Đóng tìm kiếm trước
-        document.getElementById('listModal').style.display = 'none'; 
-    }
+    function closeListModal() { document.getElementById('listModal').style.display = 'none'; }
 
     function toggleGenList(gen) {
         let list = document.getElementById(`list-gen-${gen}`);
@@ -1322,6 +1269,12 @@ function closeListSearch() {
     }
 }
 
+// Cập nhật hàm đóng Modal để tự động đóng luôn thanh tìm kiếm nếu đang mở
+// Sửa lại hàm closeListModal cũ của bạn:
+function closeListModal() {
+    closeListSearch(); // Đóng tìm kiếm trước
+    document.getElementById('listModal').style.display = 'none';
+}
     function onListSearchInput() {
         const term = document.getElementById('listSearchInput').value.toLowerCase().trim();
         const countDisplay = document.getElementById('listSearchCount');
