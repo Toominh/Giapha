@@ -406,19 +406,121 @@
     border: 1px solid rgba(245, 158, 11, 0.3);
     display: inline-block;
 }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+        /* Style cho Modal Hướng Dẫn */
+        #instructionModal .modal-content {
+            width: 100% !important; height: 100% !important; max-width: 100% !important; max-height: 100% !important; 
+            border-radius: 0 !important; margin: 0 !important; padding: 0 !important; 
+            background-color: var(--bg-color) !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; 
+        }
+        #instructionModal .modal-header {
+            background: var(--container-bg) !important; padding: 12px 20px !important;
+            border-bottom: 1px solid var(--border-color) !important; margin-bottom: 0 !important;
+            flex-shrink: 0 !important;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        #instructionContent {
+            flex: 1 !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch !important; 
+            padding: 20px !important; padding-bottom: 100px !important; box-sizing: border-box !important;
+        }
+        
+        /* Nội dung chi tiết bên trong hướng dẫn */
+        #instructionContent .container { max-width: 850px; margin: 0 auto; }
+        #instructionContent h1 { color: #10b981; font-size: 2.2rem; margin: 0; text-align: center; padding: 20px 0; }
+        #instructionContent .intro-card {
+            background: rgba(14, 165, 233, 0.1); padding: 25px; border-radius: 12px;
+            border-left: 5px solid #10b981; margin-bottom: 30px; font-style: italic;
+            color: #94a3b8; line-height: 1.8; font-size: 18px;
+        }
+        #instructionContent h2 {
+            color: #10b981; border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px; margin-top: 40px; font-size: 24px; display: flex; align-items: center;
+        }
+        #instructionContent h2::before { content: "◈"; margin-right: 12px; font-size: 1.2rem; }
+        #instructionContent .card {
+            background-color: var(--container-bg); padding: 25px; border-radius: 12px;
+            margin-bottom: 25px; border: 1px solid var(--border-color);
+        }
+        #instructionContent ul { list-style: none; padding-left: 0; }
+        #instructionContent li { margin-bottom: 15px; position: relative; padding-left: 30px; font-size: 18px; line-height: 1.6; }
+        #instructionContent li::before { content: "•"; color: #10b981; position: absolute; left: 0; font-size: 1.8rem; line-height: 1; }
+        #instructionContent .syntax {
+            background-color: #0f172a; padding: 18px; border-radius: 8px;
+            font-family: 'Consolas', monospace; color: #fbbf24; border: 1px solid #334155;
+            display: block; margin: 20px 0; font-size: 17px;
+        }
+        #instructionContent .example {
+            border-left: 4px solid #64748b; padding: 20px; margin: 20px 0;
+            color: #94a3b8; font-family: 'Consolas', monospace; white-space: pre;
+            background: rgba(0,0,0,0.2); border-radius: 0 8px 8px 0; font-size: 16px;
+        }
+        #instructionContent .badge-blue { color: #38bdf8; font-weight: bold; }
+        #instructionContent .badge-pink { color: #f472b6; font-weight: bold; }
+        #instructionContent .badge-yellow { color: #fbbf24; font-weight: bold; }
+        #instructionContent .cite { font-size: 0.8rem; color: #64748b; vertical-align: super; margin-left: 4px; }
+        #instructionContent .highlight-box {
+            background-color: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.3);
+            padding: 20px; border-radius: 10px; margin-top: 20px;
+        }
+        #instructionContent strong { color: #f8fafc; }
+
+
+        /* Style cho Khung trang trọng cổ kính */
+        .antique-frame {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 30px;
+            background-color: #1e0e00; /* Màu giấy cũ */
+            border: 8px double #826855; /* Viền đôi màu gỗ */
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 0 0 50px rgba(139, 69, 19, 0.1);
+            text-align: center;
+        }
+
+        .antique-frame::before, .antique-frame::after {
+            content: "❦";
+            color: #8b4513;
+            font-size: 24px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .antique-text {
+            font-family: 'EB Garamond', 'Crimson Text', serif;
+            font-size: 26px;
+            line-height: 1.8;
+            color: #ffd332;
+            font-style: italic;
+            margin: 0;
+            text-shadow: 1px 1px 1px rgba(255,255,255,0.8);
+        }
+
+</style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
+    function openInstructionModal() {
+        document.getElementById('instructionModal').style.display = 'flex';
+    }
+    function closeInstructionModal() {
+        document.getElementById('instructionModal').style.display = 'none';
+    }
+
+</script>
 </head>
 <body>
 
 <div id="homeScreen">
-    <header>
-        <h1>DANH SÁCH GIA PHẢ</h1>
-    </header>
+
+    <div class="antique-frame">
+        <p class="antique-text">
+            Gia phả không chỉ là nơi ghi lại tên tuổi tổ tiên mà còn lưu giữ cội nguồn, truyền thống và sự gắn kết của cả dòng họ. Qua gia phả, con cháu hiểu được nguồn gốc của mình, biết trân trọng đạo hiếu và gìn giữ những giá trị tốt đẹp cho các thế hệ mai sau.
+        </p>
+    </div>
+
     <div id="treeList" class="tree-list-container"></div>
     <footer>
         <button class="update-btn" style="background: #10b981; font-size: 18px; padding: 12px 30px;" onclick="openCreateModal()">+ Tạo Gia Phả</button>
-        <button class="update-btn" style="background:#8b5cf6;" onclick="openManageModal()">Quản lý Dữ Liệu</button>
+        <button class="update-btn" style="background:#49556a;" onclick="openManageModal()">Quản lý Dữ Liệu</button>
+        <button class="update-btn" style="background:#475569;" onclick="openInstructionModal()">💡 Hướng dẫn</button>
     </footer>
 </div>
 
@@ -480,7 +582,7 @@
         <line x1="3" y1="12" x2="3.01" y2="12"></line>
         <line x1="3" y1="18" x2="3.01" y2="18"></line>
     </svg>
-    <span>Danh sách</span>
+    <span>Nội tộc</span>
 </button>
   <div class="dropdown">
     <button class="update-btn hide-text-mobile" style="background:#f59e0b; padding: 8px 15px; font-size: 14px; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px;" onclick="toggleDropdown(event)">
@@ -626,7 +728,15 @@
     // BẠN HÃY ĐỔI MẬT KHẨU CỦA BẠN Ở ĐÂY
     const MASTER_PASSWORD = "1234";
 
-    const defaultData = `Lê Văn Mạnh (Nam) (1920) [15/08]\n+ Nguyễn Thị B (Nữ) (1922) [02/01]\n    Lê Văn Bùng (Nam) (1950)\n    + Trần Thị C (Nữ) [20/12]\n        Lê Văn Bao (Nam) (1980)`;
+    const defaultData = `Lê Đình Tục - ông cụ Kích [5/8]
++ Bà cụ Kích (nữ) [23/9]
+    Lê Chân Kim [21/5]
+    + Nguyễn Thị Huý Thi (nữ) [18/1]
+        Lê Đình Đài [23/11]
+        + Trần Thị Chục (nữ) [11/3]
+            Lê Đình Bùng (1780) [29/5]
+        + Nguyễn Thị Sự (nữ) [11/8]
+            Lê Văn Bao (1800-1880) [8/10]`;
     let treesList = []; 
     let currentTreeId = null; 
     const input = document.getElementById('dataInput');
@@ -1497,6 +1607,112 @@ function closeListSearch() {
             else { nextListMatch(e); }
         }
     }
+
+    function openInstructionModal() {
+        document.getElementById('instructionModal').style.display = 'flex';
+    }
+    function closeInstructionModal() {
+        document.getElementById('instructionModal').style.display = 'none';
+    }
+
 </script>
+
+<!-- Modal Hướng Dẫn Mới -->
+<div id="instructionModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 style="color: var(--primary-color); margin: 0; font-size: 20px;">HƯỚNG DẪN SỬ DỤNG</h2>
+            <button class="close-x-btn" onclick="closeInstructionModal()">&times;</button>
+        </div>
+        <div id="instructionContent" class="custom-scroll">
+            
+<div class="container">
+    <header>
+        <h1>Gia Phả Thông Minh <span class="cite"></span></h1>
+    </header>
+
+    <section>
+        <h2>1. Quản Lý Dữ Liệu Gia Phả</h2>
+        <div class="card">
+            <p>Ngay tại màn hình chính, bạn có thể thực hiện các thao tác quan trọng:</p>
+            <ul>
+                <li><strong>Tạo Gia Phả:</strong> Nhấn nút <span style="color: #10b981;">màu xanh lá</span> để thêm Gia phả mới. Cần nhập Tên gia phả và Cấu trúc dữ liệu, Tư liêu gia phả và đường link nếu cập nhật sẽ có trong menu chi tiết gia phả.</li>
+                <li><strong>Xuất Data Thuần (.json):</strong> Tải file dữ liệu về máy để cất giữ an toàn.</li>
+                <li><strong>Nhập Data Phục Hồi (.json):</strong> Khôi phục lại dữ liệu nếu cài lại máy hoặc lỡ tay xóa.</li>
+                <li><strong>Xuất App Offline (.html):</strong> Tải toàn bộ web và dữ liệu thành 1 file duy nhất để xem không cần mạng.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>2. Quy Tắc Nhập Liệu</h2>
+        <div class="card">
+            <p>Hệ thống tự động vẽ cây dựa trên cách bạn gõ chữ và căn lề. Vui lòng tuân thủ chặt chẽ cú pháp:</p>
+            
+            <strong>Cú pháp cơ bản:</strong>
+            <code class="syntax">Họ Tên (Giới tính) (Năm sinh) [Ngày giỗ âm lịch]</code>
+
+            <strong>Khai báo Vợ / Chồng & Con cái:</strong>
+            <ul>
+                <li><strong>Vợ Chồng:</strong> Thêm dấu <span class="badge-yellow">+</span> ở đầu dòng, đặt ngay dưới tên người chồng/vợ chính.</li>
+                <li><strong>Con cái:</strong> Dùng phím <strong>Tab</strong> để thụt lề. Cứ thụt lề 1 lần là tính 1 đời con.</li>
+                <li>Họ tên nam thì không cần ghi giới tính đằng sau.</li>
+                <li>Ví dụ trực quan dưới đây là Cụ Lê Đình Đài (con của cụ Lê Chân Kim và Nguyễn Thị Thuý Hi) có 2 vợ, vợ đầu là Lê Thị Chục, vợ 2 là Nguyễn Thị Sự, mỗi vợ có 1 người con.</li>
+               
+                
+            </ul>
+
+            <strong>Ví dụ trực quan:</strong>
+            <div class="example">Lê Đình Tục - ông cụ Kích [5/8]
++ Bà cụ Kích (nữ) [23/9]
+    Lê Chân Kim [21/5]
+    + Nguyễn Thị Huý Thi (nữ) [18/1]
+        Lê Đình Đài [23/11]
+        + Trần Thị Chục (nữ) [11/3]
+            Lê Đình Bùng (1780) [29/5]
+        + Nguyễn Thị Sự (nữ) [11/8]
+            Lê Văn Bao (1800-1880) [8/10]
+        </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>3. Tương Tác Sơ Đồ Cây</h2>
+        <div class="card">
+            <ul>
+                <li><strong>Màu sắc:</strong> Nam màu <span class="badge-blue">Xanh</span>, Nữ màu <span class="badge-pink">Hồng</span>. Vợ/chồng có dấu <span class="badge-yellow">+</span> màu vàng.</li>
+                <li><strong>Thu / Mở :</strong> Bấm nút + / - hoặc bấm vào tên người có con để đóng/mở nhánh.</li>
+                <li><strong>Nút mở rộng :</strong> Sẽ thu gọn lại cây phả hệ đến đời tuỳ chọn .</li>
+                <li><strong>Tìm kiếm:</strong> Bấm biểu tượng Kính lúp. Hệ thống tô nền cam và tự động mở nhánh. Bấm Enter để tìm người trùng tên tiếp theo.</li>
+                <li><strong>Menu Mở rộng (☰):</strong> Xem danh sách Ngày Giỗ, Tải tư liệu gốc, Xuất toàn bộ cây gia phả ra ảnh, và Chỉnh sửa gia phả.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>4. Bảng Danh Sách Nội tộc</h2>
+        <div class="card">
+            <p>Bấm nút <strong>Nội tộc</strong> (màu xanh lá) để vào giao diện thống kê:</p>
+            <ul>
+                <li><strong>Hiển thị đầy đủ:</strong> Danh sách hiển thị toàn bộ thành viên nội tộc (Không có dâu, rể).</li>
+                <li><strong>Thống kê thông minh:</strong> Dưới tên nam giới có dòng thống kê trực hệ (ví dụ: 1 vợ, 3 con, 13 cháu).</li>
+                <li><strong>Nhận diện nguồn gốc:</strong> Hiển thị dòng in nghiêng: <i>Cháu/con của [Tên Ông Nội] / [Tên Cha]</i>. Giúp đối chiếu nhánh mà không cần xem toàn bộ cây.</li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong>Phân biệt màu sắc phả hệ:</strong>
+                <ul>
+                    <li><strong>Anh em ruột:</strong> Cụm "Cháu/con của..." giống hệt nhau về chữ và màu sắc.</li>
+                    <li><strong>Anh em cùng cha khác mẹ:</strong> Cụm "Cháu/con của..." giống nhau về chữ nhưng <strong>khác màu sắc</strong>.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</div>
+
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
