@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gia phả cho mọi người</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --container-bg: #1e293b;
+            --text-color: #f8fafc;
+            --primary-color: #0ea5e9;
+            --border-color: #334155;
+            --tree-line: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding-bottom: 90px; 
+            font-size: 16px;
+            overflow: hidden;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* ---------------- HEADER ---------------- */
+        header {
+            text-align: center;
+            padding: 15px 30px;
+            background: linear-gradient(to bottom, #1e293b, var(--bg-color));
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        h1 { font-size: 26px; margin: 0; color: var(--primary-color); text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+
+        #treeHeader {
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            padding: 12px 20px;
+            background: var(--container-bg);
+            border-bottom: 1px solid var(--border-color);
+            gap: 10px; 
+            width: 100%;
+            box-sizing: border-box;
+            flex-wrap: nowrap; 
+        }
+        .header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Khoảng cách giữa nút Menu và Tên */
+}
+.tree-title-display {
+    color: #ffffff;
+    font-size: 25px;
+    font-weight: bold;
+    margin: 0;
+}
+
+        .dropdown { position: relative; display: inline-block; }
+        
+        .dropdown::after {
+            content: ""; position: absolute; width: 100%; height: 15px;
+            bottom: -15px; left: 0; background: transparent; z-index: 1001;
+        }
+        .dropdown-content {
+            display: none; position: absolute; background-color: var(--container-bg);
+            min-width: 180px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+            z-index: 1002; border-radius: 8px; overflow: hidden;
+            border: 1px solid var(--border-color); top: calc(100% + 5px); left: 0;
+        }
+        .dropdown-content a {
+            color: var(--text-color); padding: 12px 16px; text-decoration: none;
+            display: block; cursor: pointer; transition: 0.2s; font-size: 15px; text-align: left;
+        }
+        .dropdown-content a:hover { background-color: #334155; color: var(--primary-color); }
+        .dropdown-content.show { display: block !important; }
+        .hide-force { display: none !important; }
+
+        /* ---------------- MÀN HÌNH CHÍNH (DANH SÁCH) ---------------- */
+        #homeScreen { height: 100vh; overflow-y: auto; padding-bottom: 80px; }
+
+        .tree-list-container {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px; padding: 30px; max-width: 1200px; margin: 0 auto;
+        }
+
+        .tree-card {
+            background: var(--container-bg); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .tree-card:hover {
+            transform: translateY(-5px); border-color: var(--primary-color);
+            box-shadow: 0 8px 15px rgba(14, 165, 233, 0.2);
+        }
+        .tree-card h3 { margin: 0 0 10px 0; color: #10b981; font-size: 20px; }
+        .tree-card p { margin: 0; color: #94a3b8; font-size: 14px; }
+
+        /* ---------------- MÀN HÌNH CHI TIẾT (CÂY) ---------------- */
+        #treeScreen { display: none; height: 100vh; }
+
+        #treeScreen main { 
+            display: block; flex-direction: column; padding: 20px 40px; 
+            height: calc(100vh - 75px); overflow: auto; scrollbar-width: none;
+            position: relative; cursor: grab; 
+        }
+        #treeScreen main:active { cursor: grabbing; }
+        #treeScreen main::-webkit-scrollbar { display: none; }
+
+        /* ---------------- FOOTER CHUNG ---------------- */
+        footer { 
+            display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;
+            position: fixed; bottom: 0; width: 100%; background: var(--container-bg); 
+            padding: 15px; border-top: 1px solid var(--border-color); z-index: 100; cursor: default; box-sizing: border-box;
+        }
+        
+        button.update-btn, select.update-btn, .upload-btn-wrapper { 
+            background: var(--primary-color); color: #fff !important; border: none; padding: 10px 20px; 
+            border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; 
+            transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.3); display: inline-block; 
+            text-align: center; box-sizing: border-box; outline: none; appearance: auto;
+        }
+        button.update-btn:hover, select.update-btn:hover, .upload-btn-wrapper:hover { filter: brightness(1.1); transform: translateY(-1px);}
+        select.update-btn option { background: var(--container-bg); color: var(--text-color); }
+
+        /* ---------------- THANH TÌM KIẾM ---------------- */
+        .search-wrapper {
+            display: flex; align-items: center; gap: 5px; background: #0f172a; padding: 5px 15px;
+            border-radius: 25px; border: 2px solid var(--border-color);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); transition: all 0.3s ease; box-sizing: border-box;
+            flex: 1; width: auto; cursor: text;
+        }
+        .search-wrapper:focus-within { border-color: var(--primary-color); box-shadow: 0 0 10px rgba(14, 165, 233, 0.4); }
+        #searchIconBtn { background: none; border: none; color: #cbd5e1; font-size: 16px; padding: 0; display: flex; align-items: center; justify-content: center; }
+        #searchInput, #listSearchInput { width: 100%; border: none; background: transparent; color: var(--text-color); font-size: 16px; outline: none; padding: 5px 0; }
+        .search-actions { display: flex; align-items: center; gap: 5px; }
+        #searchCount, #listSearchCount { font-size: 14px; color: #cbd5e1; font-weight: bold; white-space: nowrap; }
+        .nav-btn { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 16px; padding: 5px; border-radius: 4px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
+        .nav-btn:hover { background: #334155; color: white; }
+        .close-search-btn { display: none; }
+
+        .highlight-compact { background: #f59e0b !important; color: #fff !important; padding: 2px 6px; border-radius: 4px; }
+        .active-search-compact { background: #ef4444 !important; color: #fff !important; }
+
+        .gen-text { color: #f59e0b; font-size: 0.85em; font-weight: normal; margin-left: 5px; }
+        .date-text { color: #ffd49a; font-size: 0.85em; font-style: italic; font-weight: normal; margin-left: 5px; }
+        .death-text { color: #9baee3; font-size: 0.85em; font-weight: normal; margin-left: 5px; }
+
+        /* ---------------- MODAL CHUNG ---------------- */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); cursor: default; }
+        .modal-content {
+            background: var(--container-bg); padding: 25px; border-radius: 15px;
+            width: 70%; max-width: 800px; margin: auto; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; flex-direction: column; max-height: 90vh; font-size: 18px; 
+            box-sizing: border-box;
+        }
+
+        /* Full Màn Hình cho modal Sửa/Tạo, Thống Kê và Ngày Giỗ */
+        #modal .modal-content, 
+        #listModal .modal-content, 
+        #deathModal .modal-content,
+        #introModal .modal-content { 
+            width: 100vw !important; 
+            height: 100vh !important; 
+            max-width: 100vw !important; 
+            max-height: 100vh !important; 
+            border-radius: 0; 
+            margin: 0; 
+            padding: 20px; 
+        }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 15px; }
+        .modal-header h2 { margin: 0; font-size: 22px; }
+        .close-x-btn { background: transparent; border: none; color: #cbd5e1; font-size: 28px; font-weight: bold; cursor: pointer; padding: 0; line-height: 1; transition: 0.2s; }
+        .close-x-btn:hover { color: #ef4444; }
+
+        #genListView li { font-size: 15px !important; margin-bottom: 15px; padding: 12px 15px !important; }
+        #genListView h3 { font-size: 20px !important; }
+
+        .custom-input { width: 100%; padding: 15px; font-size: 18px; background: #0f172a; color: #fff; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; outline: none; }
+        .custom-input:focus { border-color: var(--primary-color); }
+
+        textarea { width: 100%; flex: 1; background: #0f172a; color: #10b981; border: 1px solid var(--border-color); padding: 15px; font-size: 16px; margin: 0 0 15px 0; border-radius: 8px; box-sizing: border-box; outline:none; white-space: pre; overflow-x: auto; }
+        textarea:focus { border-color: var(--primary-color); }
+        
+        .custom-scroll::-webkit-scrollbar { width: 8px; height: 8px;}
+        .custom-scroll::-webkit-scrollbar-track { background: var(--bg-color); border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+
+        /* --- CSS CÂY THƯ MỤC TRÊN MÀN HÌNH CHÍNH --- */
+        .compact-tree-container { width: max-content; min-width: 100%; background: transparent; text-align: left; font-family: 'Consolas', 'Courier New', monospace; font-size: 18px; line-height: 1.8; margin: 0; padding-right: 50vw; padding-bottom: 30vh; box-sizing: border-box; }
+        .compact-tree-container ul { list-style-type: none; padding-left: 35px; margin: 0; transition: all 0.3s ease; }
+        .compact-tree-container > ul { padding-left: 0; }
+        .compact-tree-container li { position: relative; padding: 6px 0 6px 20px; }
+        .compact-tree-container li::before { content: ''; position: absolute; top: 0; bottom: 0; left: 0; border-left: 2px dashed #64748b; }
+        .compact-tree-container li::after { content: ''; position: absolute; top: 20px; left: 0; width: 15px; border-top: 2px dashed #64748b; }
+        .compact-tree-container li:last-child::before { height: 20px; bottom: auto; }
+        .compact-tree-container > ul > li::before, .compact-tree-container > ul > li::after { display: none; }
+        .compact-tree-container > ul > li { padding-left: 0; }
+
+        .compact-node { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 6px; transition: background 0.2s; 
+            /*background: rgba(30, 41, 59, 0.4); */
+        }
+        .compact-node:hover { background: rgba(255,255,255,0.1); }
+        
+        .btn-toggle-compact { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 1px solid #475569; background: #1e293b; color: #cbd5e1; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-right: 12px; user-select: none; transition: 0.2s; }
+        .btn-toggle-compact:hover { background: #3b82f6; color: white; border-color: #3b82f6; }
+        .btn-toggle-spacer { display: inline-block; width: 36px; }
+
+        .c-male { color: #38bdf8; font-weight: bold; transition: all 0.3s; }  
+        .c-female { color: #f472b6; font-weight: bold; transition: all 0.3s; } 
+        .c-spouse-mark { color: #fbbf24; font-weight: bold; margin-right: 8px; font-size: 20px; } 
+
+        .manage-action-btn { transition: all 0.2s; }
+        .manage-action-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+
+        /* TỐI ƯU GIAO DIỆN ĐIỆN THOẠI */
+        @media (max-width: 600px) {
+            footer { padding: 10px; gap: 10px; flex-wrap: nowrap; }
+            footer .update-btn { font-size: 14px !important; padding: 10px !important; flex: 1; white-space: nowrap; }
+            .modal-content { width: 95% !important; padding: 15px; }
+            #treeHeader { padding: 8px 5px; gap: 5px; flex-wrap: nowrap; }
+            #treeHeader .update-btn { padding: 6px 8px !important; }
+            .search-wrapper { flex: 1; width: auto; padding: 5px 8px; justify-content: flex-start; } 
+            #searchInput, #listSearchInput { width: 100%; opacity: 1; padding: 5px 0; font-size: 14px;}
+            .search-actions { display: flex; }
+            #searchIconBtn { display: none; }
+            .close-search-btn { display: none !important; }
+            #searchCount, #listSearchCount { font-size: 12px; }
+
+            /* Fix Thống kê & Ngày giỗ cho Mobile */
+            #genListView h3 { font-size: 16px !important; flex-wrap: wrap; }
+            #genListView li { font-size: 14px !important; margin-bottom: 8px !important; padding: 8px 10px !important; line-height: 1.4; }
+            #genListView li span { font-size: 14px !important; }
+            
+            #deathListView li { align-items: flex-start !important; padding: 12px !important; gap: 8px !important; }
+            .death-item-name { font-size: 18px !important; }
+            .death-item-role { font-size: 12px !important; margin-left: 0 !important; }
+            .death-item-date { font-size: 18px !important; padding: 5px 10px !important; }
+            .modal-header h2 { font-size: 18px !important; }
+            .hide-text-mobile span { display: none; }
+            /* Ẩn chữ bên trong các nút có class hide-text-mobile */
+            .hide-text-mobile span { 
+                display: none; 
+            }
+            
+    /* Điều chỉnh nút cho cân đối khi chỉ còn Icon */
+    .hide-text-mobile {
+        padding: 8px 12px !important;
+        justify-content: center;
+    }
+        }
+        
+        /* Tăng cỡ chữ Họ tên trong popup Thống kê */
+        #genListView li > span:first-of-type {
+            font-size: 20px !important; 
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        /* Giữ nguyên cỡ chữ của các thông tin đi kèm trong popup */
+        #genListView .gen-text, 
+        #genListView .date-text, 
+        #genListView .death-text {
+            font-size: 16px !important; 
+            font-weight: normal;
+        }
+
+        /* Giữ nguyên cỡ chữ của phần "Con của.../Cháu của..." */
+        #genListView li span:not(:first-of-type) {
+            font-size: 15px !important;
+        }
+
+        /* --- THÊM CON TRỞ BÀN TAY CHO DANH SÁCH VÀ NGÀY GIỖ --- */
+        #genListView, #deathListView {
+            cursor: grab;
+        }
+        #genListView:active, #deathListView:active {
+            cursor: grabbing;
+        }
+
+        /* --- FIX LỖI HEADER BỊ TRÔI LÊN TRÊN KHI VUỐT TRÊN IOS --- */
+        .modal-content { overflow: hidden !important; }
+        .modal-header { flex-shrink: 0 !important; position: relative; z-index: 10; }
+        #genListView, #deathListView { -webkit-overflow-scrolling: touch !important; flex-grow: 1; padding-bottom: 30px; }
+
+        /* FIX POPUP DANH SÁCH & NGÀY GIỖ GIỐNG TRANG CHI TIẾT */
+        #listModal .modal-content, 
+        #deathModal .modal-content,
+        #introModal .modal-content { 
+            width: 100% !important; height: 100% !important; max-width: 100% !important; max-height: 100% !important; 
+            border-radius: 0 !important; margin: 0 !important; padding: 0 !important; 
+            background-color: var(--bg-color) !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; 
+        }
+
+        #listModal .modal-header, #deathModal .modal-header {
+            background: var(--container-bg) !important; padding: 12px 20px !important;
+            border-bottom: 1px solid var(--border-color) !important; margin-bottom: 0 !important;
+            flex-shrink: 0 !important; position: relative !important; z-index: 10 !important;
+            display: flex; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box;
+        }
+
+        #genListView, #deathListView {
+            flex: 1 !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch !important; 
+            padding: 20px !important; padding-bottom: 50px !important; box-sizing: border-box !important;
+        }
+
+        /* Style cho nút icon thu gọn/mở rộng tất cả */
+        .icon-toggle-btn { background: transparent; border: none; cursor: pointer; padding: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; color: #ffffff; margin-left: auto; margin-right: 10px; border-radius: 50%; }
+        .icon-toggle-btn:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.1); }
+        .icon-toggle-btn svg { width: 30px; height: 30px; stroke: currentColor; }
+
+        /* Sửa lại khoảng cách margin-top cho H3 theo yêu cầu mới */
+        div#genListView h3 {
+            margin-top: 25px !important; 
+            font-size: 22px !important;
+        }
+        /* Ép riêng tiêu đề Đời 1 sát lên trên */
+        div#genListView h3:first-of-type {
+            margin-top: 0px !important;
+        }
+
+        .close-x-btn { background: transparent; border: none; color: #ffffff !important; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1; transition: 0.2s; -webkit-appearance: none; -webkit-text-fill-color: #ffffff; }
+        .close-x-btn:hover { color: #ef4444 !important; }
+/* KHUNG TÌM KIẾM TRÔI XUỐNG (Dành riêng cho màn hình Cây) */
+.search-floating-wrapper {
+    position: absolute;
+    top: 100%; /* Đẩy xuống ngay sát dưới mép Header */
+    left: 50%;
+    transform: translate(-50%, -20px);
+    width: 90%;
+    max-width: 400px;
+    background: #1e293b;
+    padding: 8px 15px;
+    border-radius: 0 0 15px 15px;
+    border: 1px solid var(--border-color);
+    border-top: none;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    z-index: 1000;
+    
+    /* Hiệu ứng ẩn/hiện */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    z-index: 2000; /* Tăng z-index lên cao hẳn để đè lên mọi Header Modal */
+}
+
+.search-floating-wrapper.active {
+    transform: translate(-50%, 0);
+    opacity: 1;
+    visibility: visible;
+}
+
+#searchToggleBtn:hover {
+    background: #334155 !important;
+    color: #fff !important;
+}
+.header-right {
+    display: flex;
+    align-items: center; /* Căn giữa tất cả các phần tử con theo chiều dọc */
+    gap: 8px;
+    height: 100%; /* Đảm bảo nhóm này chiếm hết chiều cao header */
+}
+/* --- FIX LỖI TÊN GIA PHẢ DÀI BỊ TRÀN MÀN HÌNH --- */
+@media (max-width: 600px) {
+    /* 1. Sửa lỗi trong bảng Danh sách (như trong ảnh bạn chụp) */
+    #listTreeNameDisplay {
+        display: inline-block !important;
+        max-width: 35vw !important; /* Giới hạn chiều rộng khoảng 35% màn hình */
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important; /* Thêm dấu 3 chấm khi chữ quá dài */
+        vertical-align: bottom;
+    }
+
+    /* Đảm bảo khung xanh lá "x người" không bị ép nhỏ lại */
+    #totalCount {
+        flex-shrink: 0 !important;
+    }
+
+    /* 2. Sửa lỗi tương tự cho tiêu đề ở màn hình chính (đề phòng lỗi) */
+    .tree-title-display {
+        max-width: 40vw;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+/* --- STYLE CHO THÔNG TIN THỐNG KÊ (VỢ, CON, CHÁU) --- */
+.member-stats {
+    color: #fcd34d; /* Màu vàng nhạt */
+    font-size: 14px !important;
+    margin-left: 8px;
+    font-style: normal;
+    background: rgba(245, 158, 11, 0.15);
+    padding: 2px 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    display: inline-block;
+}
+    
+        /* Style cho Modal Hướng Dẫn */
+        #instructionModal .modal-content {
+            width: 100% !important; height: 100% !important; max-width: 100% !important; max-height: 100% !important; 
+            border-radius: 0 !important; margin: 0 !important; padding: 0 !important; 
+            background-color: var(--bg-color) !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; 
+        }
+        #instructionModal .modal-header {
+            background: var(--container-bg) !important; padding: 12px 20px !important;
+            border-bottom: 1px solid var(--border-color) !important; margin-bottom: 0 !important;
+            flex-shrink: 0 !important;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        #instructionContent {
+            flex: 1 !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch !important; 
+            padding: 20px !important; padding-bottom: 100px !important; box-sizing: border-box !important;
+        }
+        
+        /* Nội dung chi tiết bên trong hướng dẫn */
+        #instructionContent .container { max-width: 850px; margin: 0 auto; }
+        #instructionContent h1 { color: #10b981; font-size: 2.2rem; margin: 0; text-align: center; padding: 20px 0; }
+        #instructionContent .intro-card {
+            background: rgba(14, 165, 233, 0.1); padding: 25px; border-radius: 12px;
+            border-left: 5px solid #10b981; margin-bottom: 30px; font-style: italic;
+            color: #94a3b8; line-height: 1.8; font-size: 18px;
+        }
+        #instructionContent h2 {
+            color: #10b981; border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px; margin-top: 40px; font-size: 24px; display: flex; align-items: center;
+        }
+        #instructionContent h2::before { content: "◈"; margin-right: 12px; font-size: 1.2rem; }
+        #instructionContent .card {
+            background-color: var(--container-bg); padding: 25px; border-radius: 12px;
+            margin-bottom: 25px; border: 1px solid var(--border-color);
+        }
+        #instructionContent ul { list-style: none; padding-left: 0; }
+        #instructionContent li { margin-bottom: 15px; position: relative; padding-left: 30px; font-size: 18px; line-height: 1.6; }
+        #instructionContent li::before { content: "•"; color: #10b981; position: absolute; left: 0; font-size: 1.8rem; line-height: 1; }
+        #instructionContent .syntax {
+            background-color: #0f172a; padding: 18px; border-radius: 8px;
+            font-family: 'Consolas', monospace; color: #fbbf24; border: 1px solid #334155;
+            display: block; margin: 20px 0; font-size: 17px;
+        }
+        #instructionContent .example {
+            border-left: 4px solid #64748b; padding: 20px; margin: 20px 0;
+            color: #94a3b8; font-family: 'Consolas', monospace; white-space: pre;
+            background: rgba(0,0,0,0.2); border-radius: 0 8px 8px 0; font-size: 16px;
+        }
+        #instructionContent .badge-blue { color: #38bdf8; font-weight: bold; }
+        #instructionContent .badge-pink { color: #f472b6; font-weight: bold; }
+        #instructionContent .badge-yellow { color: #fbbf24; font-weight: bold; }
+        #instructionContent .cite { font-size: 0.8rem; color: #64748b; vertical-align: super; margin-left: 4px; }
+        #instructionContent .highlight-box {
+            background-color: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.3);
+            padding: 20px; border-radius: 10px; margin-top: 20px;
+        }
+        #instructionContent strong { color: #f8fafc; }
+
+
+        /* Style cho Khung trang trọng cổ kính */
+        .antique-frame {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #1e0e00; /* Màu giấy cũ */
+            border: 8px double #826855; /* Viền đôi màu gỗ */
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 0 0 50px rgba(139, 69, 19, 0.1);
+            text-align: center;
+        }
+
+  /*      .antique-frame::before, .antique-frame::after {
+            content: "❦";
+            color: #8b4513;
+            font-size: 24px;
+            display: block;
+            margin-bottom: 10px;
+        }*/
+
+        .antique-text {
+            font-family: 'EB Garamond', 'Crimson Text', serif;
+            font-size: 25px;
+            line-height: 1.8;
+            color: #d6b84d;
+            font-style: italic;
+            margin: 0;
+            /*text-shadow: 1px 1px 1px rgba(255,255,255,0.8);*/
+        }
+
+</style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
+    function openInstructionModal() {
+        document.getElementById('instructionModal').style.display = 'flex';
+    }
+    function closeInstructionModal() {
+        document.getElementById('instructionModal').style.display = 'none';
+    }
+
+</script>
+</head>
+<body>
+
+<div id="homeScreen">
+
+    <div class="antique-frame">
+        <p class="antique-text">
+            Gia phả không chỉ là nơi ghi lại tên tuổi tổ tiên mà còn lưu giữ cội nguồn, truyền thống và sự gắn kết của cả dòng họ. Qua gia phả, con cháu hiểu được nguồn gốc của mình, biết trân trọng đạo hiếu và gìn giữ những giá trị tốt đẹp cho các thế hệ mai sau.
+        </p>
+    </div>
+
+    <div id="treeList" class="tree-list-container"></div>
+    <footer>
+        <button class="update-btn" style="background: #106e35; font-size: 18px; padding: 12px 30px;" onclick="openCreateModal()">+ Tạo Gia Phả</button>
+        <button class="update-btn" style="background:#49556a;" onclick="openManageModal()">Quản lý Dữ Liệu</button>
+        <button class="update-btn" style="background:#475569;" onclick="openInstructionModal()">💡 Hướng dẫn</button>
+    </footer>
+</div>
+
+<div id="treeScreen">
+    <header id="treeHeader">
+        <div class="header-left">
+    <div class="dropdown">
+        <button class="update-btn" style="background:#475569; padding: 10px 18px; font-size: 24px;" onclick="toggleDropdown(event)">☰</button>
+        <div class="dropdown-content">
+            <!-- <a onclick="hideMenu(); openListModal()">📋 Danh sách</a> -->
+            <a id="btnIntro" onclick="hideMenu(); openIntroModal()" style="display: none; color: #38bdf8;">📖 Giới thiệu</a>
+            <a onclick="hideMenu(); openDeathModal()">🕯️ Ngày Giỗ</a>
+            <a id="btnDownloadDoc" target="_blank" style="display: none; color: #10b981;">📚 Tải Tư liệu</a>
+            <a onclick="hideMenu(); captureTree()">🖼️ Tạo ảnh</a>
+            <a id="btnEdit" onclick="hideMenu(); openEditModal()">✏️ Sửa Dữ Liệu</a>
+            <a class="btnLocka" id="btnLock" onclick="hideMenu(); toggleLockTree()">🔒 Khóa Gia Phả</a>
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 5px 0;">
+            <a id="btnDelete" onclick="hideMenu(); deleteCurrentTree()" style="color: #ef4444;">🗑️ Xóa Gia Phả</a>
+
+        </div>
+    </div>
+    <h2 id="currentTreeTitle" class="tree-title-display">Tên Gia Phả</h2>
+    </div>
+    <!-- Nhóm bên phải -->
+    <div class="header-right">
+   <!-- Nút bấm mở tìm kiếm (Chỉ hiện Icon) -->
+<button id="searchToggleBtn" class="update-btn" 
+    style="background: transparent; 
+           padding: 0; 
+           border: 1px solid var(--border-color); 
+           color: #cbd5e1; 
+           border-radius: 8px; 
+           width: 38px; 
+           height: 38px; 
+           display: flex; 
+           align-items: center; 
+           justify-content: center;" 
+    onclick="toggleSearch(event)" title="Tìm kiếm">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+</button>
+
+<!-- Khung Tìm Kiếm Trôi Xuống (Nằm đè lên nội dung) -->
+<div id="searchWrapper" class="search-floating-wrapper" onclick="event.stopPropagation()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; flex-shrink: 0;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    <input type="text" id="searchInput" placeholder="Nhập tên thành viên..." oninput="onSearchInput()" onkeydown="handleSearchKey(event)">
+    <div class="search-actions">
+        <span id="searchCount">0/0</span>
+    </div>
+</div>
+    <button class="update-btn hide-text-mobile" style="background:#106e35; padding: 8px 15px; font-size: 14px; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px;" onclick="openListModal()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+        <line x1="8" y1="6" x2="21" y2="6"></line>
+        <line x1="8" y1="12" x2="21" y2="12"></line>
+        <line x1="8" y1="18" x2="21" y2="18"></line>
+        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+    </svg>
+    <span>Nội tộc</span>
+</button>
+  <div class="dropdown">
+    <button class="update-btn hide-text-mobile" style="background:#d98b07; padding: 8px 15px; font-size: 14px; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px;" onclick="toggleDropdown(event)">
+        <!-- Icon SVG Mở rộng (Chevrons Down) -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+            <path d="m7 13 5 5 5-5"></path>
+            <path d="m7 6 5 5 5-5"></path>
+        </svg>
+        <span>Mở rộng</span>
+    </button>
+    <div class="dropdown-content" id="genCollapseMenu" style="right: 0; left: auto; min-width: 150px;">
+        <!-- Nội dung menu giữ nguyên -->
+    </div>
+</div>
+
+    <button class="close-x-btn" style="padding: 0 10px; margin-left: 10px; font-size: 32px;" onclick="closeTree()" title="Đóng">&times;</button>
+    </div>
+    </header>
+
+    <main id="scrollContainer" class="custom-scroll">
+        <div id="compactTreeContainerMain" class="compact-tree-container">
+            <div id="compactTreeView"></div>
+        </div>
+    </main>
+</div>
+
+<div class="modal-overlay" id="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Nhập dữ liệu Gia Phả</h2>
+            <button class="close-x-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <input type="text" id="treeNameInput" class="custom-input" placeholder="Nhập tên gia phả (VD: Gia phả họ Lê...)">
+        <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                <label for="docNameInput" style="color: #cbd5e1; font-size: 16px; font-weight: bold;">Tên tư liệu gia phả</label>
+                <input type="text" id="docNameInput" class="custom-input" placeholder="VD: Sách gia phả..." style="margin-bottom: 0;">
+            </div>
+            <div style="flex: 2; display: flex; flex-direction: column; gap: 8px;">
+                <label for="docLinkInput" style="color: #cbd5e1; font-size: 16px; font-weight: bold;">Đường dẫn</label>
+                <input type="url" id="docLinkInput" class="custom-input" placeholder="VD: https://drive.google.com/..." style="margin-bottom: 0;">
+            </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
+            <label for="introHtmlInput" style="color: #cbd5e1; font-size: 16px; font-weight: bold;">Mã HTML Giới thiệu dòng họ (Tuỳ chọn)</label>
+            <textarea id="introHtmlInput" class="custom-scroll" placeholder="Nhập mã HTML vào đây... (Ví dụ: <h1>Lịch sử dòng họ...</h1>)" style="min-height: 100px; margin-bottom: 0;"></textarea>
+        </div>
+        <textarea id="dataInput" class="custom-scroll" placeholder="Nhập cấu trúc dữ liệu..."></textarea>
+        <div style="text-align: right;">
+            <button class="update-btn" onclick="saveData()">Lưu Cập Nhật</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="manageModal">
+    <div class="modal-content" style="max-width: 500px; background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid #334155; box-shadow: 0 15px 35px rgba(0,0,0,0.6); border-radius: 20px;">
+        <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px;">
+            <h2 style="color: #a78bfa; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 24px;">⚙️</span> Quản lý Dữ Liệu
+            </h2>
+            <button class="close-x-btn" onclick="closeManageModal()">&times;</button>
+        </div>
+        <div style="text-align: center; padding: 10px 0;">
+            <p style="font-size: 15px; color: #94a3b8; margin-bottom: 25px; line-height: 1.6;">
+                Sao lưu an toàn hệ thống gia phả của bạn. <br>Xuất file <b style="color:#38bdf8;">.json</b> để lưu trữ data thuần, hoặc xuất file <b style="color:#10b981;">.html</b> để chạy App Offline.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <button class="update-btn manage-action-btn" style="background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid #10b981; text-align: left; padding: 15px 20px; display: flex; align-items: center; gap: 15px;" onclick="exportJSON()">
+                    <span style="font-size: 22px;">📥</span> <span style="flex:1;">Xuất Data Thuần (.json)</span>
+                </button>
+                <button class="update-btn manage-action-btn" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid #f59e0b; text-align: left; padding: 15px 20px; display: flex; align-items: center; gap: 15px;" onclick="exportHTML()">
+                    <span style="font-size: 22px;">🌐</span> <span style="flex:1;">Xuất App Offline (.html)</span>
+                </button>
+                <label class="upload-btn-wrapper manage-action-btn" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid #3b82f6; text-align: left; padding: 15px 20px; display: flex; align-items: center; gap: 15px; cursor: pointer;">
+                    <span style="font-size: 22px;">📤</span> <span style="flex:1;">Nhập Data Phục Hồi (.json)</span>
+                    <input type="file" accept=".json" style="display: none;" onchange="importJSON(event)">
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Thống Kê (Đã tối ưu cùng 1 hàng) -->
+<div class="modal-overlay" id="listModal">
+    <div class="modal-content" style="height: 95vh;">
+        <div class="modal-header" style="padding: 10px 15px !important;">
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                
+                <!-- Nhóm các phần tử bên trái -->
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    
+                    <!-- Tiêu đề và số lượng -->
+                    <h2 style="color: #10b981; font-size: 18px; margin: 0; white-space: nowrap; display: flex; align-items: center; gap: 8px;">
+                        <span style="color: #ffffff; font-weight: bold; font-size: 25px;">Nội tộc </span>
+                        <!-- <span id="listTreeNameDisplay" style="color: #ffffff; font-weight: bold; font-size: 25px;"></span> -->
+                        <span id="totalCount" style="font-size: 15px; background: #0e5232; color: #fff; padding: 2px 8px; border-radius: 12px; font-weight: normal;">0 người</span>
+                    </h2>
+
+                    <!-- Nút Icon Kính lúp cho Danh sách -->
+                    <button id="listSearchToggleBtn" class="update-btn" style="background: transparent; padding: 6px; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; color: #10b981; border-radius: 8px;" onclick="toggleListSearch(event)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+
+                    <!-- Khung tìm kiếm trôi xuống của Danh sách -->
+                    <div id="listSearchWrapper" class="search-floating-wrapper" style="max-width: 300px; border-color: #10b981;" onclick="event.stopPropagation()">
+                        <input type="text" id="listSearchInput" placeholder="Tìm tên..." oninput="onListSearchInput()" onkeydown="handleListSearchKey(event)" style="font-size: 14px;">
+                        <div class="search-actions">
+                            <span id="listSearchCount" style="font-size: 12px; min-width: 30px; text-align: center;">0/0</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Nút thu gọn / mở rộng -->
+                    <button id="toggleAllBtn" class="icon-toggle-btn" onclick="toggleAllGens()" data-state="expanded" style="padding: 4px; margin:0;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px; height:20px;">
+                            <polyline points="7 13 12 8 17 13"></polyline>
+                            <polyline points="7 17 12 12 17 17"></polyline>
+                        </svg> 
+                    </button>
+
+                </div>
+
+                <!-- Nút close bên phải -->
+                <button class="close-x-btn" onclick="closeListModal()" style="font-size: 36px; margin:0; flex-shrink: 0;">&times;</button>
+            </div>
+        </div>
+        
+        <div id="genListView" class="custom-scroll" style="text-align: left; flex: 1; overflow-y: auto; color: var(--text-color); padding: 15px;"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="deathModal">
+    <div class="modal-content" style="height: 95vh;">
+        <div class="modal-header">
+            <h2 style="color: #ffb835;">Ngày Giỗ
+                <span id="deathTotalCount" style="font-size: 16px; background: #ef4444; color: #fff; padding: 2px 12px; border-radius: 20px;">0 người</span>
+            </h2>
+            <button class="close-x-btn" onclick="document.getElementById('deathModal').style.display='none'">&times;</button>
+        </div>
+        <div id="deathListView" class="custom-scroll" style="text-align: left; flex: 1; overflow-y: auto; color: var(--text-color); padding-right: 10px;"></div>
+    </div>
+</div>
+
+<script>
+    // BẠN HÃY ĐỔI MẬT KHẨU CỦA BẠN Ở ĐÂY
+    const MASTER_PASSWORD = "1234";
+
+    const defaultData = `Lê Đình Tục - ông cụ Kích [5/8]
++ Bà cụ Kích (nữ) [23/9]
+    Lê Chân Kim [21/5]
+    + Nguyễn Thị Huý Thi (nữ) [18/1]
+        Lê Đình Đài [23/11]
+        + Trần Thị Chục (nữ) [11/3]
+            Lê Đình Bùng (1780) [29/5]
+        + Nguyễn Thị Sự (nữ) [11/8]
+            Lê Văn Bao (1800-1880) [8/10]`;
+
+    // 1. Khai báo nội dung HTML giới thiệu mẫu (Dán nội dung họ Lê Văn đã làm sạch vào đây)
+    const defaultIntroTemplate = `
+    <div style="padding: 20px; background: #1e293b; color: #f8fafc; border-radius: 8px; font-family: sans-serif;">
+        <h1 style="color: #38bdf8; text-align: center;">Gia Phả Họ Lê Văn</h1>
+        <h2 style="color: #10b981; border-left: 5px solid #10b981; padding-left: 10px;">1. Nguồn Gốc</h2>
+        <p>Họ Lê Văn của chúng ta gốc từ Hộ Đội - Thụy Anh - Thái Bình...</p>
+        </div>
+    `;
+    let treesList = []; 
+    // 2. Nếu danh sách trống, tự động tạo Gia phả mẫu có sẵn giới thiệu
+if (treesList.length === 0) {
+    const defaultTree = { 
+        id: 1, 
+        name: "Gia phả mẫu", 
+        data: defaultData, 
+        introHtml: defaultIntroTemplate, // Đưa dữ liệu mẫu vào đây
+        isLocked: false 
+    };
+    treesList.push(defaultTree);
+    localStorage.setItem('familyTrees', JSON.stringify(treesList)); // Lưu vào máy
+}
+    let currentTreeId = null; 
+    const input = document.getElementById('dataInput');
+    const nameInput = document.getElementById('treeNameInput');
+    const docNameInput = document.getElementById('docNameInput');
+    const docLinkInput = document.getElementById('docLinkInput');
+    const scrollContainer = document.getElementById('scrollContainer');
+    const modal = document.getElementById('modal');
+    const introHtmlInput = document.getElementById('introHtmlInput'); // Thêm dòng này
+    // Dữ liệu HTML mẫu cho trang giới thiệu
+
+
+    let searchMatches = [];
+    let currentMatchIndex = -1;
+    const coupleColors = ['#f87171', '#fb923c', '#fbbf24', '#a3e635', '#04ffa3', '#2dd4bf', '#38bdf8', '#818cf8', '#c2aeff', '#e879f9', '#f43f5e', '#bef264', '#5eead4'];
+    let coupleColorMap = {};
+    let colorIndex = 0;
+
+    window.addEventListener('DOMContentLoaded', () => {
+        loadDataFromStorage();
+        renderHome();
+        
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+                this.selectionStart = this.selectionEnd = start + 4;
+            }
+        });
+    });
+
+    function loadDataFromStorage() {
+        if (window.offlineBackupData) {
+            treesList = window.offlineBackupData;
+            saveTreesToStorage(); window.offlineBackupData = null; 
+        } else {
+            const savedList = localStorage.getItem('giaPhaList');
+            if (savedList) { treesList = JSON.parse(savedList); } 
+            else {
+                const oldSingleData = localStorage.getItem('giaPhaData');
+                treesList = [{ id: Date.now(), name: "Gia phả mẫu", data: oldSingleData ? oldSingleData : defaultData, isLocked: false, docName: "", docLink: "" }];
+                saveTreesToStorage();
+            }
+        }
+    }
+
+    function saveTreesToStorage() { localStorage.setItem('giaPhaList', JSON.stringify(treesList)); }
+
+function renderHome() {
+        const listContainer = document.getElementById('treeList');
+        listContainer.innerHTML = '';
+        treesList.forEach(tree => {
+            const icon = tree.isLocked ? "🔒" : "📁";
+            const lockStatus = tree.isLocked ? '<span style="color:#ef4444; font-size:14px; margin-left: 5px;"></span>' : '';
+            
+            // --- XỬ LÝ ĐẾM SỐ THÀNH VIÊN ---
+            // Tách dữ liệu thành các dòng, lọc bỏ các dòng trống và đếm số lượng
+            const memberCount = tree.data ? tree.data.split('\n').filter(line => line.trim() !== '').length : 0;
+            
+            // Tạo một thẻ span (badge) để hiển thị số lượng với viền xanh bo tròn đẹp mắt
+            const countBadge = `<span style="font-size: 15px; background: #0e5232; color: #fff; padding: 2px 8px; border-radius: 12px; white-space: nowrap; font-weight: normal">${memberCount} người</span>`;
+            // -------------------------------
+
+            listContainer.innerHTML += `
+                <div class="tree-card" onclick="openTree(${tree.id})">
+                    <h3 style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        ${icon} ${tree.name} ${countBadge} ${lockStatus}
+                    </h3>
+                    <p>Bấm vào để xem chi tiết gia phả</p>
+                </div>`;
+        });
+    }
+
+    function openTree(id) {
+        currentTreeId = id; const tree = treesList.find(t => t.id === id);
+        // Dòng quan trọng: Cập nhật tên vào thẻ h2 đã tạo ở Bước 1
+    document.getElementById('currentTreeTitle').innerText = tree.name;
+    
+        input.value = tree.data; renderView(); 
+        document.getElementById('homeScreen').style.display = 'none';
+        document.getElementById('treeScreen').style.display = 'block';
+
+        const btnEdit = document.getElementById('btnEdit');
+        const btnDelete = document.getElementById('btnDelete');
+        const btnLock = document.getElementById('btnLock');
+        const btnDownloadDoc = document.getElementById('btnDownloadDoc');
+        const btnIntro = document.getElementById('btnIntro');
+        
+        // Hiện nút Giới thiệu nếu có mã HTML
+        if (tree.introHtml && tree.introHtml.trim() !== '') {
+            btnIntro.style.display = 'block';
+        } else {
+            btnIntro.style.display = 'none';
+        }
+        
+        if (tree.docLink && tree.docLink.trim() !== '') {
+            btnDownloadDoc.style.display = 'block';
+            btnDownloadDoc.href = tree.docLink;
+            btnDownloadDoc.innerHTML = `📚 Tải: ${tree.docName ? tree.docName : 'Tư liệu'}`;
+        } else {
+            btnDownloadDoc.style.display = 'none';
+        }
+
+        if (tree.isLocked) {
+            if(btnEdit) btnEdit.style.display = 'none';
+            if(btnDelete) btnDelete.style.display = 'none';
+            if(btnLock) btnLock.innerText = '🔓 Mở Khóa Gia Phả';
+        } else {
+            if(btnEdit) btnEdit.style.display = 'block';
+            if(btnDelete) btnDelete.style.display = 'block';
+            if(btnLock) btnLock.innerText = '🔒 Khóa Gia Phả';
+        }
+    }
+
+    function closeTree() {
+        currentTreeId = null;
+        document.getElementById('homeScreen').style.display = 'block';
+        document.getElementById('treeScreen').style.display = 'none';
+        renderHome(); 
+    }
+
+    function openCreateModal() {
+        currentTreeId = null; document.getElementById('modalTitle').innerText = "Tạo Gia Phả Mới";
+        nameInput.value = ""; 
+        docNameInput.value = "";
+        docLinkInput.value = "";
+        input.value = defaultData; 
+
+        if(introHtmlInput) introHtmlInput.value = defaultIntroTemplate; // THÊM DÒNG NÀY
+        modal.style.display = 'flex';
+    }
+
+    function openEditModal() {
+        if(!currentTreeId) return;
+        const tree = treesList.find(t => t.id === currentTreeId);
+        if(tree.isLocked) { alert("Gia phả này đã bị khóa!"); return; }
+        
+        document.getElementById('modalTitle').innerText = "Chỉnh sửa Gia Phả";
+        nameInput.value = tree.name; 
+        docNameInput.value = tree.docName || "";
+        docLinkInput.value = tree.docLink || "";
+        input.value = tree.data; 
+        if(introHtmlInput) introHtmlInput.value = tree.introHtml || ""; // THÊM DÒNG NÀY
+        modal.style.display = 'flex';
+    }
+
+    function deleteCurrentTree() {
+        if(!currentTreeId) return;
+        const tree = treesList.find(t => t.id === currentTreeId);
+        if(tree.isLocked) { alert("Gia phả này đã bị khóa!"); return; }
+        
+        if(confirm("⚠️ Bạn có chắc chắn muốn XÓA gia phả này không? Hành động này không thể hoàn tác!")) {
+            treesList = treesList.filter(t => t.id !== currentTreeId);
+            saveTreesToStorage(); closeTree();
+        }
+    }
+
+    function toggleLockTree() {
+        if(!currentTreeId) return;
+        const tree = treesList.find(t => t.id === currentTreeId);
+        
+        if(tree) {
+            if (tree.isLocked) {
+                const pass = prompt("Nhập mật mã để mở khóa gia phả này:");
+                if (pass === MASTER_PASSWORD) {
+                    tree.isLocked = false;
+                    alert("✅ Đã mở khóa thành công!");
+                } else if (pass !== null) {
+                    alert("❌ Sai mật mã! Bạn không có quyền mở khóa.");
+                    return;
+                } else {
+                    return; 
+                }
+            } else {
+                const confirmLock = confirm("Bạn muốn khóa gia phả này? Sau khi khóa, cần mật mã chủ để sửa hoặc xóa.");
+                if (confirmLock) {
+                    tree.isLocked = true;
+                    alert("🔒 Đã khóa gia phả.");
+                }
+            }
+            
+            saveTreesToStorage();
+            openTree(currentTreeId); 
+            renderHome(); 
+        }
+    }
+
+    function closeModal() { modal.style.display = 'none'; }
+
+    function saveData() { 
+        const newName = nameInput.value.trim() || "Gia phả chưa đặt tên";
+        const newDocName = docNameInput.value.trim();
+        const newDocLink = docLinkInput.value.trim();
+        const newData = input.value; 
+        const newIntroHtml = introHtmlInput ? introHtmlInput.value.trim() : ""; // THÊM DÒNG NÀY
+        if (currentTreeId) {
+            const treeIndex = treesList.findIndex(t => t.id === currentTreeId);
+            if(treeIndex !== -1) { 
+                if(treesList[treeIndex].isLocked) {
+                    alert("Lỗi: Gia phả đang bị khóa, không thể lưu thay đổi!");
+                    return;
+                }
+                treesList[treeIndex].name = newName; 
+                treesList[treeIndex].docName = newDocName; 
+                treesList[treeIndex].docLink = newDocLink; 
+                treesList[treeIndex].data = newData; 
+                treesList[treeIndex].introHtml = newIntroHtml; // THÊM DÒNG NÀY
+            }
+        } else {
+            // SỬA DÒNG NÀY ĐỂ THÊM introHtml: newIntroHtml
+            const newTree = { id: Date.now(), name: newName, docName: newDocName, docLink: newDocLink, data: newData, introHtml: newIntroHtml, isLocked: false };
+            treesList.push(newTree); currentTreeId = newTree.id;
+        }
+        saveTreesToStorage(); closeModal(); openTree(currentTreeId);
+    }
+
+    function enableDragScroll(element) {
+        if (!element) return;
+        let isDown = false; 
+        let startX, startY, scrollLeft, scrollTop;
+
+        element.addEventListener('mousedown', (e) => {
+            const ignoredTags = ['BUTTON', 'INPUT', 'TEXTAREA', 'LABEL', 'SELECT', 'OPTION', 'A'];
+            if(ignoredTags.includes(e.target.tagName) || e.target.classList.contains('btn-toggle-compact')) return; 
+            isDown = true; 
+            startX = e.pageX - element.offsetLeft; 
+            startY = e.pageY - element.offsetTop;
+            scrollLeft = element.scrollLeft; 
+            scrollTop = element.scrollTop;
+        });
+        element.addEventListener('mouseleave', () => { isDown = false; });
+        element.addEventListener('mouseup', () => { isDown = false; });
+        element.addEventListener('mousemove', (e) => {
+            if (!isDown) return; 
+            e.preventDefault();
+            const x = e.pageX - element.offsetLeft; 
+            const y = e.pageY - element.offsetTop;
+            const walkX = (x - startX); 
+            const walkY = (y - startY);
+            element.scrollLeft = scrollLeft - walkX; 
+            element.scrollTop = scrollTop - walkY;
+        });
+    }
+
+    enableDragScroll(document.getElementById('scrollContainer'));
+    enableDragScroll(document.getElementById('genListView'));
+    enableDragScroll(document.getElementById('deathListView'));
+
+    window.addEventListener('mousedown', function(event) {
+        if (event.target.classList.contains('modal-overlay')) { event.target.style.display = 'none'; }
+    });
+
+    function getCoupleColor(key) {
+        if (!coupleColorMap[key]) { coupleColorMap[key] = coupleColors[colorIndex % coupleColors.length]; colorIndex++; }
+        return coupleColorMap[key];
+    }
+
+    function parseLine(line) {
+        let text = line.trim(); let isWife = text.startsWith('+');
+        if (isWife) text = text.substring(1).trim();
+        let gender = text.toLowerCase().includes('(nữ)') ? 'female' : 'male';
+        text = text.replace(/\(nam\)|\(nữ\)/gi, "").trim();
+        let dates = ""; let dateMatch = text.match(/\((.*?)\)/);
+        if (dateMatch) { dates = dateMatch[1].trim(); text = text.replace(dateMatch[0], ""); }
+        let deathDate = ""; let deathMatchArr = text.match(/\[(.*?)\]/);
+        if (deathMatchArr) { deathDate = deathMatchArr[1].trim(); text = text.replace(deathMatchArr[0], ""); }
+        let name = text.trim();
+        return { name, dates, deathDate, gender, isWife };
+    }
+
+    function buildTree(lines) {
+        let roots = [], stack = []; window.treeData = roots; 
+        lines.forEach(line => {
+            if (!line.trim()) return;
+            let indent = 0; let match = line.match(/^\s*/)[0];
+            for(let c of match) indent += (c === '\t' ? 4 : 1);
+            let node = { ...parseLine(line), children: [], parentObj: null };
+            
+            while (stack.length > 0 && stack[stack.length - 1].indent >= indent) {
+                if (node.isWife && stack[stack.length - 1].indent === indent && !stack[stack.length - 1].node.isWife) break;
+                stack.pop();
+            }
+            if (stack.length > 0) {
+                let parentNode = stack[stack.length - 1].node;
+                node.gen = node.isWife ? parentNode.gen : parentNode.gen + 1;
+                if (!node.isWife) {
+                    if (parentNode.isWife) {
+                        let husbandNode = stack[stack.length - 2].node;
+                        node.bloodParentName = husbandNode.name; node.coupleKey = husbandNode.name + "_" + parentNode.name; node.parentObj = husbandNode;
+                    } else {
+                        node.bloodParentName = parentNode.name; node.coupleKey = parentNode.name + "_none"; node.parentObj = parentNode;
+                    }
+                }
+                parentNode.children.push(node);
+            } else {
+                node.gen = 1; node.bloodParentName = null; node.coupleKey = "root_" + node.name; roots.push(node);
+            }
+            stack.push({ node, indent });
+        });
+        return roots;
+    }
+
+    function buildDisplayNameHtml(node, showGen = true) {
+        let genHtml = showGen ? `<span class="gen-text">(đời ${node.gen})</span>` : "";
+        let dateHtml = node.dates ? `<span class="date-text">(${node.dates})</span>` : "";
+        let deathHtml = node.deathDate ? `<span class="death-text">${node.deathDate}</span>` : "";
+        return `${node.name} ${genHtml} ${dateHtml} ${deathHtml}`;
+    }
+
+function toggleCompactNode(element) {
+    const li = element.closest('li'); 
+    const ul = li.querySelector(':scope > ul');
+    // Tìm đúng nút +/- của dòng hiện tại để thay đổi text, tránh làm đổi text của Họ tên
+    const btn = li.querySelector(':scope > .compact-node .btn-toggle-compact');
+
+    if (ul) {
+        if (ul.style.display === 'none') { 
+            ul.style.display = 'block'; 
+            if (btn) btn.innerText = '-'; 
+        } 
+        else { 
+            ul.style.display = 'none'; 
+            if (btn) btn.innerText = '+'; 
+        }
+    }
+}
+
+    function expandAllCompact() {
+        document.querySelectorAll('#compactTreeView ul').forEach(ul => ul.style.display = 'block');
+        document.querySelectorAll('.btn-toggle-compact').forEach(btn => btn.innerText = '-');
+    }
+
+    function collapseToGen(targetGen) {
+        if(targetGen === 'all') { expandAllCompact(); return; }
+        targetGen = parseInt(targetGen);
+        document.querySelectorAll('.btn-toggle-compact').forEach(btn => {
+            let nodeGen = parseInt(btn.getAttribute('data-gen'));
+            let ul = btn.closest('li').querySelector(':scope > ul');
+            if(!ul) return;
+            if(nodeGen < targetGen) { ul.style.display = 'block'; btn.innerText = '-'; } 
+            else { ul.style.display = 'none'; btn.innerText = '+'; }
+        });
+    }
+
+    function updateGenSelect() {
+        let list = getBloodRelatives(); 
+        if(list.length === 0) return;
+        
+        let maxGen = Math.max(...list.map(n => n.gen));
+        let menu = document.getElementById('genCollapseMenu');
+        
+        let html = `<a onclick="hideMenu(); collapseToGen('all')">👁️ Tất cả</a>`;
+        for(let i = 1; i < maxGen; i++) { 
+            html += `<a onclick="hideMenu(); collapseToGen('${i}')">👁️ Đến đời ${i}</a>`; 
+        }
+        menu.innerHTML = html;
+    }
+// Hàm tính số lượng Vợ/Chồng, Con, Cháu của một người
+function getMemberStats(node) {
+    let spouses = 0;
+    let children = 0;
+    let grandchildren = 0;
+
+    if (!node.children) return { spouses, children, grandchildren };
+
+    // Đếm số vợ/chồng (là những node con có cờ isWife = true)
+    let spouseNodes = node.children.filter(c => c.isWife);
+    spouses = spouseNodes.length;
+
+    // Đếm số con (con trực tiếp hoặc con nằm dưới node vợ/chồng)
+    let childNodes = node.children.filter(c => !c.isWife);
+    spouseNodes.forEach(s => {
+        if(s.children) {
+            childNodes = childNodes.concat(s.children.filter(c => !c.isWife));
+        }
+    });
+    children = childNodes.length;
+
+    // Đếm số cháu (con của những đứa con ở trên)
+    childNodes.forEach(c => {
+        if (!c.children) return;
+        let gc = c.children.filter(x => !x.isWife);
+        let cSpouses = c.children.filter(x => x.isWife);
+        cSpouses.forEach(cs => {
+            if(cs.children) {
+                gc = gc.concat(cs.children.filter(x => !x.isWife));
+            }
+        });
+        grandchildren += gc.length;
+    });
+
+    return { spouses, children, grandchildren };
+}
+function renderCompactTree(nodes) {
+    if (!nodes || nodes.length === 0) return '';
+    let html = ``;
+    nodes.forEach(node => {
+        let colorClass = node.gender === 'male' ? 'c-male' : 'c-female';
+        let prefix = node.isWife ? '<span class="c-spouse-mark">+</span>' : '';
+        let hasChildren = node.children && node.children.length > 0;
+        
+        // Nút +/-
+        let toggleBtn = hasChildren ? `<span class="btn-toggle-compact" data-gen="${node.gen}" onclick="toggleCompactNode(this)">-</span>` : `<span class="btn-toggle-spacer"></span>`;
+        
+        let displayName = buildDisplayNameHtml(node);
+
+        // THÊM MỚI: Nếu có con thì gắn sự kiện click và con trỏ chuột hình bàn tay vào Họ Tên
+        let nameClickAttr = hasChildren ? `onclick="toggleCompactNode(this)" style="cursor: pointer; user-select: none;" title="Bấm để mở/thu gọn"` : ``;
+
+        // Gắn nameClickAttr vào thẻ span chứa tên
+        html += `<li><div class="compact-node">${toggleBtn} ${prefix} <span class="${colorClass}" ${nameClickAttr}>${displayName}</span></div>`;
+        
+        if (hasChildren) html += `<ul>${renderCompactTree(node.children)}</ul>`;
+        html += `</li>`;
+    });
+    return html;
+}
+
+    function renderView() { 
+        const parsedTree = buildTree(input.value.split('\n'));
+        document.getElementById('compactTreeView').innerHTML = `<ul>${renderCompactTree(parsedTree)}</ul>`;
+        updateGenSelect(); onSearchInput(); 
+    }
+
+    function openManageModal() { document.getElementById('manageModal').style.display = 'flex'; }
+    function closeManageModal() { document.getElementById('manageModal').style.display = 'none'; }
+
+    function exportJSON() {
+        const dataToBackup = { appName: "GiaPhaThongMinh_Multi", version: "3.0", exportDate: new Date().toISOString(), giaPhaList: treesList };
+        const blob = new Blob([JSON.stringify(dataToBackup, null, 2)], {type: 'application/json'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'DataGiaPha.json'; a.click();
+    }
+
+    function importJSON(event) {
+        const file = event.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const json = JSON.parse(e.target.result);
+                if (json && json.giaPhaList) {
+                    treesList = json.giaPhaList; saveTreesToStorage(); renderHome();
+                    alert("Khôi phục toàn bộ danh sách thành công!"); closeManageModal();
+                } else { alert("Lỗi: File JSON không đúng định dạng đa gia phả!"); }
+            } catch (error) { alert("Lỗi: Không thể đọc cấu trúc file JSON."); }
+        };
+        reader.readAsText(file); event.target.value = '';
+    }
+
+    function exportHTML() {
+        closeManageModal();
+        let htmlString = "<!DOCTYPE html>\n<html lang=\"vi\">\n" + document.documentElement.innerHTML + "\n</html>";
+        let scriptTag = `<script id="offline-data-script">window.offlineBackupData = ${JSON.stringify(treesList)};<\/script>`;
+        if(htmlString.includes('id="offline-data-script"')) { htmlString = htmlString.replace(/<script id="offline-data-script">.*?<\/script>/, scriptTag); } 
+        else { htmlString = htmlString.replace('</head>', '    ' + scriptTag + '\n</head>'); }
+        const blob = new Blob([htmlString], {type: 'text/html;charset=utf-8'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'AppGiaPha_Offline.html'; a.click();
+    }
+
+    function getBloodRelatives() {
+        let list = [];
+        function traverse(nodes) { for (let node of nodes) { if (!node.isWife) list.push(node); traverse(node.children); } }
+        traverse(window.treeData); return list;
+    }
+
+    function getAllMembersWithDeathDate() {
+        let list = [];
+        function traverse(nodes) { for (let node of nodes) { if(node.deathDate) list.push(node); if(node.children) traverse(node.children); } }
+        traverse(window.treeData); return list;
+    }
+
+    function openListModal() {
+        let list = getBloodRelatives(); if(list.length === 0) return;
+        
+        // Thêm tính năng hiển thị Tên gia phả hiện tại
+        const currentTree = treesList.find(t => t.id === currentTreeId);
+        if (currentTree) {
+            const nameDisplay = document.getElementById('listTreeNameDisplay');
+            if (nameDisplay) nameDisplay.innerText = currentTree.name;
+        }
+
+        let allGens = [...new Set(list.map(node => node.gen))].sort((a, b) => a - b);
+        let grouped = {}; let total = 0; 
+        allGens.forEach(g => grouped[g] = []);
+        list.forEach(node => { grouped[node.gen].push(node); total++; });
+        
+        document.getElementById('totalCount').innerText = total + " người";
+        let html = '';
+        
+        allGens.forEach(g => {
+            html += `<h3 onclick="toggleGenList(${g})" style="cursor: pointer; color: #cecece; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+                        <div>
+                            <span id="icon-gen-${g}" style="display:inline-block; width: 20px; transition: 0.3s; color: var(--primary-color);">▾</span>
+                            Đời ${g} <span style="font-size: 14px; opacity: 0.7;">(${grouped[g].length} thành viên)</span>
+                        </div>
+                    </h3>
+                    <ul id="list-gen-${g}" style="list-style: none; padding-left: 5px; transition: all 0.3s ease;">`;
+                    
+grouped[g].forEach((node, idx) => {
+            let nameColor = node.gender === 'male' ? '#629dff' : '#df5969';
+            let extraInfo = '';
+            if (node.parentObj) {
+                let cColor = getCoupleColor(node.coupleKey); let parent = node.parentObj; let grandparent = parent.parentObj;
+                let pathText = grandparent ? `${grandparent.name} / ${parent.name}` : `${parent.name}`;
+                extraInfo = `<div style="color: ${cColor}; font-size: 15px; font-style: italic; margin-left: 45px; margin-top: 6px;"> ${pathText} </div>`;
+            }
+            
+            // --- XỬ LÝ THÔNG TIN THỐNG KÊ ---
+            let stats = getMemberStats(node);
+            let statsArr = [];
+            let spouseLabel = node.gender === 'male' ? 'vợ' : 'chồng';
+            if (stats.spouses > 0) statsArr.push(`${stats.spouses} ${spouseLabel}`);
+            if (stats.children > 0) statsArr.push(`${stats.children} con`);
+            if (stats.grandchildren > 0) statsArr.push(`${stats.grandchildren} cháu`);
+            
+            let statsHtml = '';
+            if (statsArr.length > 0) {
+                statsHtml = `<span class="member-stats">${statsArr.join(', ')}</span>`;
+            }
+            // --------------------------------
+
+            html += `<li style="margin-bottom: 12px; font-size: 17px; background: rgba(30,41,59, 0.5); padding: 8px 10px; border-radius: 6px;">
+                        <strong style="display:inline-block; color:#cbd5e1; width: 45px;">${g}.${idx + 1}.</strong> 
+                        <span class="list-member-name" style="color: ${nameColor}; font-weight: bold;">${buildDisplayNameHtml(node, false)}</span>
+                        ${statsHtml}
+                        ${extraInfo}
+                    </li>`;
+        });
+            html += `</ul>`;
+        });
+        
+        document.getElementById('genListView').innerHTML = html;
+        
+        let toggleBtn = document.getElementById('toggleAllBtn');
+        if(toggleBtn) {
+            toggleBtn.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="7 13 12 8 17 13"></polyline>
+                    <polyline points="7 17 12 12 17 17"></polyline>
+                </svg>`;
+            toggleBtn.dataset.state = 'expanded';
+            toggleBtn.title = "Thu gọn tất cả";
+        }
+
+        document.getElementById('listModal').style.display = 'flex';
+        
+        // Reset thanh tìm kiếm
+        document.getElementById('listSearchInput').value = '';
+        let countDisplay = document.getElementById('listSearchCount');
+        if(countDisplay) countDisplay.innerText = "0/0";
+    }
+
+    function closeListModal() { 
+        closeListSearch(); // Đóng tìm kiếm trước
+        document.getElementById('listModal').style.display = 'none'; 
+    }
+
+    function toggleGenList(gen) {
+        let list = document.getElementById(`list-gen-${gen}`);
+        let icon = document.getElementById(`icon-gen-${gen}`);
+        if (list.style.display === 'none') {
+            list.style.display = 'block';
+            icon.innerText = '▾';
+        } else {
+            list.style.display = 'none';
+            icon.innerText = '▸';
+        }
+    }
+
+    function toggleAllGens() {
+        const btn = document.getElementById('toggleAllBtn');
+        const isExpanded = btn.dataset.state === 'expanded';
+        const allLists = document.querySelectorAll('[id^="list-gen-"]');
+        const allIcons = document.querySelectorAll('[id^="icon-gen-"]');
+
+        const iconCollapseAll = `
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="7 13 12 8 17 13"></polyline>
+                <polyline points="7 17 12 12 17 17"></polyline>
+            </svg>`;
+        const iconExpandAll = `
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="7 11 12 16 17 11"></polyline>
+                <polyline points="7 7 12 12 17 7"></polyline>
+            </svg>`;
+
+        if (isExpanded) {
+            allLists.forEach(list => list.style.display = 'none');
+            allIcons.forEach(icon => icon.innerText = '▸');
+            btn.innerHTML = iconExpandAll; 
+            btn.dataset.state = 'collapsed';
+            btn.title = "Mở rộng tất cả";
+        } else {
+            allLists.forEach(list => list.style.display = 'block');
+            allIcons.forEach(icon => icon.innerText = '▾');
+            btn.innerHTML = iconCollapseAll; 
+            btn.dataset.state = 'expanded';
+            btn.title = "Thu gọn tất cả";
+        }
+    }
+
+    function openDeathModal() {
+        let deadMembers = getAllMembersWithDeathDate();
+        deadMembers.sort((a, b) => {
+            let partsA = a.deathDate.split('/'); let partsB = b.deathDate.split('/');
+            let dayA = parseInt(partsA[0]) || 0; let monthA = parseInt(partsA[1]) || 0;
+            let dayB = parseInt(partsB[0]) || 0; let monthB = parseInt(partsB[1]) || 0;
+            if (monthA !== monthB) return monthA - monthB; return dayA - dayB;
+        });
+        document.getElementById('deathTotalCount').innerText = deadMembers.length + " người";
+        
+        let html = `<ul style="list-style: none; padding-left: 0; margin-top: 15px;">`;
+        if (deadMembers.length === 0) { 
+            html += `<li style="color: #cbd5e1; text-align: center; padding: 20px;">Chưa có thông tin ngày giỗ nào. Nhớ điền vào khung dữ liệu dạng [ngày/tháng].</li>`; 
+        } else {
+            deadMembers.forEach((node, idx) => {
+                let nameColor = node.gender === 'male' ? '#38bdf8' : '#f472b6';
+                let roleText = node.isWife ? `Vợ / Đời ${node.gen}` : `Đời ${node.gen}`;
+                html += `<li style="margin-bottom: 15px; background: linear-gradient(to right, rgba(30,41,59, 0.8), rgba(15,23,42, 0.9)); padding: 15px 20px; border-radius: 10px; border-left: 4px solid #874d9d; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div style="display: flex; align-items: center; flex-wrap: wrap;">
+                        <span style="color: #64748b; font-size: 15px; margin-right: 12px; font-weight: bold;">${idx + 1}</span>
+                        <span class="death-item-name" style="color: ${nameColor}; font-weight: bold; font-size: 19px; text-shadow: 0 0 5px rgba(0,0,0,0.5);">${node.name}</span>
+                        <span class="death-item-role" style="font-size: 14px; color: #ebebeb; margin-left: 15px; padding: 4px 8px; background: rgba(255,255,255,0.05); border-radius: 6px;">${roleText}</span>
+                    </div>
+                    <div class="death-item-date" style="color: #c97fff; padding: 8px 15px; letter-spacing: 0.5px; font-size: 20px;">
+                        ${node.deathDate}
+                    </div>
+                </li>`;
+            });
+        }
+        html += `</ul>`;
+        document.getElementById('deathListView').innerHTML = html;
+        document.getElementById('deathModal').style.display = 'flex';
+    }
+
+    function clearSearchHighlights() { document.querySelectorAll('.c-male, .c-female').forEach(n => n.classList.remove('highlight-compact', 'active-search-compact')); }
+    
+    function onSearchInput() {
+        const term = document.getElementById('searchInput').value.toLowerCase().trim();
+        const countDisplay = document.getElementById('searchCount');
+        clearSearchHighlights(); searchMatches = []; currentMatchIndex = -1;
+        if (term === '') { countDisplay.innerText = "0/0"; return; }
+
+        document.querySelectorAll('.compact-node').forEach(node => {
+            const nameSpan = node.querySelector('.c-male, .c-female');
+            if (nameSpan && nameSpan.innerText.toLowerCase().includes(term)) {
+                searchMatches.push(nameSpan); nameSpan.classList.add('highlight-compact');
+                let parentUl = node.closest('ul');
+                while (parentUl && parentUl.parentElement.closest('#compactTreeView')) {
+                    parentUl.style.display = 'block';
+                    const toggleBtn = parentUl.parentElement.querySelector('.btn-toggle-compact');
+                    if (toggleBtn) toggleBtn.innerText = '-';
+                    parentUl = parentUl.parentElement.closest('ul');
+                }
+            }
+        });
+        if (searchMatches.length > 0) { currentMatchIndex = 0; updateSearchFocus(); } 
+        else { countDisplay.innerText = "0/0"; }
+    }
+
+    function updateSearchFocus() {
+        if (searchMatches.length === 0) return;
+        searchMatches.forEach(el => el.classList.remove('active-search-compact'));
+        const activeEl = searchMatches[currentMatchIndex]; activeEl.classList.add('active-search-compact');
+        document.getElementById('searchCount').innerText = `${currentMatchIndex + 1}/${searchMatches.length}`;
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+    }
+
+function toggleSearch(event) {
+    if (event) event.stopPropagation();
+    const wrapper = document.getElementById('searchWrapper');
+    const input = document.getElementById('searchInput');
+
+    if (wrapper.classList.contains('active')) {
+        closeSearch();
+    } else {
+        wrapper.classList.add('active');
+        // Đợi 150ms cho animation thả xuống chạy xong rồi focus để bung bàn phím
+        setTimeout(() => { input.focus(); }, 150); 
+    }
+}
+
+function closeSearch(event) {
+    if (event) event.stopPropagation();
+    const wrapper = document.getElementById('searchWrapper');
+    if (wrapper && wrapper.classList.contains('active')) {
+        wrapper.classList.remove('active');
+        
+        // Trả lại trạng thái mặc định, xóa highlight khi đóng tìm kiếm
+        document.getElementById('searchInput').value = '';
+        onSearchInput(); 
+    }
+}
+
+    function nextMatch(e) { if(e) e.stopPropagation(); if (searchMatches.length === 0) return; currentMatchIndex = (currentMatchIndex + 1) % searchMatches.length; updateSearchFocus(); }
+    function prevMatch(e) { if(e) e.stopPropagation(); if (searchMatches.length === 0) return; currentMatchIndex = (currentMatchIndex - 1 + searchMatches.length) % searchMatches.length; updateSearchFocus(); }
+    function handleSearchKey(e) { if (e.key === 'Enter') { e.preventDefault(); if (e.shiftKey) { prevMatch(e); } else { nextMatch(e); } } }
+
+    function captureTree() {
+        const target = document.getElementById('compactTreeContainerMain');
+        if (!target) return;
+        const oldPaddingRight = target.style.paddingRight; const oldPaddingBottom = target.style.paddingBottom;
+        target.style.paddingRight = '30px'; target.style.paddingBottom = '30px';
+
+        html2canvas(target, { backgroundColor: '#0f172a', scale: 2 }).then(canvas => {
+            target.style.paddingRight = oldPaddingRight; target.style.paddingBottom = oldPaddingBottom;
+            const treeName = treesList.find(t => t.id === currentTreeId)?.name || 'Gia-Pha';
+            const link = document.createElement('a');
+            link.download = treeName + '.jpg'; 
+            link.href = canvas.toDataURL('image/jpeg', 0.85); 
+            link.click();
+        }).catch(err => {
+            target.style.paddingRight = oldPaddingRight; target.style.paddingBottom = oldPaddingBottom;
+            alert("Có lỗi xảy ra trong quá trình tạo ảnh!");
+        });
+    }
+
+    document.onkeydown = function(evt) {
+        evt = evt || window.event;
+        const isEscape = (evt.key === "Escape" || evt.key === "Esc" || evt.keyCode === 27);
+        
+        if (isEscape) {
+            const allModals = document.querySelectorAll('.modal-overlay');
+            allModals.forEach(m => m.style.display = 'none');
+            const personDetails = document.getElementById('personDetails');
+            if (personDetails) { personDetails.classList.remove('active'); personDetails.style.display = 'none'; }
+            if (typeof closeSearch === "function") { closeSearch(); }
+            if (document.activeElement) { document.activeElement.blur(); }
+        }
+    };
+
+function toggleDropdown(event) {
+    event.stopPropagation(); 
+    // Luôn lấy phần tử chứa sự kiện (chính là cái nút button)
+    let btn = event.currentTarget; 
+    let currentMenu = btn.nextElementSibling;
+    
+    document.querySelectorAll('.dropdown-content').forEach(menu => {
+        if (menu !== currentMenu) { menu.classList.remove('show'); }
+    });
+    currentMenu.classList.toggle('show');
+}
+
+window.addEventListener('click', function(event) {
+    // 1. Đóng menu dropdown (Cũ)
+    if (!event.target.matches('.update-btn') && !event.target.closest('.dropdown-content')) {
+        document.querySelectorAll('.dropdown-content').forEach(menu => {
+            menu.classList.remove('show');
+        });
+    }
+
+    // 2. Đóng thanh tìm kiếm nếu click ra ngoài (Mới)
+    const searchWrapper = document.getElementById('searchWrapper');
+    const searchToggleBtn = document.getElementById('searchToggleBtn');
+    if (searchWrapper && searchWrapper.classList.contains('active')) {
+        // Nếu click không nằm trong thanh tìm kiếm và không nằm ở nút bật
+        if (!searchWrapper.contains(event.target) && (!searchToggleBtn || !searchToggleBtn.contains(event.target))) {
+            closeSearch();
+        }
+    }
+    // 3. THÊM MỚI: Đóng thanh tìm kiếm màn hình DANH SÁCH
+    const listSearchWrapper = document.getElementById('listSearchWrapper');
+    const listSearchToggleBtn = document.getElementById('listSearchToggleBtn');
+    if (listSearchWrapper && listSearchWrapper.classList.contains('active')) {
+        if (!listSearchWrapper.contains(event.target) && (!listSearchToggleBtn || !listSearchToggleBtn.contains(event.target))) {
+            closeListSearch();
+        }
+    }
+});
+
+    function hideMenu() {
+        document.querySelectorAll('.dropdown-content').forEach(menu => {
+            menu.classList.remove('show');
+        });
+    }
+
+    // --- LOGIC TÌM KIẾM TRONG POPUP DANH SÁCH GIỐNG CHROME ---
+    let listSearchMatches = [];
+    let currentListMatchIndex = -1;
+
+    function clearListSearchHighlights() {
+        document.querySelectorAll('#genListView .list-member-name').forEach(n => {
+            n.classList.remove('highlight-compact', 'active-search-compact');
+        });
+    }
+// Hàm bật/tắt thanh tìm kiếm trong Danh sách
+function toggleListSearch(event) {
+    if (event) event.stopPropagation();
+    const wrapper = document.getElementById('listSearchWrapper');
+    const input = document.getElementById('listSearchInput');
+
+    if (wrapper.classList.contains('active')) {
+        closeListSearch();
+    } else {
+        wrapper.classList.add('active');
+        setTimeout(() => { input.focus(); }, 150);
+    }
+}
+
+// Hàm đóng thanh tìm kiếm trong Danh sách
+function closeListSearch() {
+    const wrapper = document.getElementById('listSearchWrapper');
+    if (wrapper && wrapper.classList.contains('active')) {
+        wrapper.classList.remove('active');
+        document.getElementById('listSearchInput').value = '';
+        onListSearchInput(); // Xóa các highlight cũ
+    }
+}
+
+   function onListSearchInput() {
+        const term = document.getElementById('listSearchInput').value.toLowerCase().trim();
+        const countDisplay = document.getElementById('listSearchCount');
+        clearListSearchHighlights();
+        listSearchMatches = [];
+        currentListMatchIndex = -1;
+
+        if (term === '') {
+            countDisplay.innerText = "0/0";
+            return;
+        }
+
+        // TÌM KIẾM TRÊN TOÀN BỘ TEXT CỦA THẺ <li> (Bao gồm Họ tên, Thống kê và Tên Ông/Cha)
+        document.querySelectorAll('#genListView li').forEach(liNode => {
+            const nameSpan = liNode.querySelector('.list-member-name');
+            
+            if (liNode.innerText.toLowerCase().includes(term)) {
+                listSearchMatches.push(liNode); // Lưu toàn bộ thẻ li để trượt màn hình tới
+                if (nameSpan) nameSpan.classList.add('highlight-compact'); // Vẫn chỉ bôi nền màu phần Họ Tên cho đẹp
+
+                // Tự động mở rộng nhánh Đời nếu nó đang bị thu gọn
+                let parentUl = liNode.closest('ul');
+                if (parentUl && parentUl.style.display === 'none') {
+                    parentUl.style.display = 'block';
+                    let genId = parentUl.id.replace('list-gen-', '');
+                    let icon = document.getElementById(`icon-gen-${genId}`);
+                    if (icon) icon.innerText = '▾';
+                }
+            }
+        });
+
+        if (listSearchMatches.length > 0) {
+            currentListMatchIndex = 0;
+            updateListSearchFocus();
+        } else {
+            countDisplay.innerText = "0/0";
+        }
+    }
+
+    function updateListSearchFocus() {
+        if (listSearchMatches.length === 0) return;
+        
+        // Xóa highlight đỏ cũ
+        document.querySelectorAll('#genListView .list-member-name.active-search-compact').forEach(el => el.classList.remove('active-search-compact'));
+        
+        const activeLi = listSearchMatches[currentListMatchIndex];
+        const activeNameSpan = activeLi.querySelector('.list-member-name');
+        
+        if (activeNameSpan) activeNameSpan.classList.add('active-search-compact');
+        document.getElementById('listSearchCount').innerText = `${currentListMatchIndex + 1}/${listSearchMatches.length}`;
+        
+        // Tự động trượt danh sách đến đúng người đang focus
+        activeLi.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+    }
+
+    function nextListMatch(e) {
+        if (e) e.stopPropagation();
+        if (listSearchMatches.length === 0) return;
+        currentListMatchIndex = (currentListMatchIndex + 1) % listSearchMatches.length;
+        updateListSearchFocus();
+    }
+
+    function prevListMatch(e) {
+        if (e) e.stopPropagation();
+        if (listSearchMatches.length === 0) return;
+        currentListMatchIndex = (currentListMatchIndex - 1 + listSearchMatches.length) % listSearchMatches.length;
+        updateListSearchFocus();
+    }
+
+    function handleListSearchKey(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (e.shiftKey) { prevListMatch(e); } 
+            else { nextListMatch(e); }
+        }
+    }
+
+    function openInstructionModal() {
+        document.getElementById('instructionModal').style.display = 'flex';
+    }
+    function closeInstructionModal() {
+        document.getElementById('instructionModal').style.display = 'none';
+    }
+// THÊM 2 HÀM NÀY ĐỂ MỞ/ĐÓNG POPUP GIỚI THIỆU
+    function openIntroModal() {
+        const tree = treesList.find(t => t.id === currentTreeId);
+        if (tree && tree.introHtml) {
+            document.getElementById('introContent').innerHTML = tree.introHtml;
+            document.getElementById('introModal').style.display = 'flex';
+        }
+    }
+
+    function closeIntroModal() {
+        document.getElementById('introModal').style.display = 'none';
+        document.getElementById('introContent').innerHTML = ''; // Clear để giải phóng ram
+    }
+</script>
+<div class="modal-overlay" id="introModal">
+    <div class="modal-content" style="height: 95vh; padding: 0;">
+        <div class="modal-header" style="background: var(--container-bg); padding: 12px 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 0; flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box;">
+            <h2 style="color: #38bdf8; margin: 0;">📖 Giới Thiệu Dòng Họ</h2>
+            <button class="close-x-btn" onclick="closeIntroModal()">&times;</button>
+        </div>
+        <div id="introContent" class="custom-scroll" style="flex: 1; overflow-y: auto; padding: 20px; color: var(--text-color); box-sizing: border-box; -webkit-overflow-scrolling: touch;">
+        </div>
+    </div>
+</div>
+<!-- Modal Hướng Dẫn Mới -->
+<div id="instructionModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 style="color: var(--primary-color); margin: 0; font-size: 20px;">HƯỚNG DẪN SỬ DỤNG</h2>
+            <button class="close-x-btn" onclick="closeInstructionModal()">&times;</button>
+        </div>
+        <div id="instructionContent" class="custom-scroll">
+            
+<div class="container">
+    <header>
+        <h1>Gia Phả cho mọi người <span class="cite"></span></h1>
+    </header>
+
+    <section>
+        <h2>1. Quản Lý Dữ Liệu Gia Phả</h2>
+        <div class="card">
+            <p>Ngay tại màn hình chính, bạn có thể thực hiện các thao tác quan trọng:</p>
+            <ul>
+                <li><strong>Tạo Gia Phả:</strong> Nhấn nút <span style="color: #10b981;">màu xanh lá</span> để thêm Gia phả mới. Cần nhập Tên gia phả và Cấu trúc dữ liệu, Tư liêu gia phả và đường link nếu cập nhật sẽ có trong menu chi tiết gia phả.</li>
+                <li><strong>Xuất Data Thuần (.json):</strong> Tải file dữ liệu về máy để cất giữ an toàn.</li>
+                <li><strong>Nhập Data Phục Hồi (.json):</strong> Khôi phục lại dữ liệu nếu cài lại máy hoặc lỡ tay xóa.</li>
+                <li><strong>Xuất App Offline (.html):</strong> Tải toàn bộ web và dữ liệu thành 1 file duy nhất để xem không cần mạng.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>2. Quy Tắc Nhập Liệu</h2>
+        <div class="card">
+            <p>Hệ thống tự động vẽ cây dựa trên cách bạn gõ chữ và căn lề. Vui lòng tuân thủ chặt chẽ cú pháp:</p>
+            
+            <strong>Cú pháp cơ bản:</strong>
+            <code class="syntax">Họ Tên (Giới tính) (Năm sinh) [Ngày giỗ âm lịch]</code>
+
+            <strong>Khai báo Vợ / Chồng & Con cái:</strong>
+            <ul>
+                <li><strong>Vợ Chồng:</strong> Thêm dấu <span class="badge-yellow">+</span> ở đầu dòng, đặt ngay dưới tên người chồng/vợ chính.</li>
+                <li><strong>Con cái:</strong> Dùng phím <strong>Tab</strong> để thụt lề. Cứ thụt lề 1 lần là tính 1 đời con.</li>
+                <li>Họ tên nam thì không cần ghi giới tính đằng sau.</li>
+                <li>Ví dụ trực quan dưới đây là Cụ Lê Đình Đài (con của cụ Lê Chân Kim và Nguyễn Thị Thuý Hi) có 2 vợ, vợ đầu là Lê Thị Chục, vợ 2 là Nguyễn Thị Sự, mỗi vợ có 1 người con.</li>
+               
+                
+            </ul>
+
+            <strong>Ví dụ trực quan:</strong>
+            <div class="example">Lê Đình Tục - ông cụ Kích [5/8]
++ Bà cụ Kích (nữ) [23/9]
+    Lê Chân Kim [21/5]
+    + Nguyễn Thị Huý Thi (nữ) [18/1]
+        Lê Đình Đài [23/11]
+        + Trần Thị Chục (nữ) [11/3]
+            Lê Đình Bùng (1780) [29/5]
+        + Nguyễn Thị Sự (nữ) [11/8]
+            Lê Văn Bao (1800-1880) [8/10]
+        </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>3. Tương Tác Sơ Đồ Cây</h2>
+        <div class="card">
+            <ul>
+                <li><strong>Màu sắc:</strong> Nam màu <span class="badge-blue">Xanh</span>, Nữ màu <span class="badge-pink">Hồng</span>. Vợ/chồng có dấu <span class="badge-yellow">+</span> màu vàng.</li>
+                <li><strong>Thu / Mở :</strong> Bấm nút + / - hoặc bấm vào tên người có con để đóng/mở nhánh.</li>
+                <li><strong>Nút mở rộng :</strong> Sẽ thu gọn lại cây phả hệ đến đời tuỳ chọn .</li>
+                <li><strong>Tìm kiếm:</strong> Bấm biểu tượng Kính lúp. Hệ thống tô nền cam và tự động mở nhánh. Bấm Enter để tìm người trùng tên tiếp theo.</li>
+                <li><strong>Menu Mở rộng (☰):</strong> Xem danh sách Ngày Giỗ, Tải tư liệu gốc, Xuất toàn bộ cây gia phả ra ảnh, và Chỉnh sửa gia phả.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>4. Bảng Danh Sách Nội tộc</h2>
+        <div class="card">
+            <p>Bấm nút <strong>Nội tộc</strong> (màu xanh lá) để vào giao diện thống kê:</p>
+            <ul>
+                <li><strong>Hiển thị đầy đủ:</strong> Danh sách hiển thị toàn bộ thành viên nội tộc (Không có dâu, rể).</li>
+                <li><strong>Thống kê thông minh:</strong> Dưới tên nam giới có dòng thống kê trực hệ (ví dụ: 1 vợ, 3 con, 13 cháu).</li>
+                <li><strong>Nhận diện nguồn gốc:</strong> Hiển thị dòng in nghiêng: <i>Cháu/con của [Tên Ông Nội] / [Tên Cha]</i>. Giúp đối chiếu nhánh mà không cần xem toàn bộ cây.</li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong>Phân biệt màu sắc phả hệ:</strong>
+                <ul>
+                    <li><strong>Anh em ruột:</strong> Cụm "Cháu/con của..." giống hệt nhau về chữ và màu sắc.</li>
+                    <li><strong>Anh em cùng cha khác mẹ:</strong> Cụm "Cháu/con của..." giống nhau về chữ nhưng <strong>khác màu sắc</strong>.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
