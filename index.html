@@ -151,7 +151,7 @@
 
         .gen-text { color: #f59e0b; font-size: 0.85em; font-weight: normal; margin-left: 5px; }
         .date-text { color: #ffd49a; font-size: 0.85em; font-style: italic; font-weight: normal; margin-left: 5px; }
-        .death-text { color: #6c85cc; font-size: 0.85em; font-weight: normal; margin-left: 5px; }
+        .death-text { color: #9baee3; font-size: 0.85em; font-weight: normal; margin-left: 5px; }
 
         /* ---------------- MODAL CHUNG ---------------- */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); cursor: default; }
@@ -268,7 +268,7 @@
         #genListView .gen-text, 
         #genListView .date-text, 
         #genListView .death-text {
-            font-size: 14px !important; 
+            font-size: 16px !important; 
             font-weight: normal;
         }
 
@@ -518,7 +518,7 @@
 
     <div id="treeList" class="tree-list-container"></div>
     <footer>
-        <button class="update-btn" style="background: #10b981; font-size: 18px; padding: 12px 30px;" onclick="openCreateModal()">+ Tạo Gia Phả</button>
+        <button class="update-btn" style="background: #106e35; font-size: 18px; padding: 12px 30px;" onclick="openCreateModal()">+ Tạo Gia Phả</button>
         <button class="update-btn" style="background:#49556a;" onclick="openManageModal()">Quản lý Dữ Liệu</button>
         <button class="update-btn" style="background:#475569;" onclick="openInstructionModal()">💡 Hướng dẫn</button>
     </footer>
@@ -573,7 +573,7 @@
         <span id="searchCount">0/0</span>
     </div>
 </div>
-    <button class="update-btn hide-text-mobile" style="background:#10b981; padding: 8px 15px; font-size: 14px; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px;" onclick="openListModal()">
+    <button class="update-btn hide-text-mobile" style="background:#106e35; padding: 8px 15px; font-size: 14px; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px;" onclick="openListModal()">
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
         <line x1="8" y1="6" x2="21" y2="6"></line>
         <line x1="8" y1="12" x2="21" y2="12"></line>
@@ -585,7 +585,7 @@
     <span>Nội tộc</span>
 </button>
   <div class="dropdown">
-    <button class="update-btn hide-text-mobile" style="background:#f59e0b; padding: 8px 15px; font-size: 14px; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px;" onclick="toggleDropdown(event)">
+    <button class="update-btn hide-text-mobile" style="background:#d98b07; padding: 8px 15px; font-size: 14px; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px;" onclick="toggleDropdown(event)">
         <!-- Icon SVG Mở rộng (Chevrons Down) -->
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
             <path d="m7 13 5 5 5-5"></path>
@@ -674,7 +674,7 @@
                     <h2 style="color: #10b981; font-size: 18px; margin: 0; white-space: nowrap; display: flex; align-items: center; gap: 8px;">
                         <span style="color: #ffffff; font-weight: bold; font-size: 25px;">Nội tộc </span>
                         <!-- <span id="listTreeNameDisplay" style="color: #ffffff; font-weight: bold; font-size: 25px;"></span> -->
-                        <span id="totalCount" style="font-size: 13px; background: #10b981; color: #fff; padding: 2px 8px; border-radius: 12px;">0 người</span>
+                        <span id="totalCount" style="font-size: 15px; background: #0e5232; color: #fff; padding: 2px 8px; border-radius: 12px; font-weight: normal;">0 người</span>
                     </h2>
 
                     <!-- Nút Icon Kính lúp cho Danh sách -->
@@ -796,7 +796,7 @@ function renderHome() {
             const memberCount = tree.data ? tree.data.split('\n').filter(line => line.trim() !== '').length : 0;
             
             // Tạo một thẻ span (badge) để hiển thị số lượng với viền xanh bo tròn đẹp mắt
-            const countBadge = `<span style="font-size: 13px; background: #10b981; color: #fff; padding: 2px 8px; border-radius: 12px; white-space: nowrap;">${memberCount} người</span>`;
+            const countBadge = `<span style="font-size: 15px; background: #0e5232; color: #fff; padding: 2px 8px; border-radius: 12px; white-space: nowrap; font-weight: normal">${memberCount} người</span>`;
             // -------------------------------
 
             listContainer.innerHTML += `
@@ -1028,7 +1028,7 @@ function renderHome() {
     function buildDisplayNameHtml(node, showGen = true) {
         let genHtml = showGen ? `<span class="gen-text">(đời ${node.gen})</span>` : "";
         let dateHtml = node.dates ? `<span class="date-text">(${node.dates})</span>` : "";
-        let deathHtml = node.deathDate ? `<span class="death-text">[${node.deathDate}]</span>` : "";
+        let deathHtml = node.deathDate ? `<span class="death-text">${node.deathDate}</span>` : "";
         return `${node.name} ${genHtml} ${dateHtml} ${deathHtml}`;
     }
 
@@ -1226,7 +1226,7 @@ grouped[g].forEach((node, idx) => {
             if (node.parentObj) {
                 let cColor = getCoupleColor(node.coupleKey); let parent = node.parentObj; let grandparent = parent.parentObj;
                 let pathText = grandparent ? `${grandparent.name} / ${parent.name}` : `${parent.name}`;
-                extraInfo = `<div style="color: ${cColor}; font-size: 15px; font-style: italic; margin-left: 45px; margin-top: 6px;">( ${pathText} )</div>`;
+                extraInfo = `<div style="color: ${cColor}; font-size: 15px; font-style: italic; margin-left: 45px; margin-top: 6px;"> ${pathText} </div>`;
             }
             
             // --- XỬ LÝ THÔNG TIN THỐNG KÊ ---
@@ -1239,7 +1239,7 @@ grouped[g].forEach((node, idx) => {
             
             let statsHtml = '';
             if (statsArr.length > 0) {
-                statsHtml = `<span class="member-stats">(${statsArr.join(', ')})</span>`;
+                statsHtml = `<span class="member-stats">${statsArr.join(', ')}</span>`;
             }
             // --------------------------------
 
