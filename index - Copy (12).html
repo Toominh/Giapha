@@ -759,9 +759,6 @@
     <h2 style="color: #10b981; border-left: 5px solid #10b981; padding-left: 10px;">1. Nguồn Gốc</h2>
     <p>Họ Lê Văn của chúng ta gốc từ Hộ Đội - Thụy Anh - Thái Bình...</p>
 </div>`;
-// Thêm 2 dòng này gần chỗ defaultIntroTemplate
-const defaultDocName = "Gia phả Ngành thứ ba họ Lê Văn - PDF";
-const defaultDocLink = "https://drive.google.com/..."; // Dán link thật của bạn vào đây
 
 const introInput = document.getElementById('introHtmlInput');
     let treesList = []; 
@@ -803,16 +800,7 @@ const introInput = document.getElementById('introHtmlInput');
             if (savedList) { treesList = JSON.parse(savedList); } 
             else {
                 const oldSingleData = localStorage.getItem('giaPhaData');
-                // Khởi tạo thêm isLocked: false, introHtml, docName và docLink cho dữ liệu mặc định
-                treesList = [{ 
-                    id: Date.now(), 
-                    name: "Gia phả mẫu", 
-                    data: oldSingleData ? oldSingleData : defaultData, 
-                    isLocked: false, 
-                    docName: "Gia phả Ngành thứ ba họ Lê Văn - PDF", 
-                    docLink: "https://drive.google.com/...", // Sửa link thực tế của bạn vào đây
-                    introHtml: defaultIntroHtml 
-                }];
+               treesList = [{ id: Date.now(), name: "Gia phả mẫu", data: oldSingleData ? oldSingleData : defaultData, introHtml: defaultIntroHtml, isLocked: false, docName: "", docLink: "" }];
                 saveTreesToStorage();
             }
         }
@@ -893,24 +881,14 @@ if (tree.introHtml && tree.introHtml.trim() !== '') {
     }
 
     function openCreateModal() {
-    currentTreeId = null;
-    document.getElementById('modalTitle').innerText = "Tạo Gia Phả Mới";
-    
-    // Đặt tên mặc định cho gia phả mới nếu muốn, hoặc để trống
-    nameInput.value = "Gia phả mới"; 
-    
-    // Đổ dữ liệu mẫu vào các ô nhập liệu
-    docNameInput.value = defaultDocName; 
-    docLinkInput.value = defaultDocLink;
-    
-    input.value = defaultData;
-    
-    if(introHtmlInput) {
-        introHtmlInput.value = defaultIntroHtml;
+        currentTreeId = null; document.getElementById('modalTitle').innerText = "Tạo Gia Phả Mới";
+        nameInput.value = ""; 
+        docNameInput.value = "";
+        docLinkInput.value = "";
+        input.value = defaultData; 
+        introInput.value = defaultIntroHtml;
+        modal.style.display = 'flex';
     }
-    
-    modal.style.display = 'flex';
-}
 
     function openEditModal() {
         if(!currentTreeId) return;
