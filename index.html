@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gia Phả Thông Minh - Quản Lý Nhiều Gia Phả</title>
+    <title>Gia phả cho mọi người</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -487,7 +487,7 @@
 
         .antique-text {
             font-family: 'EB Garamond', 'Crimson Text', serif;
-            font-size: 26px;
+            font-size: 20px;
             line-height: 1.8;
             color: #ffd332;
             font-style: italic;
@@ -789,7 +789,7 @@ function renderHome() {
         listContainer.innerHTML = '';
         treesList.forEach(tree => {
             const icon = tree.isLocked ? "🔒" : "📁";
-            const lockStatus = tree.isLocked ? '<span style="color:#ef4444; font-size:14px; margin-left: 5px;">(Đã khóa)</span>' : '';
+            const lockStatus = tree.isLocked ? '<span style="color:#ef4444; font-size:14px; margin-left: 5px;"></span>' : '';
             
             // --- XỬ LÝ ĐẾM SỐ THÀNH VIÊN ---
             // Tách dữ liệu thành các dòng, lọc bỏ các dòng trống và đếm số lượng
